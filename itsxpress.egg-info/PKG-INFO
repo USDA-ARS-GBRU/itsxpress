@@ -1,0 +1,16 @@
+Metadata-Version: 1.2
+Name: itsxpress
+Version: 0.1.5
+Summary: Rapidly trim sequences down to their Internally transcribed spacer regions
+Home-page: http://github.com/usda-ars-gbru/itsxpress
+Author: Adam R. Rivers
+Author-email: adam.rivers@ars.usda.gov
+License: License :: OSI Approved :: BSD License
+Description: Rapidly trim sequences down to their Internally transcribed spacer regions
+Keywords: Amplicon sequencing fungal ITS
+Platform: UNKNOWN
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Development Status :: 3 - Alpha
+Requires-Python: >3.5
