@@ -37,6 +37,7 @@ import subprocess
 import logging
 import os
 import shutil
+import itertools
 
 from Bio import SeqIO
 
@@ -181,7 +182,7 @@ class ItsPosition:
 				start = int(self.ddict[sequence]["left"]["pos"]) - 1
 			else:
 				start = None
-			if right in self.ddict[sequence]:
+			if "right" in self.ddict[sequence]:
 				stop =	int(self.ddict[sequence]["right"]["pos"]) - 1
 			else:
 				stop = None
@@ -209,7 +210,7 @@ class Dedup:
 		
 	def parse(self):
 		"""
-		Parse the uc data file to populat the matchcdict attribute.
+		Parse the uc data file to populate the matchcdict attribute.
 	
 		"""
 	
@@ -232,30 +233,50 @@ class Dedup:
 		self.seq_file = seq_file
 		self.parse()
 	
+		
 	
-	def _get_trimmed_seq_list(self, handle, itspos):
-		seqs = []
-		for record in SeqIO.parse(handle , "fastq"):
+	def _get_trimmed_seq_generator(self, seqgen, itspos):
+		"""This function takes a Biopython SeqIO sequence generator of sequences, and 
+		returns a generator of trimmed sequecnes. Sequences where the ITS ends could 
+		not be determed are ommited.
+		
+		Args:
+		
+			seqgen (obj): A SeqIO generator of all input sequences
+			ispos (obj): a itsxpress ItsPosition object
+		
+		Returns:
+			A map object generator that yeilds filtered, trimmed sequence records.
+			
+		"""
+		
+	
+		def _filterfunc(record):
+			""" Filters records down to those that contain a valid ITS start and stop position
+			
+			"""
 			try:
-				repseq = self.matchdict[record.id]
-				start, stop = itspos.get_position(repseq)
-				seqs.append(record[start:stop])
+				if record.id in self.matchdict:
+					repseq = self.matchdict[record.id]
+					start, stop = itspos.get_position(repseq)
+					if start and stop:
+						return True
+				else:
+					return False
 			except:
-				logging.warn("Could not parse {}, continuing.".format(record.id))
-				continue
-		return seqs
-		
-	def _get_trimmed_seq_generator(self, handle, itspos):
-		pass
-		seqgen = SeqIO.parse(handle , "fastq")
-		for record in seqgen:
-			if record.id in self.matchdict:
-				repseq = self.matchdict[record.id]
-			else: 
-				continue
+				return False
+
+		def map_func(record):
+			"""Trims the record down to to correct region
+			
+			"""
+			repseq = self.matchdict[record.id]
 			start, stop = itspos.get_position(repseq)
-		
-		
+			return record[start:stop]
+			
+		filt = filter(_filterfunc, seqgen)
+		return map(map_func, filt)
+
 				
 	def create_trimmed_seqs(self, outfile, gzipped, itspos):
 		"""Creates a fastq file, optionally gzipped, with the reads trimmed to the 
@@ -270,18 +291,26 @@ class Dedup:
 			(str): name of the file written
 		
 		"""
+		
+		def write_seqs():
+			if gzipped:
+				with gzip.open(outfile, 'wt') as g:
+					SeqIO.write(seqs, g, "fastq")
+			else:
+				with open(outfile, 'w') as g:
+					SeqIO.write(seqs, g, "fastq")
+				
 		if self.seq_file.endswith(".gz"):
 			with gzip.open(self.seq_file, 'rt') as f:
-				seqs = self._get_trimmed_seq_list(f,itspos)
+				seqgen = SeqIO.parse(f, 'fastq')
+				seqs = self._get_trimmed_seq_generator(seqgen, itspos)
+				write_seqs()
+
 		else:
 			with open(seld.seq_file, 'r') as f:
-				seqs = self._get_trimmed_seq_list(f, itspos)
-		if gzipped:
-			with gzip.open(outfile, 'wt') as g:
-				SeqIO.write(seqs, g, "fastq")
-		else:
-			with open(outfile, 'w') as g:
-				SeqIO.write(seqs, g, "fastq")
+				seqgen = SeqIO.parse(f, 'fastq')
+				seqs = self._get_trimmed_seq_generator(seqgen, itspos)
+				write_seqs()
 				
 				
 class SeqSample:
@@ -340,7 +369,7 @@ class SeqSample:
 			p4.check_returncode()
 		except subprocess.CalledProcessError:
 			logging.error("Could not perform ITS identificaton with hmmserach")
-			logging.error(p3.stderr.decode('utf-8'))
+			logging.error(p4.stderr.decode('utf-8'))
 			
 			
 class SeqSamplePairedInterleaved(SeqSample):
