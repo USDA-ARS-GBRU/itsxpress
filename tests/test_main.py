@@ -1,13 +1,14 @@
-
+# -*- coding: utf-8 -*-
 import os
 import tempfile
 import shutil
 import gzip
 import subprocess
+
 from Bio import SeqIO
-import itsxpress
 from nose.tools import assert_raises
 
+import itsxpress
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict
