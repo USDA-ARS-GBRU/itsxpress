@@ -13,10 +13,9 @@ ITS amplicon sample with 100,000 read pairs in about 5 minutes, aproxamatly 100x
 It also trims fastq files rather than just fasta files.
 
 Process:
-	* Merges and error corrects reads using bbduk
+	* Merges and error corrects reads using bbduk if reade are paired-end
 	* Deduplicates reads using Vmatch to eliminate redundant hmm searches
-	* Searches for conserved regions using the ITSx hmms, but it uses HMMsearch rather 
-	  HMMscan which is much faster for large numbers of sequences:
+	* Searches for conserved regions using the ITSx hmms, useing HMMsearch:
 	  https://cryptogenomicon.org/2011/05/27/hmmscan-vs-hmmsearch-speed-the-numerology/
 	* Parses everyting in python returning (optionally gzipped) fastq files.
 
@@ -35,9 +34,10 @@ import tempfile
 import argparse
 import subprocess
 import logging
+import time
 import os
+import sys
 import shutil
-import itertools
 
 from Bio import SeqIO
 
@@ -55,13 +55,18 @@ def _myparser():
 	parser.add_argument('--outfile', '-o', type=str, help="the trimmed Fastq file, if it \
 						ends in 'gz' it will be gzipped")
 	parser.add_argument('--tempdir', help='Specify the temp file directory', default=None)
+	parser.add_argument('--keeptemp' ,help="Sould intermediate files be kept?", action='store_true')
 	parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
 	parser.add_argument('--taxa', help='Select the taxonomic group sequenced', 
 						choices=taxa_choices, default="Fungi")
 	parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
 	parser.add_argument('--threads' ,help="Number of processor threads to use", default="1")
-	args = parser.parse_args()
-	return args
+	try:
+		args = parser.parse_args()
+		return args
+	except:
+		parser.print_help()
+		raise SystemExit(1)
 
 
 
@@ -72,7 +77,7 @@ class ItsPosition:
 	
 	Args:
 		domtable (str):	 the path locating the domtable file from HMMER 3 hmmsearch.
-		type (str): The region of the ITS to extract choises: ["ITS2"].
+		type (str): The region of the ITS to extract choises: ["ITS1", "ITS2", "ALL"].
 	
 	Attributes:
 		ddict (dict): A dictionary holding the scores and start and stop 
@@ -80,6 +85,7 @@ class ItsPosition:
 			Example: {sample:{left:{score:31, pos:15}, right:{score:32, pos:354}}
 		leftprefix (str): the left prefix to search for (set by type variable).
 		rightprefix (str): the right prefix to search for (set by type variable).
+	
 	Todo:
 		* Add additional ITS regions.
 	
@@ -127,30 +133,34 @@ class ItsPosition:
 		
 
 	def parse(self):
-		"""Parses domtable from HMMsearch.
+		"""Parses dom table from HMMsearch.
 		
 		The dom table is parsed to record the start and stop position from the top scoring
-		hmm mathces. This results in the ddict attribute containging the positions at 
+		hmm mathces. This populates the ddict attribute containing the positions at 
 		which to trim each sequence.
 			
 			
 		""" 
-		with open(self.domtable , 'r') as f:
-			for line in f:
-				if not line.startswith("#"):
-					ll=line.split()
-					sequence=ll[0]
-					hmmprofile=ll[3]
-					score=ll[7]
-					from_pos=ll[19]
-					to_pos=ll[20]
-					if sequence not in self.ddict:
-						self.ddict[sequence]={}
-					if hmmprofile.startswith(self.leftprefix):
-						self._left_score(sequence, score, to_pos)
-					elif hmmprofile.startswith(self.rightprefix):
-						self._right_score(sequence, score, from_pos)
-
+		try:
+			with open(self.domtable , 'r') as f:
+				for line in f:
+					if not line.startswith("#"):
+						ll=line.split()
+						sequence=ll[0]
+						hmmprofile=ll[3]
+						score=ll[7]
+						from_pos=ll[19]
+						to_pos=ll[20]
+						if sequence not in self.ddict:
+							self.ddict[sequence]={}
+						if hmmprofile.startswith(self.leftprefix):
+							self._left_score(sequence, score, to_pos)
+						elif hmmprofile.startswith(self.rightprefix):
+							self._right_score(sequence, score, from_pos)
+		except Exception as e:
+			logging.error("Exception occured when parsing HMMSearh results")
+			raise e
+			
 	def __init__(self, domtable, type):
 		self.domtable = domtable
 		self.ddict = {}
@@ -174,6 +184,9 @@ class ItsPosition:
 		
 		Returns:
 			(tuple): (start position, end position) zero indexed
+			
+		Raises:
+			KeyError: If input sequence is not present in dictionary (no ITS start or stop sites were found) 
 		
 		"""
 	
@@ -188,8 +201,8 @@ class ItsPosition:
 				stop = None
 			return(start, stop)
 		except KeyError:
-			logging.error("Could not return position for sequence {}.".format(sequence))
-
+			logging.debug("No ITS stop or start sites were identified for sequence {}, skipping.".format(sequence))
+			raise KeyError
 						
 class Dedup:
 	"""A class to handle deduplicated sequence data.
@@ -211,20 +224,26 @@ class Dedup:
 	def parse(self):
 		"""
 		Parse the uc data file to populate the matchcdict attribute.
+		
+		Rasies:
+			SystemExit: Exits if uc file cannot be parsed
 	
 		"""
-	
-		with open(self.uc_file, 'r') as f:
-			self.matchdict = {}
-			for line in f:
-				ll = line.split()
-				type = ll[0]
-				ref = ll[9]
-				seq = ll[8]
-				if type == 'S':
-					self.matchdict[seq] = seq
-				elif type == 'H':
-					self.matchdict[seq] = ref
+		try:
+			with open(self.uc_file, 'r') as f:
+				self.matchdict = {}
+				for line in f:
+					ll = line.split()
+					type = ll[0]
+					ref = ll[9]
+					seq = ll[8]
+					if type == 'S':
+						self.matchdict[seq] = seq
+					elif type == 'H':
+						self.matchdict[seq] = ref
+		except Exception as e:
+			logging.exception("Could not parse the Vsearch '.uc' file.")
+			raise e
 	
 	def __init__(self, uc_file, rep_file, seq_file):
 		self.matchdict = None
@@ -242,11 +261,11 @@ class Dedup:
 		
 		Args:
 		
-			seqgen (obj): A SeqIO generator of all input sequences
+			seqgen (obj): A Biopython SeqIO generator of all input sequences
 			ispos (obj): a itsxpress ItsPosition object
 		
 		Returns:
-			A map object generator that yeilds filtered, trimmed sequence records.
+			(obj): A map object generator that yeilds filtered, trimmed sequence records.
 			
 		"""
 		
@@ -254,6 +273,12 @@ class Dedup:
 		def _filterfunc(record):
 			""" Filters records down to those that contain a valid ITS start and stop position
 			
+			Args:
+				record (obj): a Biopython SeqRecord object
+			
+			Returns:
+				bool: True if an ITS start and stop positions are present false otherwise
+			  
 			"""
 			try:
 				if record.id in self.matchdict:
@@ -263,12 +288,17 @@ class Dedup:
 						return True
 				else:
 					return False
-			except:
+			except KeyError:
 				return False
 
 		def map_func(record):
 			"""Trims the record down to to correct region
 			
+			Args:
+				record (obj): a Biopython SeqRecord object
+			
+			Returns:
+				obj: a Biopython SeqRecord object trimmed to the ITS region
 			"""
 			repseq = self.matchdict[record.id]
 			start, stop = itspos.get_position(repseq)
@@ -288,11 +318,11 @@ class Dedup:
 			itspos (object): an ItsPosition object
 		
 		Returns:
-			(str): name of the file written
+			str: name of the file written
 		
 		"""
 		
-		def write_seqs():
+		def _write_seqs():
 			if gzipped:
 				with gzip.open(outfile, 'wt') as g:
 					SeqIO.write(seqs, g, "fastq")
@@ -304,21 +334,25 @@ class Dedup:
 			with gzip.open(self.seq_file, 'rt') as f:
 				seqgen = SeqIO.parse(f, 'fastq')
 				seqs = self._get_trimmed_seq_generator(seqgen, itspos)
-				write_seqs()
+				_write_seqs()
 
 		else:
 			with open(seld.seq_file, 'r') as f:
 				seqgen = SeqIO.parse(f, 'fastq')
 				seqs = self._get_trimmed_seq_generator(seqgen, itspos)
-				write_seqs()
+				_write_seqs()
 				
 				
 class SeqSample:
 	"""The class for processing sequence data into trimmed sequences.
 	
 	Attributes:
-		seq_file (str): the Location of the fastq or fastq.gz sequence file for the object
-	
+		tempdir (obj): A temporary directory object
+		fastq (str): The path to the input fastq file
+		uc_file (str): The path to the Vsearch uc mapping file
+		rep_file: (str) the path to the representitive seequences fasta file created by Vsearch 
+		seq_file (str): the location of the fastq or fastq.gz sequence file used for analysis
+		
 	"""
 	
 
@@ -332,6 +366,12 @@ class SeqSample:
 		
 	
 	def _deduplicate(self, threads=1):
+		"""Runs Vsearch dereplication to create a fasta file of nonredundant sequences.
+		
+		Args:
+			threads (int or str):the number of prosessor threads to use 
+		
+		"""
 		try:
 			self.uc_file=os.path.join(self.tempdir, 'uc.txt')
 			self.rep_file=os.path.join(self.tempdir,'rep.fa')
@@ -342,14 +382,16 @@ class SeqSample:
 						  "--uc", self.uc_file,
 						  "--strand", "both",
 						  "--threads", str(threads)]
-			print(parameters)
 			p2 = subprocess.run(parameters, stderr=subprocess.PIPE)
 			logging.info(p2.stderr.decode('utf-8'))
 			p2.check_returncode()
-		except subprocess.CalledProcessError:
-			logging.info("Could not perform dereplication with Vsearch")
-			logging.info(p2.stderr.decode('utf-8'))
-	
+		except subprocess.CalledProcessError as e:
+			logging.exception("Could not perform dereplication with Vsearch. Error from Vsearch was:\n {}".format(p2.stderr.decode('utf-8')))
+			raise e
+		except FileNotFoundError as f:
+			logging.error("Vsearch was not found, make sure Vsearch is installed and executible")
+			raise f
+
 	def _search(self, hmmfile, threads=1):
 		try:
 			self.dom_file=os.path.join(self.tempdir, 'domtbl.txt')
@@ -367,10 +409,12 @@ class SeqSample:
 						  self.rep_file]
 			p4 = subprocess.run(parameters,stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
 			p4.check_returncode()
-		except subprocess.CalledProcessError:
-			logging.error("Could not perform ITS identificaton with hmmserach")
-			logging.error(p4.stderr.decode('utf-8'))
-			
+		except subprocess.CalledProcessError as e :
+			logging.exception("Could not perform ITS identificaton with hmmserach. The error was:\n {}".format(p4.stderr.decode('utf-8')))
+			raise f
+		except FileNotFoundError as f:
+			logging.error("hmmsearch was not found, make sure HMMER3 is installed and executible")
+			raise f
 			
 class SeqSamplePairedInterleaved(SeqSample):
 	"""SeqSample class extended to paired, interleaved format.
@@ -388,10 +432,14 @@ class SeqSamplePairedInterleaved(SeqSample):
 					  't=' + str(threads)]
 			p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
 			self.seq_file = seq_file
+			p1.check_returncode()
 			logging.info(p1.stderr.decode('utf-8'))
-		except:
-			logging.error("could not perform read merging with bbmerge")
-			logging.error(p1.stderr.decode('utf-8'))
+		except subprocess.CalledProcessError as e:
+			logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
+			raise e
+		except FileNotFoundError as f:
+			logging.error("BBmerge was not found, make sure BBmerge is executible")
+			raise f
 
 class SeqSamplePairedNotInterleaved(SeqSample):
 	"""SeqSample class extended to paired, two fastq file format.
@@ -411,25 +459,31 @@ class SeqSamplePairedNotInterleaved(SeqSample):
 					  't=' + str(threads)]
 			p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
 			self.seq_file = seq_file
+			p1.check_returncode()
 			logging.info(p1.stderr.decode('utf-8'))
-		except:
-			logging.error("could not perform read merging with bbmerge")
-			logging.error(p1.stderr.decode('utf-8'))
+		except subprocess.CalledProcessError as e:
+			logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
+			raise e
+		except FileNotFoundError as f:
+			logging.error("BBmerge was not found, make sure BBmerge is executible")
+			raise f
 
 class SeqSampleNotPaired(SeqSample):
 	"""SeqSample class extended to unpaired format.
 	
 	"""
 
-	def __init__(self, *args):
-		SeqSample.__init__(self, *args)
+	def __init__(self, fastq, tempdir):
+		SeqSample.__init__(self, fastq, tempdir)
 		self.seq_file = self.fastq
 
 	
 
 def _is_paired(fastq, fastq2, single_end):
-	"""dertermines workflow based on fill inputs
+	"""Dertermines workflow based on file inputs.
 	
+	Args:
+		
 	"""
 	if fastq and fastq2:
 		paired_end = True
@@ -441,43 +495,117 @@ def _is_paired(fastq, fastq2, single_end):
 		paired_end=True
 		interleaved=True
 	return paired_end, interleaved
+
+def _logger_setup(logfile):
+	"""Set up logging to a logfile and the terminal standard out.
 	
+	Args:
+		fastq (str): The path to a fastq or fastq.gz file
+		fastq2 (str): The path to a fastq or fastq.gz file for the reverese sequences
+		
+	Returns:
+		(turns): 	
+	"""
+	try:
+		logging.basicConfig(level=logging.DEBUG,
+						format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+						datefmt='%m-%d %H:%M',
+						filename=logfile,
+						filemode='w')
+		# define a Handler which writes INFO messages or higher to the sys.stderr
+		console = logging.StreamHandler()
+		console.setLevel(logging.INFO)
+		# set a format which is simpler for console use
+		formatter = logging.Formatter('%(asctime)s: %(levelname)-8s %(message)s')
+		# tell the handler to use this format
+		console.setFormatter(formatter)
+		# add the handler to the root logger
+		logging.getLogger('').addHandler(console)
+	except Exception as e:
+		print("An error occured setting up logging")
+		raise e
+
+def _check_fastqs(fastq, fastq2=None):
+	"""Verifies the input files are valid fastq or fastq.gz files.
+	
+	Args:
+		fastq (str): The path to a fastq or fastq.gz file
+		fastq2 (str): The path to a fastq or fastq.gz file for the reverese sequences
+	
+	Raises:
+		SystemExit if invalid input sequences are found.
+	"""
+	try:
+		parameters=['reformat.sh', 'in='+fastq]
+		if fastq2:
+			parameters.append('in2=' + fastq2)
+		p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
+		p1.check_returncode()
+	except subprocess.CalledProcessError as e:
+		logging.error("There appears to be an issue with your input fastq or fastq.gz file(s).")
+		raise e
+	except FileNotFoundError as e:
+		logging.error("BBtools was not found. check that the BBtools reformat.sh package is executible")
+		raise f
+
 
 def main():
 	"""Run Complete ITS trimming workflow
 	
 	"""
-	#Set up logging
+	# Set up logging
+	t0 = time.time()
 	args = _myparser()
-	logging.basicConfig(filename=args.log, level=logging.INFO)
-	# Parse input types
-	paired_end, interleaved = _is_paired(args.fastq,args.fastq2, args.single_end)
-	# create SeqSample objects and merge if needed
-	if paired_end and interleaved:
-		sobj = SeqSamplePairedInterleaved(fastq=args.fastq, tempdir=args.tempdir)
-		sobj._merge_reads(threads=args.threads)
-	elif paired_end and not interleaved:
-		sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=args.tempdir)
-		sobj._merge_reads(threads=args.threads)
-	elif not paired_end and not interleaved:
-		sobj = SeqSampleNotPaired(fastq=args.fastq, tempdir=args.tempdir)
-	#Deduplicate
-	sobj._deduplicate(threads=args.threads)
-	#HMMSearch for ITS regions
-	hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict[args.taxa])
-	print("hmmfilepath = {}".format(hmmfile))
-	sobj._search(hmmfile=hmmfile, threads=args.threads)
-	# Parse HMMseach output
-	its_pos = ItsPosition(domtable=sobj.dom_file, type=args.region)
-	# Create deduplication object
-	print("sobj uc_file is {}".format(sobj.uc_file))
-	dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file)
-	# create trimmed sequences
-	if args.outfile.split('.')[-1] =='gz':
-		dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True, itspos=its_pos)
-	else:
-		dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, itspos=its_pos)
-	#shutil.rmtree(sobj.tempdir)
+	_logger_setup(args.log)
+	try:
+		logging.info("Verifing the input sequecnes.")
+		_check_fastqs(args.fastq, args.fastq2)
+		# Parse input types
+		paired_end, interleaved = _is_paired(args.fastq,args.fastq2, args.single_end)
+		# create SeqSample objects and merge if needed
+		if paired_end and interleaved:
+			logging.info("Sequences are paired-end and interleaved. They will be merged using BBmerge.")
+			sobj = SeqSamplePairedInterleaved(fastq=args.fastq, tempdir=args.tempdir)
+			sobj._merge_reads(threads=args.threads)
+		elif paired_end and not interleaved:
+			logging.info("Sequences are paired-end in two files. They will be merged using BBmerge.")
+			sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=args.tempdir)
+			sobj._merge_reads(threads=args.threads)
+		elif not paired_end and not interleaved:
+			logging.info("Sequences are assumed to be single-end.")
+			sobj = SeqSampleNotPaired(fastq=args.fastq, tempdir=args.tempdir)
+		logging.info("Temporary directory is: {}".format(sobj.tempdir))
+		# Deduplicate
+		logging.info("Unique sequences are being written to a temporary fasta file with Vsearch.")
+		sobj._deduplicate(threads=args.threads)
+		# HMMSearch for ITS regions
+		logging.info("Searching for ITS start and stop sites using HMMSearch. This step takes a while.")
+		hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict[args.taxa])
+		sobj._search(hmmfile=hmmfile, threads=args.threads)
+		# Parse HMMseach output
+		logging.info("Parsing HMM results.")
+		its_pos = ItsPosition(domtable=sobj.dom_file, type=args.region)
+		# Create deduplication object
+		dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file)
+		# Create trimmed sequences
+		logging.info("Writing out sequences")
+		if args.outfile.split('.')[-1] =='gz':
+			dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True, itspos=its_pos)
+		else:
+			dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, itspos=its_pos)
+		t1 = time.time()
+		fmttime = time.strftime("%H:%M:%S",time.gmtime(t1-t0))
+		logging.info("ITSxpress ran in {}".format(fmttime))
+	except Exception as e:
+		logging.error("ITSXpress terminated with errors. see the log file fo details.")
+	finally:
+		try:
+			if not args.keeptemp:
+				shutil.rmtree(sobj.tempdir)
+		except UnboundLocalError:
+			pass
+		except AttributeError:
+			pass		
 
 
 if __name__ == '__main__':
