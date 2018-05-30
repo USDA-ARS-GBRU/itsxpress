@@ -67,16 +67,16 @@ for you so it is the preferred installation method.
 Usage 
 ---------
 
--h, --help            	show this help message and exit
+-h, --help            	show this help message and exit.
 --fastq, -f				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. Interleaved
                         or not.
---single_end, -s		A flag to specify if the fastq file is inteleaved
+--single_end, -s		A flag to specify if the fastq file is inteleaved.
                         single-ended (not paired). Default is false.
---fastq2, -f2			A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. representing read 2 (optional)
---outfile, -o			The trimmed Fastq file, if it ends in 'gz' it will be gzipped
---tempdir		     	Specify the temp file directory
+--fastq2, -f2			A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file representing read 2, optional.
+--outfile, -o			The trimmed Fastq file, if it ends in ``gz`` it will be gzipped.
+--tempdir		     	Specify the temp file directory.
 --keeptemp            	Should intermediate files be kept?
---region 				{ITS2,ITS1,ALL}
+--region 				Options : {ITS2,ITS1,ALL}
 --taxa 					Select the taxonomic group sequenced: {Alveolata, Bryophyta,
 							Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,
 							Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Microsporidia,
