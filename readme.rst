@@ -39,16 +39,22 @@ Installation
 ITSxpress can be installed from:
 
 1. Preferred method - Bioconda (to be done):
+
 .. code-block:: bash
+
     conda install itsxpress
 
 2. Pip (to be done): 
+
 .. code-block:: bash
+
     pip install itsxpress
 
 
 3. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
+
 .. code-block:: bash
+
     git clone https://github.com/USDA-ARS-GBRU/itsxpress.git
 
 
@@ -62,11 +68,11 @@ Usage
 ---------
 
 -h, --help            	show this help message and exit
---fastq, -f				A ``.fastq``, ``.fq``, ``.fastq.gz` or ``.fq.gz` file. Interleaved
+--fastq, -f				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. Interleaved
                         or not.
 --single_end, -s		A flag to specify if the fastq file is inteleaved
                         single-ended (not paired). Default is false.
---fastq2, -f2			A ``.fastq``, ``.fq``, ``.fastq.gz` or ``.fq.gz` file. representing read 2 (optional)
+--fastq2, -f2			A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. representing read 2 (optional)
 --outfile, -o			The trimmed Fastq file, if it ends in 'gz' it will be gzipped
 --tempdir		     	Specify the temp file directory
 --keeptemp            	Should intermediate files be kept?
