@@ -3,7 +3,7 @@
 Author: Adam Rivers, USDA Agricultural Reseach Service
 
 The internally transcribed spacer region is a region between highly conserved the small
-subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. In Eukaryotes it contains 
+subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. In Eukaryotes it contains
 the 5.8s genes and two variable length spacer regions. In amplicon sequening studies it is
 common practice to trim off the conserved (SSU, 5,8S or LSU) regions. Bengtsson-Palme
 et al. (2013) published software the software package ITSx to do this.
@@ -25,7 +25,7 @@ Refernce:
 	Ingo Ebersberger, Kemal Sanli, Filipe de Souza, Erik Kristiansson, Kessy Abarenkov,
 	K. Martin Eriksson, R. Henrik Nilsson. (2013). ITSx: Improved software detection
 	and extraction of ITS1 and ITS2 from ribosomal ITS sequences of fungi and other
-	eukaryotes for use in environmental sequencing. Methods in Ecology and Evolution, 
+	eukaryotes for use in environmental sequencing. Methods in Ecology and Evolution,
 	4: 914-919, 2013 (DOI: 10.1111/2041-210X.12073)
 """
 
@@ -72,8 +72,8 @@ def _myparser():
 
 class ItsPosition:
 	"""Class for ITS positional information derived from hmmserach domtable files.
-	
-	
+
+
 	Args:
 		domtable (str):	 the path locating the domtable file from HMMER 3 hmmsearch.
 		region (str): The region of the ITS to extract choises: ["ITS1", "ITS2", "ALL"].
@@ -112,10 +112,10 @@ class ItsPosition:
 		
 		
 	def _right_score(self, sequence, score, from_pos):
-		"""Evaluates right scores and positions form the new line of a domtable file and 
+		"""Evaluates right scores and positions form the new line of a domtable file and
 		updates ddict if neccicary.
 	
-		Args: 
+		Args:
 			sequence (str): The name of the sequence.
 			score (int): The bit score from HMMSearch.
 			from_pos (int): The beginning position of the right seqeunce.
@@ -137,8 +137,7 @@ class ItsPosition:
 		The dom table is parsed to record the start and stop position from the top scoring
 		hmm mathces. This populates the ddict attribute containing the positions at
 		which to trim each sequence.
-			
-			
+		
 		""" 
 		try:
 			with open(self.domtable , 'r') as f:
@@ -185,7 +184,7 @@ class ItsPosition:
 			(tuple): (start position, end position) zero indexed
 			
 		Raises:
-			KeyError: If input sequence is not present in dictionary (no ITS start or stop sites were found) 
+			KeyError: If input sequence is not present in dictionary (no ITS start or stop sites were found)
 		
 		"""
 	
@@ -210,7 +209,7 @@ class Dedup:
 	start ansd	stop sites are determened only once.
 	
 	Attributes:
-		matchdict (dict): a dictionary of each sequence ID as a key and 
+		matchdict (dict): a dictionary of each sequence ID as a key and
 			its representative sequence ID as a value {seq1:rep1, seq2:rep1, seq2:rep2}.
 		uc_file (str): the location of the .uc file contianing matching information.
 		rep_file (str): The location of the representative sequences file.
@@ -254,8 +253,8 @@ class Dedup:
 		
 	
 	def _get_trimmed_seq_generator(self, seqgen, itspos):
-		"""This function takes a Biopython SeqIO sequence generator of sequences, and 
-		returns a generator of trimmed sequecnes. Sequences where the ITS ends could 
+		"""This function takes a Biopython SeqIO sequence generator of sequences, and
+		returns a generator of trimmed sequecnes. Sequences where the ITS ends could
 		not be determed are ommited.
 		
 		Args:
@@ -308,7 +307,7 @@ class Dedup:
 
 				
 	def create_trimmed_seqs(self, outfile, gzipped, itspos):
-		"""Creates a fastq file, optionally gzipped, with the reads trimmed to the 
+		"""Creates a fastq file, optionally gzipped, with the reads trimmed to the
 			selected region.
 		
 		Args:
@@ -425,7 +424,7 @@ class SeqSamplePairedInterleaved(SeqSample):
 	def _merge_reads(self, threads):
 		try:
 			seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
-			parameters = ['bbmerge.sh', 
+			parameters = ['bbmerge.sh',
 					  'in=' + self.fastq,
 					  'out=' + seq_file,
 					  't=' + str(threads)]
@@ -451,7 +450,7 @@ class SeqSamplePairedNotInterleaved(SeqSample):
 	def _merge_reads(self, threads):
 		try:
 			seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
-			parameters = ['bbmerge.sh', 
+			parameters = ['bbmerge.sh',
 					  'in=' + self.fastq, 
 					  'in2=' + self.fastq2,
 					  'out=' + seq_file,
@@ -501,9 +500,7 @@ def _logger_setup(logfile):
 	Args:
 		fastq (str): The path to a fastq or fastq.gz file
 		fastq2 (str): The path to a fastq or fastq.gz file for the reverese sequences
-		
-	Returns:
-		(turns): 	
+	
 	"""
 	try:
 		logging.basicConfig(level=logging.DEBUG,

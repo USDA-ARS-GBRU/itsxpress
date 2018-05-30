@@ -11,7 +11,7 @@ from nose.tools import assert_raises
 import itsxpress
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
-from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict
+from itsxpress.definitions import ROOT_DIR, taxa_dict
 hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict["Fungi"])
 
 
@@ -37,7 +37,7 @@ def test_dedup():
 	assert len(dedup.matchdict) == 227
 	# Check that non-representative seqs are logged
 	assert dedup.matchdict['M02696:28:000000000-ATWK5:1:1101:11740:1800'] == 'M02696:28:000000000-ATWK5:1:1101:10899:1561'
-	# Check that representative seqs are logged 
+	# Check that representative seqs are logged
 	assert dedup.matchdict["M02696:28:000000000-ATWK5:1:1101:23011:4341"] == 'M02696:28:000000000-ATWK5:1:1101:23011:4341'
 
 def test_dedup_create_trimmed_seqs():
@@ -79,7 +79,7 @@ def test_dedup_create_trimmed_seqs_gzipped():
 	assert n == 226
 	assert length == 42863
 	shutil.rmtree(tf)
-	
+
 def test_seq_sample_paired_interleaved():
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_interleaved.fastq")
 	sobj = itsxpress.main.SeqSamplePairedInterleaved(fastq=fastq, tempdir=".")
