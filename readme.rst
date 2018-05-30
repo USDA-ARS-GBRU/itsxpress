@@ -132,3 +132,8 @@ an interleaved gzipped fastq files using 40 cpu threads.
     itsxpress --fastq interleaved.fastq.gz --region ITS1 --taxa Microsporidia \
     --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 40
 
+
+
+.. image:: https://api.codacy.com/project/badge/Grade/a32b42c5881c4b0cb6c31c5a64f449f2
+   :alt: Codacy Badge
+   :target: https://app.codacy.com/app/GBRU/itsxpress?utm_source=github.com&utm_medium=referral&utm_content=USDA-ARS-GBRU/itsxpress&utm_campaign=badger
