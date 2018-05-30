@@ -68,20 +68,20 @@ Usage
 ---------
 
 -h, --help            	show this help message and exit.
---fastq, -f				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. Interleaved
+--fastq 				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. Interleaved
                         or not.
---single_end, -s		A flag to specify if the fastq file is inteleaved.
+--single_end 			A flag to specify if the fastq file is inteleaved.
                         single-ended (not paired). Default is false.
---fastq2, -f2			A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file representing read 2, optional.
---outfile, -o			The trimmed Fastq file, if it ends in ``gz`` it will be gzipped.
---tempdir		     	Specify the temp file directory.
---keeptemp            	Should intermediate files be kept?
+--fastq2 				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file representing read 2, optional.
+--outfile				The trimmed Fastq file, if it ends in ``gz`` it will be gzipped.
+--tempdir				Specify the temp file directory.
+--keeptemp				Should intermediate files be kept?
 --region 				Options : {ITS2,ITS1,ALL}
---taxa 					Select the taxonomic group sequenced: {Alveolata, Bryophyta,
-							Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,
-							Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Microsporidia,
-							Oomycota, Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,
-							Tracheophyta, Eustigmatophyceae, Apusozoa, Parabasalia}
+--taxa					Select the taxonomic group sequenced: {Alveolata, Bryophyta,
+						Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,
+						Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Microsporidia,
+						Oomycota, Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,
+						Tracheophyta, Eustigmatophyceae, Apusozoa, Parabasalia}
 --log		          	Log file
 --threads		     	Number of processor threads to use
 
@@ -91,10 +91,11 @@ Examples
 
 Use case 1: Trimming the ITS2 region from a fungal amplicon sequencing dataset with 
 forward and reverse gzipped fastq files using two cpu threads.
- 
+
 .. code-block:: bash
+
     itsxpress --fastq r1.fastq.gz --fastq2 r2.fastq.gz --region ITS2 --taxa Fungi \
-     --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
+    --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
 
 ITSxpress can take gzipped or ungzipped fastq files and it can write gzipped or 
 ungzipped fastq files. It expects fastq files to end in : .fq, .fastq, .fq.gz or fastq.gz
@@ -104,16 +105,18 @@ Use case 2: Trimming the ITS2 region from a fungal amplicon sequencing dataset w
 an interleaved gzipped fastq files using two cpu threads.
  
 .. code-block:: bash
+
     itsxpress --fastq interleaved.fastq.gz  --region ITS2 --taxa Fungi \
-     --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
+    --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
 
 
 Use case 3: Trimming the ITS2 region from a fungal amplicon sequencing dataset with 
 an interleaved gzipped fastq files using two cpu threads.
  
 .. code-block:: bash
+
     itsxpress --fastq single-end.fastq.gz --single_end --region ITS2 --taxa Fungi \
-     --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
+    --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
 
 Single ended data is less common and may come from a dataset where the reads have already 
 been merged.
@@ -122,6 +125,7 @@ Use case 4: Trimming the ITS1 region from a Microsporidia amplicon sequencing da
 an interleaved gzipped fastq files using 40 cpu threads.
 
 .. code-block:: bash
+
     itsxpress --fastq interleaved.fastq.gz --region ITS1 --taxa Microsporidia \
-     --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 40
+    --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 40
 
