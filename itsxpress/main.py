@@ -55,7 +55,7 @@ def _myparser():
 	parser.add_argument('--outfile', '-o', type=str, help="the trimmed Fastq file, if it \
 						ends in 'gz' it will be gzipped")
 	parser.add_argument('--tempdir', help='Specify the temp file directory', default=None)
-	parser.add_argument('--keeptemp' ,help="Sould intermediate files be kept?", action='store_true')
+	parser.add_argument('--keeptemp' ,help="Should intermediate files be kept?", action='store_true')
 	parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
 	parser.add_argument('--taxa', help='Select the taxonomic group sequenced', 
 						choices=taxa_choices, default="Fungi")
