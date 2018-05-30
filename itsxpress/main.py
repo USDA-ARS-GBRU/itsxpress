@@ -36,7 +36,6 @@ import subprocess
 import logging
 import time
 import os
-import sys
 import shutil
 
 from Bio import SeqIO
@@ -77,7 +76,7 @@ class ItsPosition:
 	
 	Args:
 		domtable (str):	 the path locating the domtable file from HMMER 3 hmmsearch.
-		type (str): The region of the ITS to extract choises: ["ITS1", "ITS2", "ALL"].
+		region (str): The region of the ITS to extract choises: ["ITS1", "ITS2", "ALL"].
 	
 	Attributes:
 		ddict (dict): A dictionary holding the scores and start and stop
@@ -161,16 +160,16 @@ class ItsPosition:
 			logging.error("Exception occured when parsing HMMSearh results")
 			raise e
 			
-	def __init__(self, domtable, type):
+	def __init__(self, domtable, region):
 		self.domtable = domtable
 		self.ddict = {}
-		if type=="ITS2":
+		if region=="ITS2":
 			self.leftprefix='3_'
 			self.rightprefix='4_'
-		elif type=="ITS1":
+		elif region=="ITS1":
 			self.leftprefix='1_'
 			self.rightprefix='2_'
-		elif type=="ALL":
+		elif region=="ALL":
 			self.leftprefix='1_'
 			self.rightprefix='4_'
 		self.parse()
@@ -411,7 +410,7 @@ class SeqSample:
 			p4.check_returncode()
 		except subprocess.CalledProcessError as e :
 			logging.exception("Could not perform ITS identificaton with hmmserach. The error was:\n {}".format(p4.stderr.decode('utf-8')))
-			raise f
+			raise e
 		except FileNotFoundError as f:
 			logging.error("hmmsearch was not found, make sure HMMER3 is installed and executible")
 			raise f
@@ -584,7 +583,7 @@ def main():
 		sobj._search(hmmfile=hmmfile, threads=args.threads)
 		# Parse HMMseach output
 		logging.info("Parsing HMM results.")
-		its_pos = ItsPosition(domtable=sobj.dom_file, type=args.region)
+		its_pos = ItsPosition(domtable=sobj.dom_file, region=args.region)
 		# Create deduplication object
 		dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file)
 		# Create trimmed sequences
@@ -596,8 +595,9 @@ def main():
 		t1 = time.time()
 		fmttime = time.strftime("%H:%M:%S",time.gmtime(t1-t0))
 		logging.info("ITSxpress ran in {}".format(fmttime))
-	except Exception as e:
+	except Exception:
 		logging.error("ITSXpress terminated with errors. see the log file fo details.")
+		raise SystemExit(1)
 	finally:
 		try:
 			if not args.keeptemp:
@@ -605,7 +605,7 @@ def main():
 		except UnboundLocalError:
 			pass
 		except AttributeError:
-			pass		
+			pass
 
 
 if __name__ == '__main__':
