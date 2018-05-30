@@ -6,6 +6,8 @@ ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) reg
 .. image:: https://codecov.io/gh/USDA-ARS-GBRU/itsxpress/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/USDA-ARS-GBRU/itsxpress
 
+.. image:: https://api.codacy.com/project/badge/Grade/7e2a4c97cde74bccb3e84b706d7a2aa5
+  :target: https://www.codacy.com/app/GBRU/itsxpress?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=USDA-ARS-GBRU/itsxpress&amp;utm_campaign=Badge_Grade
 
 Author
 ------

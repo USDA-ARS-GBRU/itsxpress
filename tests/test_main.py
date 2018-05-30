@@ -87,7 +87,7 @@ def test_seq_sample_paired_interleaved():
 	sobj._deduplicate(threads=1)
 	sobj._search(hmmfile=hmmfile, threads=1)
 	shutil.rmtree(sobj.tempdir)
-	
+
 def test_seq_sample_not_paired():
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_merged.fastq")
 	sobj = itsxpress.main.SeqSampleNotPaired(fastq=fastq, tempdir=".")

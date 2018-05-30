@@ -77,7 +77,7 @@ class ItsPosition:
 	Args:
 		domtable (str):	 the path locating the domtable file from HMMER 3 hmmsearch.
 		region (str): The region of the ITS to extract choises: ["ITS1", "ITS2", "ALL"].
-	
+
 	Attributes:
 		ddict (dict): A dictionary holding the scores and start and stop
 			positions for the selected segment of each sequence.
@@ -138,7 +138,7 @@ class ItsPosition:
 		hmm mathces. This populates the ddict attribute containing the positions at
 		which to trim each sequence.
 		
-		""" 
+		"""
 		try:
 			with open(self.domtable , 'r') as f:
 				for line in f:
@@ -451,7 +451,7 @@ class SeqSamplePairedNotInterleaved(SeqSample):
 		try:
 			seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
 			parameters = ['bbmerge.sh',
-					  'in=' + self.fastq, 
+					  'in=' + self.fastq,
 					  'in2=' + self.fastq2,
 					  'out=' + seq_file,
 					  't=' + str(threads)]
