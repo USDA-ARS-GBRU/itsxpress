@@ -2,14 +2,14 @@
 """ITSxpress: A python module to rapidly trim ITS amplicon sequences from Fastq files.
 Author: Adam Rivers, USDA Agricultural Reseach Service
 
-The internally transcribed spacer region is a region between highly conserved the small 
+The internally transcribed spacer region is a region between highly conserved the small
 subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. In Eukaryotes it contains 
-the 5.8s genes and two variable length spacer regions. In amplicon sequening studies it is 
-common practice to trim off the conserved (SSU, 5,8S or LSU) regions. Bengtsson-Palme 
-et al. (2013) published software the software package ITSx to do this. 
+the 5.8s genes and two variable length spacer regions. In amplicon sequening studies it is
+common practice to trim off the conserved (SSU, 5,8S or LSU) regions. Bengtsson-Palme
+et al. (2013) published software the software package ITSx to do this.
 
-ITSxpress is a high-speed implementation of the methods in	ITSx. It can process a typical 
-ITS amplicon sample with 100,000 read pairs in about 5 minutes, aproxamatly 100x faster. 
+ITSxpress is a high-speed implementation of the methods in	ITSx. It can process a typical
+ITS amplicon sample with 100,000 read pairs in about 5 minutes, aproxamatly 100x faster.
 It also trims fastq files rather than just fasta files.
 
 Process:
@@ -20,11 +20,11 @@ Process:
 	* Parses everyting in python returning (optionally gzipped) fastq files.
 
 Refernce:
-	Johan Bengtsson-Palme, Vilmar Veldre, Martin Ryberg, Martin Hartmann, Sara Branco, 
-	Zheng Wang, Anna Godhe, Yann Bertrand, Pierre De Wit, Marisol Sanchez, 
-	Ingo Ebersberger, Kemal Sanli, Filipe de Souza, Erik Kristiansson, Kessy Abarenkov, 
-	K. Martin Eriksson, R. Henrik Nilsson. (2013). ITSx: Improved software detection 
-	and extraction of ITS1 and ITS2 from ribosomal ITS sequences of fungi and other 
+	Johan Bengtsson-Palme, Vilmar Veldre, Martin Ryberg, Martin Hartmann, Sara Branco,
+	Zheng Wang, Anna Godhe, Yann Bertrand, Pierre De Wit, Marisol Sanchez,
+	Ingo Ebersberger, Kemal Sanli, Filipe de Souza, Erik Kristiansson, Kessy Abarenkov,
+	K. Martin Eriksson, R. Henrik Nilsson. (2013). ITSx: Improved software detection
+	and extraction of ITS1 and ITS2 from ribosomal ITS sequences of fungi and other
 	eukaryotes for use in environmental sequencing. Methods in Ecology and Evolution, 
 	4: 914-919, 2013 (DOI: 10.1111/2041-210X.12073)
 """
@@ -57,7 +57,7 @@ def _myparser():
 	parser.add_argument('--tempdir', help='Specify the temp file directory', default=None)
 	parser.add_argument('--keeptemp' ,help="Should intermediate files be kept?", action='store_true')
 	parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
-	parser.add_argument('--taxa', help='Select the taxonomic group sequenced', 
+	parser.add_argument('--taxa', help='Select the taxonomic group sequenced',
 						choices=taxa_choices, default="Fungi")
 	parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
 	parser.add_argument('--threads' ,help="Number of processor threads to use", default="1")
@@ -70,7 +70,7 @@ def _myparser():
 
 
 
-	
+
 class ItsPosition:
 	"""Class for ITS positional information derived from hmmserach domtable files.
 	
@@ -80,8 +80,8 @@ class ItsPosition:
 		type (str): The region of the ITS to extract choises: ["ITS1", "ITS2", "ALL"].
 	
 	Attributes:
-		ddict (dict): A dictionary holding the scores and start and stop 
-			positions for the selected segment of each sequence. 
+		ddict (dict): A dictionary holding the scores and start and stop
+			positions for the selected segment of each sequence.
 			Example: {sample:{left:{score:31, pos:15}, right:{score:32, pos:354}}
 		leftprefix (str): the left prefix to search for (set by type variable).
 		rightprefix (str): the right prefix to search for (set by type variable).
@@ -92,10 +92,10 @@ class ItsPosition:
 	"""
 	
 	def _left_score(self, sequence, score, to_pos):
-		"""Evaluates left scores and positions from the new line of a domtable file and 
+		"""Evaluates left scores and positions from the new line of a domtable file and
 			updates ddict if neccicary.
 		
-		Args: 
+		Args:
 			sequence (str): The name of the sequence.
 			score (int): The bit score from HMMSearch.
 			to_pos (int): the ending position of the left seqeunce.
@@ -136,7 +136,7 @@ class ItsPosition:
 		"""Parses dom table from HMMsearch.
 		
 		The dom table is parsed to record the start and stop position from the top scoring
-		hmm mathces. This populates the ddict attribute containing the positions at 
+		hmm mathces. This populates the ddict attribute containing the positions at
 		which to trim each sequence.
 			
 			
@@ -234,12 +234,12 @@ class Dedup:
 				self.matchdict = {}
 				for line in f:
 					ll = line.split()
-					type = ll[0]
+					datatype = ll[0]
 					ref = ll[9]
 					seq = ll[8]
-					if type == 'S':
+					if datatype == 'S':
 						self.matchdict[seq] = seq
-					elif type == 'H':
+					elif datatype == 'H':
 						self.matchdict[seq] = ref
 		except Exception as e:
 			logging.exception("Could not parse the Vsearch '.uc' file.")
@@ -350,7 +350,7 @@ class SeqSample:
 		tempdir (obj): A temporary directory object
 		fastq (str): The path to the input fastq file
 		uc_file (str): The path to the Vsearch uc mapping file
-		rep_file: (str) the path to the representitive seequences fasta file created by Vsearch 
+		rep_file: (str) the path to the representitive seequences fasta file created by Vsearch
 		seq_file (str): the location of the fastq or fastq.gz sequence file used for analysis
 		
 	"""
@@ -369,7 +369,7 @@ class SeqSample:
 		"""Runs Vsearch dereplication to create a fasta file of nonredundant sequences.
 		
 		Args:
-			threads (int or str):the number of prosessor threads to use 
+			threads (int or str):the number of prosessor threads to use
 		
 		"""
 		try:

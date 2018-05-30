@@ -15,18 +15,18 @@ Author
 Introduction
 ------------
 
-The internally transcribed spacer region is a region between highly conserved the small 
-subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. In Eukaryotes it contains 
-the 5.8s genes and two variable length spacer regions. In amplicon sequening studies it is 
-common practice to trim off the conserved (SSU, 5,8S or LSU) regions. `Bengtsson-Palme 
-et al. (2013)`_ published software the software package ITSx_ to do this. 
+The internally transcribed spacer region is a region between highly conserved the small
+subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. In Eukaryotes it contains
+the 5.8s genes and two variable length spacer regions. In amplicon sequening studies it is
+common practice to trim off the conserved (SSU, 5,8S or LSU) regions. `Bengtsson-Palme
+et al. (2013)`_ published software the software package ITSx_ to do this.
 
-ITSxpress is designed to support the calling of exact sequence variants rather than OTUs_ .
-This newer method of sequence error-correction requires quality score data from each 
-sequence, so each input sequence must be trimmed. ITSXpress makes this possible by 
-taking FASTQ data, de-replicating the sequences then identifying the start and stop 
-sites using HMMSearch.  Results are parsed and the trimmed files are returned. The ITS 1, 
-ITS2 or the entire ITS region including the 5.8s rRNA gene can be selected. ITSxpress 
+ITSxpress is designed to support the calling of exact sequence variants rather than OTUs_.
+This newer method of sequence error-correction requires quality score data from each
+sequence, so each input sequence must be trimmed. ITSXpress makes this possible by
+taking FASTQ data, de-replicating the sequences then identifying the start and stop
+sites using HMMSearch.  Results are parsed and the trimmed files are returned. The ITS 1,
+ITS2 or the entire ITS region including the 5.8s rRNA gene can be selected. ITSxpress
 uses the hmm model from ITSx so results are comprable.
 
 

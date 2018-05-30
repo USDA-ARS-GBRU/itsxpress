@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
 import os
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
 
-# Define Taxa that Hmms were created for 
+# This is the project Root
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Define Taxa that Hmms were created for
 # A = Alveolata
 # B = Bryophyta
 # C = Bacillariophyta
@@ -25,11 +26,11 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Roo
 # X = Apusozoa
 # Y = Parabasalia
 
-taxa_choices = ["Alveolata", "Bryophyta", "Bacillariophyta","Amoebozoa", "Euglenozoa", "Fungi", 
+taxa_choices = ["Alveolata", "Bryophyta", "Bacillariophyta","Amoebozoa", "Euglenozoa", "Fungi",
  "Chlorophyta","Rhodophyta","Phaeophyceae","Marchantiophyta","Metazoa","Microsporidia",
  "Oomycota","Haptophyceae", "Raphidophyceae"," Rhizaria","Synurophyceae",
  "Tracheophyta","Eustigmatophyceae","Apusozoa","Parabasalia"]
- 
+
 taxa_dict = {"Alveolata":"A.hmm","Bryophyta":"B.hmm", "Bacillariophyta":"C.hmm",
  "Amoebozoa":"D.hmm", "Euglenozoa":"E.hmm", "Fungi":"F.hmm","Chlorophyta":"G.hmm",
  "Rhodophyta":"H.hmm","Phaeophyceae":"I.hmm","Marchantiophyta":"L.hmm","Metazoa":"M.hmm",
