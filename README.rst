@@ -70,22 +70,32 @@ for you so it is the preferred installation method.
 Usage 
 ---------
 
--h, --help            	show this help message and exit.
-f, --fastq 				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. Interleaved
-                        or not.
--s, --single_end 		A flag to specify if the fastq file is inteleaved.
-                        single-ended (not paired). Default is false.
--f2, --fastq2 			A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file representing read 2, optional.
--o, --outfile			The trimmed Fastq file, if it ends in ``gz`` it will be gzipped.
+-h, --help            	Show this help message and exit.
+
+--fastq 				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. Interleaved
+                        	or not.
+                        
+--single_end 			A flag to specify if the fastq file is inteleaved.
+                        	single-ended (not paired). Default is false.
+                        
+--fastq2 				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file representing read 2, optional.
+
+--outfile				The trimmed Fastq file, if it ends in ``gz`` it will be gzipped.
+
 --tempdir				Specify the temp file directory.
+
 --keeptemp				Should intermediate files be kept?
+
 --region 				Options : {ITS2, ITS1, ALL}
+
 --taxa					Select the taxonomic group sequenced: {Alveolata, Bryophyta,
 						Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,
 						Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Microsporidia,
 						Oomycota, Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,
 						Tracheophyta, Eustigmatophyceae, Apusozoa, Parabasalia}
+						
 --log		          	Log file
+
 --threads		     	Number of processor threads to use
 
 
