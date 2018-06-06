@@ -84,10 +84,10 @@ class ItsPosition:
 			Example: {sample:{left:{score:31, pos:15}, right:{score:32, pos:354}}
 		leftprefix (str): the left prefix to search for (set by type variable).
 		rightprefix (str): the right prefix to search for (set by type variable).
-	
+
 	Todo:
 		* Add additional ITS regions.
-	
+
 	"""
 	
 	def _left_score(self, sequence, score, to_pos):
