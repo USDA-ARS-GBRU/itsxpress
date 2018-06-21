@@ -65,7 +65,7 @@ def _myparser():
 		return args
 	except:
 		parser.print_help()
-		raise SystemExit(1)
+		raise SystemExit(0)
 
 
 
