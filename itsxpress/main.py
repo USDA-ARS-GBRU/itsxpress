@@ -190,7 +190,7 @@ class ItsPosition:
 	
 		try:
 			if "left" in self.ddict[sequence]:
-				start = int(self.ddict[sequence]["left"]["pos"]) - 1
+				start = int(self.ddict[sequence]["left"]["pos"])
 			else:
 				start = None
 			if "right" in self.ddict[sequence]:
@@ -542,7 +542,7 @@ def _check_fastqs(fastq, fastq2=None):
 		raise e
 	except FileNotFoundError as e:
 		logging.error("BBtools was not found. check that the BBtools reformat.sh package is executible")
-		raise f
+		raise e
 
 
 def main():
