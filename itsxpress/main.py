@@ -335,7 +335,7 @@ class Dedup:
 				_write_seqs()
 
 		else:
-			with open(seld.seq_file, 'r') as f:
+			with open(self.seq_file, 'r') as f:
 				seqgen = SeqIO.parse(f, 'fastq')
 				seqs = self._get_trimmed_seq_generator(seqgen, itspos)
 				_write_seqs()
