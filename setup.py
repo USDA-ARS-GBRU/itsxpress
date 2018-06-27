@@ -2,11 +2,11 @@ from setuptools import setup
 
 setup(
     name='itsxpress',
-    version='1.5.4',
+    version='1.5.5',
     packages=['itsxpress'],
     license='License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication',
-    description=open('README.rst').read(),
-    long_description="Rapidly trim sequences down to their Internally Transcribed Spacer (ITS) regions",
+    description="Rapidly trim sequences down to their Internally Transcribed Spacer (ITS) regions",
+    long_description=open('README.rst').read(),
     classifiers=['Topic :: Scientific/Engineering :: Bio-Informatics',
                  'Programming Language :: Python :: 3.6',
                  'Programming Language :: Python :: 3.5',

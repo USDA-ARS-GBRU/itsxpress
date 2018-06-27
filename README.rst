@@ -47,7 +47,7 @@ ITSxpress can be installed from:
 
     conda install itsxpress
 
-2. Pip (to be done): 
+2. Pip: 
 
 .. code-block:: bash
 
