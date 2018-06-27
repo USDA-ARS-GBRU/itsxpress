@@ -1,5 +1,5 @@
 ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) region of FASTQ files 
-========================================================================================
+==================================================================================================
 .. image:: https://travis-ci.org/USDA-ARS-GBRU/itsxpress.svg?branch=master
     :target: https://travis-ci.org/USDA-ARS-GBRU/itsxpress
 
@@ -10,12 +10,12 @@ ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) reg
   :target: https://www.codacy.com/app/GBRU/itsxpress?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=USDA-ARS-GBRU/itsxpress&amp;utm_campaign=Badge_Grade
 
 Author
-------
+-------
 * Adam R. Rivers, US Department of Agriculture, Agricultural Research Service
 
 
 Introduction
-------------
+-------------
 
 The internally transcribed spacer region is a region between highly conserved the small
 subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. In Eukaryotes it contains
@@ -38,7 +38,7 @@ uses the hmm model from ITSx so results are comprable.
 
 
 Installation
-------------
+-------------
 ITSxpress can be installed from:
 
 1. Preferred method - Bioconda (to be done):
@@ -62,7 +62,7 @@ ITSxpress can be installed from:
 
 
 Dependencies
-------------
+-------------
 The software requires Vsearch, BBtools, Hmmer and Biopython. Bioconda takes care of this
 for you so it is the preferred installation method.
 
@@ -100,7 +100,7 @@ Usage
 
 
 Examples
---------
+---------
 
 Use case 1: Trimming the ITS2 region from a fungal amplicon sequencing dataset with 
 forward and reverse gzipped fastq files using two cpu threads.
@@ -144,7 +144,7 @@ an interleaved gzipped fastq files using 40 cpu threads.
 
 
 License information
--------------------
+--------------------
 
 This software is a work of the United States Department of Agriculture, Agricultural 
 Research Service. 17 U.S.C. Section 105 states that "Copyright protection under this 

@@ -60,12 +60,8 @@ def _myparser():
 						choices=taxa_choices, default="Fungi")
 	parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
 	parser.add_argument('--threads' ,help="Number of processor threads to use", default="1")
-	try:
-		args = parser.parse_args()
-		return args
-	except:
-		parser.print_help()
-		raise SystemExit(0)
+	args = parser.parse_args()
+	return args
 
 
 
@@ -85,8 +81,6 @@ class ItsPosition:
 		leftprefix (str): the left prefix to search for (set by type variable).
 		rightprefix (str): the right prefix to search for (set by type variable).
 
-	Todo:
-		* Add additional ITS regions.
 
 	"""
 	
@@ -335,7 +329,7 @@ class Dedup:
 				_write_seqs()
 
 		else:
-			with open(seld.seq_file, 'r') as f:
+			with open(self.seq_file, 'r') as f:
 				seqgen = SeqIO.parse(f, 'fastq')
 				seqs = self._get_trimmed_seq_generator(seqgen, itspos)
 				_write_seqs()
@@ -355,12 +349,20 @@ class SeqSample:
 	
 
 	def __init__(self, fastq, tempdir=None):
-		self.tempdir = tempfile.mkdtemp(prefix='itsxpress_', dir=tempdir)
+		if tempdir:
+			if not os.path.exists(tempdir):
+				logging.warning("Secified location for tempfile ({}) does not exist, using default location.".format(tempdir))
+				self.tempdir = tempfile.mkdtemp(prefix='itsxpress_')
+			else:
+				self.tempdir = tempfile.mkdtemp(prefix='itsxpress_', dir=tempdir)
+		else:
+			self.tempdir = tempfile.mkdtemp(prefix='itsxpress_')
 		self.fastq = fastq
 		self.uc_file = None
 		self.rep_file =	None
 		self.dom_file = None
 		self.seq_file = None
+		print(self.tempdir)
 		
 	
 	def _deduplicate(self, threads=1):
@@ -460,7 +462,7 @@ class SeqSamplePairedNotInterleaved(SeqSample):
 			p1.check_returncode()
 			logging.info(p1.stderr.decode('utf-8'))
 		except subprocess.CalledProcessError as e:
-			logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
+			logging.exception("Could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
 			raise e
 		except FileNotFoundError as f:
 			logging.error("BBmerge was not found, make sure BBmerge is executible")
@@ -532,7 +534,7 @@ def _check_fastqs(fastq, fastq2=None):
 		SystemExit if invalid input sequences are found.
 	"""
 	try:
-		parameters=['reformat.sh', 'in='+fastq]
+		parameters=['reformat.sh', 'in='+fastq, 'reads=50']
 		if fastq2:
 			parameters.append('in2=' + fastq2)
 		p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
@@ -592,8 +594,9 @@ def main():
 		t1 = time.time()
 		fmttime = time.strftime("%H:%M:%S",time.gmtime(t1-t0))
 		logging.info("ITSxpress ran in {}".format(fmttime))
-	except Exception:
+	except Exception as e:
 		logging.error("ITSXpress terminated with errors. see the log file fo details.")
+		logging.error(e)
 		raise SystemExit(1)
 	finally:
 		try:
