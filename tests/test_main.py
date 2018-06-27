@@ -57,7 +57,7 @@ def test_dedup_create_trimmed_seqs():
 			n += 1
 			length += len(rec)
 	assert n == 226
-	assert length == 42863
+	assert length == 42637
 	shutil.rmtree(tf)
 
 def test_dedup_create_trimmed_seqs_gzipped():
@@ -77,7 +77,7 @@ def test_dedup_create_trimmed_seqs_gzipped():
 			n += 1
 			length += len(rec)
 	assert n == 226
-	assert length == 42863
+	assert length == 42637
 	shutil.rmtree(tf)
 
 def test_seq_sample_paired_interleaved():
