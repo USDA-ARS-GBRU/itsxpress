@@ -1,2 +1,3 @@
-include itsxpress/ITSx_db/*
-include tests/*
+include itsxpress/ITSx_db/HMMs/*
+include tests/test_data/*
+include tests/test_data/ex_tmpdir/*
