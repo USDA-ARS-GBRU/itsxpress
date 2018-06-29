@@ -21,7 +21,7 @@ def test_check_fastqs():
 	assert_raises(subprocess.CalledProcessError, itsxpress.main._check_fastqs, fastq, fastq2)
 
 def test_its_position_init():
-	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_temdir", "domtbl.txt"), "ITS2")
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	exp1 = {'left': {'score': '53.7', 'pos': '128'}, 'right': {'score': '60.0', 'pos': '282'}}
 	assert exp1 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"]
 	exp2 = {'right': {'score': '35.1', 'pos': '327'}}
@@ -29,9 +29,9 @@ def test_its_position_init():
 	assert len(itspos.ddict) == 137
 
 def test_dedup():
-	uc = os.path.join(TEST_DIR, "test_data", "ex_temdir", "uc.txt")
-	seq = os.path.join(TEST_DIR, "test_data", "ex_temdir", "seq.fq.gz")
-	rep = os.path.join(TEST_DIR, "test_data", "ex_temdir", "rep.fa")
+	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq)
 	# Check length of records
 	assert len(dedup.matchdict) == 227
@@ -42,11 +42,11 @@ def test_dedup():
 
 def test_dedup_create_trimmed_seqs():
 	tf = tempfile.mkdtemp()
-	uc = os.path.join(TEST_DIR, "test_data", "ex_temdir", "uc.txt")
-	seq = os.path.join(TEST_DIR, "test_data", "ex_temdir", "seq.fq.gz")
-	rep = os.path.join(TEST_DIR, "test_data", "ex_temdir", "rep.fa")
+	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq)
-	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_temdir", "domtbl.txt"), "ITS2")
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	# Check non gzipped
 	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq"), gzipped=False, itspos=itspos)
 	with open(os.path.join(tf,"testout.fastq"), 'r') as f:
@@ -62,11 +62,11 @@ def test_dedup_create_trimmed_seqs():
 
 def test_dedup_create_trimmed_seqs_gzipped():
 	tf = tempfile.mkdtemp()
-	uc = os.path.join(TEST_DIR, "test_data", "ex_temdir", "uc.txt")
-	seq = os.path.join(TEST_DIR, "test_data", "ex_temdir", "seq.fq.gz")
-	rep = os.path.join(TEST_DIR, "test_data", "ex_temdir", "rep.fa")
+	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq)
-	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_temdir", "domtbl.txt"), "ITS2")
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	# Check non gzipped
 	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq.gz"), gzipped=True, itspos=itspos)
 	with gzip.open(os.path.join(tf,"testout.fastq.gz"), 'rt') as f:
