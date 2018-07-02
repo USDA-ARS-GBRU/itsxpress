@@ -1,25 +1,26 @@
 #!/usr/bin/env python
 """ITSxpress: A python module to rapidly trim ITS amplicon sequences from Fastq files.
-Author: Adam Rivers, USDA Agricultural Reseach Service
+Author: Adam Rivers, USDA Agricultural Research Service
 
 The internally transcribed spacer region is a region between highly conserved the small
 subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. In Eukaryotes it contains
-the 5.8s genes and two variable length spacer regions. In amplicon sequening studies it is
+the 5.8s genes and two variable length spacer regions. In amplicon sequencing studies it is
 common practice to trim off the conserved (SSU, 5,8S or LSU) regions. Bengtsson-Palme
 et al. (2013) published software the software package ITSx to do this.
 
-ITSxpress is a high-speed implementation of the methods in	ITSx. It can process a typical
-ITS amplicon sample with 100,000 read pairs in about 5 minutes, aproxamatly 100x faster.
-It also trims fastq files rather than just fasta files.
+ITSxpress is a high-speed implementation of the methods in ITSx than also allows FASTQ 
+files to be processed. It is approximately 6-9x faster than ITSx v1.1b. It also trims fastq 
+files Which is essential for Analizing sequences using the newer exact Sequence Variant 
+methods in Qiime2, Dada2, Deblur and Unoise that are replacing OTU clustering. 
 
 Process:
-	* Merges and error corrects reads using bbduk if reade are paired-end
+	* Merges and error corrects reads using bbduk if reads are paired-end
 	* Deduplicates reads using Vmatch to eliminate redundant hmm searches
-	* Searches for conserved regions using the ITSx hmms, useing HMMsearch:
+	* Searches for conserved regions using the ITSx hmms, using HMMsearch:
 	  https://cryptogenomicon.org/2011/05/27/hmmscan-vs-hmmsearch-speed-the-numerology/
-	* Parses everyting in python returning (optionally gzipped) fastq files.
+	* Parses everything in python returning (optionally gzipped) fastq files.
 
-Refernce:
+Reference:
 	Johan Bengtsson-Palme, Vilmar Veldre, Martin Ryberg, Martin Hartmann, Sara Branco,
 	Zheng Wang, Anna Godhe, Yann Bertrand, Pierre De Wit, Marisol Sanchez,
 	Ingo Ebersberger, Kemal Sanli, Filipe de Souza, Erik Kristiansson, Kessy Abarenkov,
@@ -42,13 +43,13 @@ from Bio import SeqIO
 
 from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict
 
-def _myparser():
+def myparser():
 	parser = argparse.ArgumentParser(description='ITSxpress: A python module to rapidly \
 		trim ITS amplicon sequences from Fastq files.')
 	parser.add_argument('--fastq', '-f', type=str, required=True,
 						help='A .fastq, .fq, .fastq.gz or .fq.gz file. Interleaved or not.')
 	parser.add_argument('--single_end', '-s', action='store_true', default=False,
-						help='A flag to specify if the fastq file is inteleaved single-ended (not paired). Default is false.')
+						help='A flag to specify if the fastq file is interleaved single-ended (not paired). Default is false.')
 	parser.add_argument('--fastq2', '-f2', type=str, default=None,
 						help='A .fastq, .fq, .fastq.gz or .fq.gz file. representing read 2 (optional)')
 	parser.add_argument('--outfile', '-o', type=str, help="the trimmed Fastq file, if it \
@@ -60,8 +61,7 @@ def _myparser():
 						choices=taxa_choices, default="Fungi")
 	parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
 	parser.add_argument('--threads' ,help="Number of processor threads to use", default="1")
-	args = parser.parse_args()
-	return args
+	return parser
 
 
 
@@ -72,7 +72,7 @@ class ItsPosition:
 
 	Args:
 		domtable (str):	 the path locating the domtable file from HMMER 3 hmmsearch.
-		region (str): The region of the ITS to extract choises: ["ITS1", "ITS2", "ALL"].
+		region (str): The region of the ITS to extract choices: ["ITS1", "ITS2", "ALL"].
 
 	Attributes:
 		ddict (dict): A dictionary holding the scores and start and stop
@@ -214,11 +214,10 @@ class Dedup:
 	
 		
 	def parse(self):
-		"""
-		Parse the uc data file to populate the matchcdict attribute.
+		"""Parse the uc data file to populate the matchdict attribute.
 		
-		Rasies:
-			SystemExit: Exits if uc file cannot be parsed
+		Raises:
+			Exception: General exception if uc file is not parsed properly
 	
 		"""
 		try:
@@ -249,10 +248,9 @@ class Dedup:
 	def _get_trimmed_seq_generator(self, seqgen, itspos):
 		"""This function takes a Biopython SeqIO sequence generator of sequences, and
 		returns a generator of trimmed sequecnes. Sequences where the ITS ends could
-		not be determed are ommited.
+		not be determined are ommited.
 		
 		Args:
-		
 			seqgen (obj): A Biopython SeqIO generator of all input sequences
 			ispos (obj): a itsxpress ItsPosition object
 		
@@ -362,7 +360,7 @@ class SeqSample:
 		self.rep_file =	None
 		self.dom_file = None
 		self.seq_file = None
-		print(self.tempdir)
+
 		
 	
 	def _deduplicate(self, threads=1):
@@ -395,7 +393,7 @@ class SeqSample:
 	def _search(self, hmmfile, threads=1):
 		try:
 			self.dom_file=os.path.join(self.tempdir, 'domtbl.txt')
-			#Run hmmsearch
+			#Run Hmmsearch
 			parameters = ["hmmsearch",
 			  			  "--domtblout",
 						  self.dom_file,
@@ -501,7 +499,7 @@ def _logger_setup(logfile):
 	
 	Args:
 		fastq (str): The path to a fastq or fastq.gz file
-		fastq2 (str): The path to a fastq or fastq.gz file for the reverese sequences
+		fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
 	
 	"""
 	try:
@@ -547,13 +545,16 @@ def _check_fastqs(fastq, fastq2=None):
 		raise e
 
 
-def main():
+def main(args=None):
 	"""Run Complete ITS trimming workflow
 	
 	"""
 	# Set up logging
 	t0 = time.time()
-	args = _myparser()
+	parser = myparser()
+	if not args:
+		args = parser.parse_args()
+
 	_logger_setup(args.log)
 	try:
 		logging.info("Verifing the input sequecnes.")
@@ -580,7 +581,7 @@ def main():
 		logging.info("Searching for ITS start and stop sites using HMMSearch. This step takes a while.")
 		hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict[args.taxa])
 		sobj._search(hmmfile=hmmfile, threads=args.threads)
-		# Parse HMMseach output
+		# Parse Hmmsearch output
 		logging.info("Parsing HMM results.")
 		its_pos = ItsPosition(domtable=sobj.dom_file, region=args.region)
 		# Create deduplication object

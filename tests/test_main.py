@@ -4,9 +4,10 @@ import tempfile
 import shutil
 import gzip
 import subprocess
+import filecmp
 
 from Bio import SeqIO
-from nose.tools import assert_raises
+from nose.tools import ok_, eq_, assert_raises
 
 import itsxpress
 
@@ -23,10 +24,10 @@ def test_check_fastqs():
 def test_its_position_init():
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	exp1 = {'left': {'score': '53.7', 'pos': '128'}, 'right': {'score': '60.0', 'pos': '282'}}
-	assert exp1 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"]
+	ok_(exp1 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"])
 	exp2 = {'right': {'score': '35.1', 'pos': '327'}}
-	assert exp2 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:23011:4341"]
-	assert len(itspos.ddict) == 137
+	ok_(exp2 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:23011:4341"])
+	ok_(len(itspos.ddict) == 137)
 
 def test_dedup():
 	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
@@ -113,4 +114,22 @@ def test_is_paired():
 	paired_end, interleaved = itsxpress.main._is_paired("fastq1.fq", None, single_end=True)
 	assert paired_end == False and interleaved == False
 
+def test_myparser():
+	parser = itsxpress.main.myparser()
+	args = parser.parse_args(['--fastq', 'test.fastq','--outfile', 'test.out','--tempdir', 'dirt','--region','ITS1','--taxa', 'Fungi'])
+	ok_(args.fastq == 'test.fastq')
 
+def test_main():
+	parser = itsxpress.main.myparser()
+	tf = tempfile.mkdtemp()
+	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_interleaved.fastq")
+	outfile = os.path.join(tf,'testout.fastq')
+	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
+	args = parser.parse_args(['--fastq', fastq,'--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi'])
+	itsxpress.main.main(args=args)
+	seqs = SeqIO.parse(outfile, 'fastq')
+	n = 0
+	for rec in seqs:
+		n += 1
+	ok_(n==226)
+	shutil.rmtree(tf)
