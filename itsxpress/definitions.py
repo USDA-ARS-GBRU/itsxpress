@@ -15,7 +15,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 # I = Phaeophyceae (brown algae)
 # L = Marchantiophyta (liverworts)
 # M = Metazoa
-# N = Microsporidia
+# N = Microsporidia (No longer present in ITSx files)
 # O = Oomycota
 # P = Haptophyceae (prymnesiophytes)
 # Q = Raphidophyceae
@@ -23,17 +23,17 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 # S = Synurophyceae
 # T = Tracheophyta (higher plants)
 # U = Eustigmatophyceae
-# X = Apusozoa
-# Y = Parabasalia
+# X = Apusozoa (No longer present in ITSx files)
+# Y = Parabasalia (No longer present in ITSx files)
 
 taxa_choices = ["Alveolata", "Bryophyta", "Bacillariophyta","Amoebozoa", "Euglenozoa", "Fungi",
- "Chlorophyta","Rhodophyta","Phaeophyceae","Marchantiophyta","Metazoa","Microsporidia",
+ "Chlorophyta","Rhodophyta","Phaeophyceae","Marchantiophyta","Metazoa",
  "Oomycota","Haptophyceae", "Raphidophyceae"," Rhizaria","Synurophyceae",
- "Tracheophyta","Eustigmatophyceae"]
+ "Tracheophyta","Eustigmatophyceae", "All"]
 
 taxa_dict = {"Alveolata":"A.hmm","Bryophyta":"B.hmm", "Bacillariophyta":"C.hmm",
  "Amoebozoa":"D.hmm", "Euglenozoa":"E.hmm", "Fungi":"F.hmm","Chlorophyta":"G.hmm",
  "Rhodophyta":"H.hmm","Phaeophyceae":"I.hmm","Marchantiophyta":"L.hmm","Metazoa":"M.hmm",
- "Microsporidia": "N.hmm","Oomycota":"O.hmm","Haptophyceae":"P.hmm",
+ "Oomycota":"O.hmm","Haptophyceae":"P.hmm",
  "Raphidophyceae":"Q.hmm"," Rhizaria":"R.hmm","Synurophyceae":"S.hmm",
- "Tracheophyta":"T.hmm","Eustigmatophyceae":"U.hmm"}
+ "Tracheophyta":"T.hmm","Eustigmatophyceae":"U.hmm","All":"all.hmm"}
