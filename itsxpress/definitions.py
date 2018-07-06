@@ -1,3 +1,6 @@
+"""Definitions.py: variables shared across the package.
+
+"""
 import os
 
 # This is the project Root

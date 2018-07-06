@@ -95,7 +95,7 @@ def test_seq_sample_not_paired():
 	sobj._deduplicate(threads=1)
 	sobj._search(hmmfile=hmmfile, threads=1)
 	shutil.rmtree(sobj.tempdir)
-	
+
 def test_seq_sample_paired_not_interleaved():
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
 	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
@@ -104,8 +104,8 @@ def test_seq_sample_paired_not_interleaved():
 	sobj._deduplicate(threads=1)
 	sobj._search(hmmfile=hmmfile, threads=1)
 	shutil.rmtree(sobj.tempdir)
-	
-	
+
+
 def test_is_paired():
 	paired_end, interleaved = itsxpress.main._is_paired("fastq1.fq", "fastq2.fq", single_end=False)
 	assert paired_end == True and interleaved == False
@@ -133,7 +133,7 @@ def test_main_interleaved():
 		n += 1
 	ok_(n==226)
 	shutil.rmtree(tf)
-	
+
 def test_main_paired():
 	parser = itsxpress.main.myparser()
 	tf = tempfile.mkdtemp()
@@ -141,7 +141,7 @@ def test_main_paired():
 	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
 	outfile = os.path.join(tf,'testout.fastq')
 	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
-	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi'])
+	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = 0
@@ -157,7 +157,7 @@ def test_main_merged():
 
 	outfile = os.path.join(tf,'testout.fastq')
 	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
-	args = parser.parse_args(['--fastq', fastq, '--single_end', '--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi'])
+	args = parser.parse_args(['--fastq', fastq, '--single_end', '--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = 0
@@ -165,4 +165,3 @@ def test_main_merged():
 		n += 1
 	ok_(n==226)
 	shutil.rmtree(tf)
-	

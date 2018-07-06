@@ -1,23 +1,26 @@
 #!/usr/bin/env python
-"""ITSxpress: A python module to rapidly trim ITS amplicon sequences from Fastq files.
-Author: Adam Rivers, USDA Agricultural Research Service
+"""ITSxpress: A python module to rapidly trim ITS amplicon sequences from FASTQ files.
 
-The internally transcribed spacer region is a region between highly conserved the small
-subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. In Eukaryotes it contains
-the 5.8s genes and two variable length spacer regions. In amplicon sequencing studies it is
+Authors: Adam Rivers, Kyle weber, USDA Agricultural Research Service
+
+The internally transcribed spacer region is a region between the highly conserved small
+subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. The eukaryotic ITS contains
+the 5.8s gene and two variable length spacer regions. In amplicon sequencing studies it is
 common practice to trim off the conserved (SSU, 5,8S or LSU) regions. Bengtsson-Palme
 et al. (2013) published software the software package ITSx to do this.
 
-ITSxpress is a high-speed implementation of the methods in ITSx than also allows FASTQ 
-files to be processed. It is approximately 6-9x faster than ITSx v1.1b. It also trims fastq 
-files Which is essential for Analizing sequences using the newer exact Sequence Variant 
-methods in Qiime2, Dada2, Deblur and Unoise that are replacing OTU clustering. 
+ITSxpress is a high-speed implementation of the methods in ITSx than also allows FASTQ
+files to be processed. Processing FASTQ files Which is essential for analyzing
+sequences using the newer exact Sequence Variant methods in Qiime2, Dada2, Deblur
+and Unoise that are replacing OTU clustering.
+
+ITSxpress is also available as a QIIME Plugin. See
+https://github.com/USDA-ARS-GBRU/q2_itsxpress for details.
 
 Process:
 	* Merges and error corrects reads using bbduk if reads are paired-end
 	* Deduplicates reads using Vmatch to eliminate redundant hmm searches
 	* Searches for conserved regions using the ITSx hmms, using HMMsearch:
-	  https://cryptogenomicon.org/2011/05/27/hmmscan-vs-hmmsearch-speed-the-numerology/
 	* Parses everything in python returning (optionally gzipped) fastq files.
 
 Reference:
@@ -49,18 +52,18 @@ def myparser():
 	parser.add_argument('--fastq', '-f', type=str, required=True,
 						help='A .fastq, .fq, .fastq.gz or .fq.gz file. Interleaved or not.')
 	parser.add_argument('--single_end', '-s', action='store_true', default=False,
-						help='A flag to specify if the fastq file is interleaved single-ended (not paired). Default is false.')
+						help='A flag to specify that the FASTQ file is single-ended (not paired). Default is false.')
 	parser.add_argument('--fastq2', '-f2', type=str, default=None,
 						help='A .fastq, .fq, .fastq.gz or .fq.gz file. representing read 2 (optional)')
 	parser.add_argument('--outfile', '-o', type=str, help="the trimmed Fastq file, if it \
 						ends in 'gz' it will be gzipped")
-	parser.add_argument('--tempdir', help='Specify the temp file directory', default=None)
+	parser.add_argument('--tempdir', help='The temp file directory', default=None)
 	parser.add_argument('--keeptemp' ,help="Should intermediate files be kept?", action='store_true')
 	parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
-	parser.add_argument('--taxa', help='Select the taxonomic group sequenced',
+	parser.add_argument('--taxa', help='The taxonomic group sequenced.',
 						choices=taxa_choices, default="Fungi")
 	parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
-	parser.add_argument('--threads' ,help="Number of processor threads to use", default="1")
+	parser.add_argument('--threads' ,help="Number of processor threads to use.", type=int, default=1)
 	return parser
 
 
@@ -83,18 +86,18 @@ class ItsPosition:
 
 
 	"""
-	
+
 	def _left_score(self, sequence, score, to_pos):
 		"""Evaluates left scores and positions from the new line of a domtable file and
-			updates ddict if neccicary.
-		
+			updates ddict if necessary.
+
 		Args:
 			sequence (str): The name of the sequence.
 			score (int): The bit score from HMMSearch.
-			to_pos (int): the ending position of the left seqeunce.
-		
+			to_pos (int): the ending position of the left sequence.
+
 		"""
-		
+
 		if "left" in self.ddict[sequence]:
 			if score > self.ddict[sequence]["left"]["score"]:
 				 self.ddict[sequence]["left"]["score"]=score
@@ -103,17 +106,17 @@ class ItsPosition:
 			self.ddict[sequence]["left"]={}
 			self.ddict[sequence]["left"]["score"]=score
 			self.ddict[sequence]["left"]["pos"]=to_pos
-		
-		
+
+
 	def _right_score(self, sequence, score, from_pos):
 		"""Evaluates right scores and positions form the new line of a domtable file and
-		updates ddict if neccicary.
-	
+		updates ddict if necessary.
+
 		Args:
 			sequence (str): The name of the sequence.
 			score (int): The bit score from HMMSearch.
-			from_pos (int): The beginning position of the right seqeunce.
-	
+			from_pos (int): The beginning position of the right sequence.
+
 		"""
 		if "right" in self.ddict[sequence]:
 			if score > self.ddict[sequence]["right"]["score"]:
@@ -123,15 +126,14 @@ class ItsPosition:
 			self.ddict[sequence]["right"]={}
 			self.ddict[sequence]["right"]["score"]=score
 			self.ddict[sequence]["right"]["pos"]=from_pos
-		
+
 
 	def parse(self):
 		"""Parses dom table from HMMsearch.
-		
-		The dom table is parsed to record the start and stop position from the top scoring
-		hmm mathces. This populates the ddict attribute containing the positions at
-		which to trim each sequence.
-		
+
+		The dom table is parsed and the start and stop position from the top scoring
+		hmm math is saved. The start and stop positions of reach sequence are added to the ddict attribute.
+
 		"""
 		try:
 			with open(self.domtable , 'r') as f:
@@ -152,7 +154,7 @@ class ItsPosition:
 		except Exception as e:
 			logging.error("Exception occured when parsing HMMSearh results")
 			raise e
-			
+
 	def __init__(self, domtable, region):
 		self.domtable = domtable
 		self.ddict = {}
@@ -166,22 +168,22 @@ class ItsPosition:
 			self.leftprefix='1_'
 			self.rightprefix='4_'
 		self.parse()
-	
-			
+
+
 	def get_position(self, sequence):
-		""" Retuns the start and stop positions for a given sequence
-	
+		""" Returns the start and stop positions for a given sequence.
+
 		Args:
 			sequence (str): The name of the sequence.
-		
+
 		Returns:
 			(tuple): (start position, end position) zero indexed
-			
+
 		Raises:
 			KeyError: If input sequence is not present in dictionary (no ITS start or stop sites were found)
-		
+
 		"""
-	
+
 		try:
 			if "left" in self.ddict[sequence]:
 				start = int(self.ddict[sequence]["left"]["pos"])
@@ -195,30 +197,30 @@ class ItsPosition:
 		except KeyError:
 			logging.debug("No ITS stop or start sites were identified for sequence {}, skipping.".format(sequence))
 			raise KeyError
-						
+
 class Dedup:
 	"""A class to handle deduplicated sequence data.
-	
+
 	To speed processing Vmatch is used to remove duplicate amplicons so that the
-	start ansd	stop sites are determened only once.
-	
+	start and stop sites are determined only once.
+
 	Attributes:
 		matchdict (dict): a dictionary of each sequence ID as a key and
 			its representative sequence ID as a value {seq1:rep1, seq2:rep1, seq2:rep2}.
-		uc_file (str): the location of the .uc file contianing matching information.
+		uc_file (str): the location of the .uc file containing matching information.
 		rep_file (str): The location of the representative sequences file.
-		seq_file (str): Teh location of the complete sequences file.
-		
-	
+		seq_file (str): The location of the complete sequences file.
+
+
 	"""
-	
-		
+
+
 	def parse(self):
 		"""Parse the uc data file to populate the matchdict attribute.
-		
+
 		Raises:
 			Exception: General exception if uc file is not parsed properly
-	
+
 		"""
 		try:
 			with open(self.uc_file, 'r') as f:
@@ -235,40 +237,40 @@ class Dedup:
 		except Exception as e:
 			logging.exception("Could not parse the Vsearch '.uc' file.")
 			raise e
-	
+
 	def __init__(self, uc_file, rep_file, seq_file):
 		self.matchdict = None
 		self.uc_file = uc_file
 		self.rep_file = rep_file
 		self.seq_file = seq_file
 		self.parse()
-	
-		
-	
+
+
+
 	def _get_trimmed_seq_generator(self, seqgen, itspos):
-		"""This function takes a Biopython SeqIO sequence generator of sequences, and
+		"""This function takes a Biopython SeqIO sequence generator, and
 		returns a generator of trimmed sequences. Sequences where the ITS ends could
-		not be determined are ommited.
-		
+		not be determined are omitted.
+
 		Args:
 			seqgen (obj): A Biopython SeqIO generator of all input sequences
-			ispos (obj): a itsxpress ItsPosition object
-		
+			ispos (obj): An itsxpress ItsPosition object
+
 		Returns:
-			(obj): A map object generator that yeilds filtered, trimmed sequence records.
-			
+			(obj): A map object generator that yields filtered, trimmed sequence records.
+
 		"""
-		
-	
+
+
 		def _filterfunc(record):
 			""" Filters records down to those that contain a valid ITS start and stop position
-			
+
 			Args:
 				record (obj): a Biopython SeqRecord object
-			
+
 			Returns:
 				bool: True if an ITS start and stop positions are present false otherwise
-			  
+
 			"""
 			try:
 				if record.id in self.matchdict:
@@ -282,36 +284,36 @@ class Dedup:
 				return False
 
 		def map_func(record):
-			"""Trims the record down to correct region
-			
+			"""Trims the record down to the selected ITS region
+
 			Args:
 				record (obj): a Biopython SeqRecord object
-			
+
 			Returns:
 				obj: a Biopython SeqRecord object trimmed to the ITS region
 			"""
 			repseq = self.matchdict[record.id]
 			start, stop = itspos.get_position(repseq)
 			return record[start:stop]
-			
+
 		filt = filter(_filterfunc, seqgen)
 		return map(map_func, filt)
 
-				
+
 	def create_trimmed_seqs(self, outfile, gzipped, itspos):
-		"""Creates a fastq file, optionally gzipped, with the reads trimmed to the
+		"""Creates a FASTQ file, optionally gzipped, with the reads trimmed to the
 			selected region.
-		
+
 		Args:
-			outfile (str): the file to write the sequences to.
+			outfile (str): The file to write the sequences to.
 			gzip (bool): Should the files be gzipped?
 			itspos (object): an ItsPosition object
-		
+
 		Returns:
-			str: name of the file written
-		
+			str: Name of the file written
+
 		"""
-		
+
 		def _write_seqs():
 			if gzipped:
 				with gzip.open(outfile, 'wt') as g:
@@ -319,7 +321,7 @@ class Dedup:
 			else:
 				with open(outfile, 'w') as g:
 					SeqIO.write(seqs, g, "fastq")
-				
+
 		if self.seq_file.endswith(".gz"):
 			with gzip.open(self.seq_file, 'rt') as f:
 				seqgen = SeqIO.parse(f, 'fastq')
@@ -331,20 +333,20 @@ class Dedup:
 				seqgen = SeqIO.parse(f, 'fastq')
 				seqs = self._get_trimmed_seq_generator(seqgen, itspos)
 				_write_seqs()
-				
-				
+
+
 class SeqSample:
 	"""The class for processing sequence data into trimmed sequences.
-	
+
 	Attributes:
 		tempdir (obj): A temporary directory object
-		fastq (str): The path to the input fastq file
+		fastq (str): The path to the input FASTQ file
 		uc_file (str): The path to the Vsearch uc mapping file
-		rep_file: (str) the path to the representative sequences fasta file created by Vsearch
+		rep_file: (str) the path to the representative sequences FASTA file created by Vsearch
 		seq_file (str): the location of the fastq or fastq.gz sequence file used for analysis
-		
+
 	"""
-	
+
 
 	def __init__(self, fastq, tempdir=None):
 		if tempdir:
@@ -361,14 +363,14 @@ class SeqSample:
 		self.dom_file = None
 		self.seq_file = None
 
-		
-	
+
+
 	def _deduplicate(self, threads=1):
-		"""Runs Vsearch dereplication to create a fasta file of nonredundant sequences.
-		
+		"""Runs Vsearch dereplication to create a FASTA file of non-redundant sequences.
+
 		Args:
 			threads (int or str):the number of processor threads to use
-		
+
 		"""
 		try:
 			self.uc_file=os.path.join(self.tempdir, 'uc.txt')
@@ -413,14 +415,14 @@ class SeqSample:
 		except FileNotFoundError as f:
 			logging.error("hmmsearch was not found, make sure HMMER3 is installed and executable")
 			raise f
-			
+
 class SeqSamplePairedInterleaved(SeqSample):
 	"""SeqSample class extended to paired, interleaved format.
-	
+
 	"""
 	def __init__(self, fastq, tempdir):
 		SeqSample.__init__(self, fastq, tempdir)
-		
+
 	def _merge_reads(self, threads):
 		try:
 			seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
@@ -440,13 +442,13 @@ class SeqSamplePairedInterleaved(SeqSample):
 			raise f
 
 class SeqSamplePairedNotInterleaved(SeqSample):
-	"""SeqSample class extended to paired, two fastq file format.
-	
+	"""SeqSample class extended to paired, two FASTQ file format.
+
 	"""
 	def __init__(self, fastq, tempdir, fastq2):
 		SeqSample.__init__(self, fastq, tempdir)
 		self.fastq2 = fastq2
-	
+
 	def _merge_reads(self, threads):
 		try:
 			seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
@@ -468,20 +470,20 @@ class SeqSamplePairedNotInterleaved(SeqSample):
 
 class SeqSampleNotPaired(SeqSample):
 	"""SeqSample class extended to unpaired format.
-	
+
 	"""
 
 	def __init__(self, fastq, tempdir):
 		SeqSample.__init__(self, fastq, tempdir)
 		self.seq_file = self.fastq
 
-	
+
 
 def _is_paired(fastq, fastq2, single_end):
 	"""Determines the workflow based on file inputs.
-	
+
 	Args:
-		
+
 	"""
 	if fastq and fastq2:
 		paired_end = True
@@ -496,11 +498,11 @@ def _is_paired(fastq, fastq2, single_end):
 
 def _logger_setup(logfile):
 	"""Set up logging to a logfile and the terminal standard out.
-	
+
 	Args:
 		fastq (str): The path to a fastq or fastq.gz file
 		fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
-	
+
 	"""
 	try:
 		logging.basicConfig(level=logging.DEBUG,
@@ -518,18 +520,19 @@ def _logger_setup(logfile):
 		# add the handler to the root logger
 		logging.getLogger('').addHandler(console)
 	except Exception as e:
-		print("An error occured setting up logging")
+		print("An error occurred setting up logging")
 		raise e
 
 def _check_fastqs(fastq, fastq2=None):
 	"""Verifies the input files are valid fastq or fastq.gz files.
-	
+
 	Args:
 		fastq (str): The path to a fastq or fastq.gz file
 		fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
-	
+
 	Raises:
-		SystemExit if invalid input sequences are found.
+		FileNotFound: Error if BBTools was not found.
+		subprocess.CalledProcessError: Error if there was an issue processing files
 	"""
 	try:
 		parameters=['reformat.sh', 'in='+fastq, 'reads=50']
@@ -546,8 +549,8 @@ def _check_fastqs(fastq, fastq2=None):
 
 
 def main(args=None):
-	"""Run Complete ITS trimming workflow
-	
+	"""Run Complete ITS trimming workflow.
+
 	"""
 	# Set up logging
 	t0 = time.time()
@@ -557,7 +560,7 @@ def main(args=None):
 
 	_logger_setup(args.log)
 	try:
-		logging.info("Verifing the input sequences.")
+		logging.info("Verifying the input sequences.")
 		_check_fastqs(args.fastq, args.fastq2)
 		# Parse input types
 		paired_end, interleaved = _is_paired(args.fastq,args.fastq2, args.single_end)
@@ -565,22 +568,22 @@ def main(args=None):
 		if paired_end and interleaved:
 			logging.info("Sequences are paired-end and interleaved. They will be merged using BBmerge.")
 			sobj = SeqSamplePairedInterleaved(fastq=args.fastq, tempdir=args.tempdir)
-			sobj._merge_reads(threads=args.threads)
+			sobj._merge_reads(threads=str(args.threads))
 		elif paired_end and not interleaved:
 			logging.info("Sequences are paired-end in two files. They will be merged using BBmerge.")
 			sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=args.tempdir)
-			sobj._merge_reads(threads=args.threads)
+			sobj._merge_reads(threads=str(args.threads))
 		elif not paired_end and not interleaved:
 			logging.info("Sequences are assumed to be single-end.")
 			sobj = SeqSampleNotPaired(fastq=args.fastq, tempdir=args.tempdir)
 		logging.info("Temporary directory is: {}".format(sobj.tempdir))
 		# Deduplicate
-		logging.info("Unique sequences are being written to a temporary fasta file with Vsearch.")
-		sobj._deduplicate(threads=args.threads)
+		logging.info("Unique sequences are being written to a temporary FASTA file with Vsearch.")
+		sobj._deduplicate(threads=str(args.threads))
 		# HMMSearch for ITS regions
 		logging.info("Searching for ITS start and stop sites using HMMSearch. This step takes a while.")
 		hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict[args.taxa])
-		sobj._search(hmmfile=hmmfile, threads=args.threads)
+		sobj._search(hmmfile=hmmfile, threads=str(args.threads))
 		# Parse Hmmsearch output
 		logging.info("Parsing HMM results.")
 		its_pos = ItsPosition(domtable=sobj.dom_file, region=args.region)
@@ -596,7 +599,7 @@ def main(args=None):
 		fmttime = time.strftime("%H:%M:%S",time.gmtime(t1-t0))
 		logging.info("ITSxpress ran in {}".format(fmttime))
 	except Exception as e:
-		logging.error("ITSXpress terminated with errors. see the log file fo details.")
+		logging.error("ITSXpress terminated with errors. See the log file fo details.")
 		logging.error(e)
 		raise SystemExit(1)
 	finally:
