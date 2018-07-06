@@ -247,7 +247,7 @@ class Dedup:
 	
 	def _get_trimmed_seq_generator(self, seqgen, itspos):
 		"""This function takes a Biopython SeqIO sequence generator of sequences, and
-		returns a generator of trimmed sequecnes. Sequences where the ITS ends could
+		returns a generator of trimmed sequences. Sequences where the ITS ends could
 		not be determined are ommited.
 		
 		Args:
@@ -282,7 +282,7 @@ class Dedup:
 				return False
 
 		def map_func(record):
-			"""Trims the record down to to correct region
+			"""Trims the record down to correct region
 			
 			Args:
 				record (obj): a Biopython SeqRecord object
@@ -340,7 +340,7 @@ class SeqSample:
 		tempdir (obj): A temporary directory object
 		fastq (str): The path to the input fastq file
 		uc_file (str): The path to the Vsearch uc mapping file
-		rep_file: (str) the path to the representitive seequences fasta file created by Vsearch
+		rep_file: (str) the path to the representative sequences fasta file created by Vsearch
 		seq_file (str): the location of the fastq or fastq.gz sequence file used for analysis
 		
 	"""
@@ -367,7 +367,7 @@ class SeqSample:
 		"""Runs Vsearch dereplication to create a fasta file of nonredundant sequences.
 		
 		Args:
-			threads (int or str):the number of prosessor threads to use
+			threads (int or str):the number of processor threads to use
 		
 		"""
 		try:
@@ -387,7 +387,7 @@ class SeqSample:
 			logging.exception("Could not perform dereplication with Vsearch. Error from Vsearch was:\n {}".format(p2.stderr.decode('utf-8')))
 			raise e
 		except FileNotFoundError as f:
-			logging.error("Vsearch was not found, make sure Vsearch is installed and executible")
+			logging.error("Vsearch was not found, make sure Vsearch is installed and executable")
 			raise f
 
 	def _search(self, hmmfile, threads=1):
@@ -408,10 +408,10 @@ class SeqSample:
 			p4 = subprocess.run(parameters,stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
 			p4.check_returncode()
 		except subprocess.CalledProcessError as e :
-			logging.exception("Could not perform ITS identificaton with hmmserach. The error was:\n {}".format(p4.stderr.decode('utf-8')))
+			logging.exception("Could not perform ITS identification with hmmserach. The error was:\n {}".format(p4.stderr.decode('utf-8')))
 			raise e
 		except FileNotFoundError as f:
-			logging.error("hmmsearch was not found, make sure HMMER3 is installed and executible")
+			logging.error("hmmsearch was not found, make sure HMMER3 is installed and executable")
 			raise f
 			
 class SeqSamplePairedInterleaved(SeqSample):
@@ -436,7 +436,7 @@ class SeqSamplePairedInterleaved(SeqSample):
 			logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
 			raise e
 		except FileNotFoundError as f:
-			logging.error("BBmerge was not found, make sure BBmerge is executible")
+			logging.error("BBmerge was not found, make sure BBmerge is executable")
 			raise f
 
 class SeqSamplePairedNotInterleaved(SeqSample):
@@ -463,7 +463,7 @@ class SeqSamplePairedNotInterleaved(SeqSample):
 			logging.exception("Could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
 			raise e
 		except FileNotFoundError as f:
-			logging.error("BBmerge was not found, make sure BBmerge is executible")
+			logging.error("BBmerge was not found, make sure BBmerge is executable")
 			raise f
 
 class SeqSampleNotPaired(SeqSample):
@@ -478,7 +478,7 @@ class SeqSampleNotPaired(SeqSample):
 	
 
 def _is_paired(fastq, fastq2, single_end):
-	"""Dertermines workflow based on file inputs.
+	"""Determines the workflow based on file inputs.
 	
 	Args:
 		
@@ -526,7 +526,7 @@ def _check_fastqs(fastq, fastq2=None):
 	
 	Args:
 		fastq (str): The path to a fastq or fastq.gz file
-		fastq2 (str): The path to a fastq or fastq.gz file for the reverese sequences
+		fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
 	
 	Raises:
 		SystemExit if invalid input sequences are found.
@@ -541,7 +541,7 @@ def _check_fastqs(fastq, fastq2=None):
 		logging.error("There appears to be an issue with your input fastq or fastq.gz file(s).")
 		raise e
 	except FileNotFoundError as e:
-		logging.error("BBtools was not found. check that the BBtools reformat.sh package is executible")
+		logging.error("BBtools was not found. check that the BBtools reformat.sh package is executable")
 		raise e
 
 
@@ -557,7 +557,7 @@ def main(args=None):
 
 	_logger_setup(args.log)
 	try:
-		logging.info("Verifing the input sequecnes.")
+		logging.info("Verifing the input sequences.")
 		_check_fastqs(args.fastq, args.fastq2)
 		# Parse input types
 		paired_end, interleaved = _is_paired(args.fastq,args.fastq2, args.single_end)
