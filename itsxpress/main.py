@@ -44,7 +44,7 @@ import shutil
 
 from Bio import SeqIO
 
-from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict
+from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, cluster_id
 
 def myparser():
 	parser = argparse.ArgumentParser(description='ITSxpress: A python module to rapidly \
@@ -60,8 +60,8 @@ def myparser():
 	parser.add_argument('--tempdir', help='The temp file directory', default=None)
 	parser.add_argument('--keeptemp' ,help="Should intermediate files be kept?", action='store_true')
 	parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
-	parser.add_argument('--taxa', help='The taxonomic group sequenced.',
-						choices=taxa_choices, default="Fungi")
+	parser.add_argument('--taxa', help='The taxonomic group sequenced.', choices=taxa_choices, default="Fungi")
+	parser.add_argument('--slow', help='Turn off {} percent identity clustering, and use exact dereplication'.format(str(cluster_id*100)), action='store_true')
 	parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
 	parser.add_argument('--threads' ,help="Number of processor threads to use.", type=int, default=1)
 	return parser
@@ -392,6 +392,34 @@ class SeqSample:
 			logging.error("Vsearch was not found, make sure Vsearch is installed and executable")
 			raise f
 
+
+	def _cluster(self, threads=1):
+		"""Runs Vsearch clustering to create a FASTA file of non-redundant sequences.
+
+		Args:
+			threads (int or str):the number of processor threads to use
+
+		"""
+		try:
+			self.uc_file=os.path.join(self.tempdir, 'uc.txt')
+			self.rep_file=os.path.join(self.tempdir,'rep.fa')
+			parameters = ["vsearch",
+						  "--cluster_size", self.seq_file,
+						  "--centroids", self.rep_file,
+						  "--uc", self.uc_file,
+						  "--strand", "both",
+						  "--id", str(cluster_id),
+						  "--threads", str(threads)]
+			p2 = subprocess.run(parameters, stderr=subprocess.PIPE)
+			print(p2.stderr.decode('utf-8'))
+			p2.check_returncode()
+		except subprocess.CalledProcessError as e:
+			logging.exception("Could not perform clustering with Vsearch. Error from Vsearch was:\n {}".format(p2.stderr.decode('utf-8')))
+			raise e
+		except FileNotFoundError as f:
+			logging.error("Vsearch was not found, make sure Vsearch is installed and executable")
+			raise f
+
 	def _search(self, hmmfile, threads=1):
 		try:
 			self.dom_file=os.path.join(self.tempdir, 'domtbl.txt')
@@ -579,7 +607,10 @@ def main(args=None):
 		logging.info("Temporary directory is: {}".format(sobj.tempdir))
 		# Deduplicate
 		logging.info("Unique sequences are being written to a temporary FASTA file with Vsearch.")
-		sobj._deduplicate(threads=str(args.threads))
+		if args.slow:
+			sobj._deduplicate(threads=str(args.threads))
+		else:
+			sobj._cluster(threads=str(args.threads))
 		# HMMSearch for ITS regions
 		logging.info("Searching for ITS start and stop sites using HMMSearch. This step takes a while.")
 		hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict[args.taxa])
@@ -599,7 +630,7 @@ def main(args=None):
 		fmttime = time.strftime("%H:%M:%S",time.gmtime(t1-t0))
 		logging.info("ITSxpress ran in {}".format(fmttime))
 	except Exception as e:
-		logging.error("ITSXpress terminated with errors. See the log file fo details.")
+		logging.error("ITSXpress terminated with errors. See the log file for details.")
 		logging.error(e)
 		raise SystemExit(1)
 	finally:

@@ -40,3 +40,5 @@ taxa_dict = {"Alveolata":"A.hmm","Bryophyta":"B.hmm", "Bacillariophyta":"C.hmm",
  "Oomycota":"O.hmm","Haptophyceae":"P.hmm",
  "Raphidophyceae":"Q.hmm"," Rhizaria":"R.hmm","Synurophyceae":"S.hmm",
  "Tracheophyta":"T.hmm","Eustigmatophyceae":"U.hmm","All":"all.hmm"}
+
+cluster_id = 0.987

@@ -141,7 +141,7 @@ def test_main_paired():
 	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
 	outfile = os.path.join(tf,'testout.fastq')
 	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
-	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi', '--threads', '1'])
+	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = 0
@@ -158,6 +158,22 @@ def test_main_merged():
 	outfile = os.path.join(tf,'testout.fastq')
 	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
 	args = parser.parse_args(['--fastq', fastq, '--single_end', '--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi', '--threads', '1'])
+	itsxpress.main.main(args=args)
+	seqs = SeqIO.parse(outfile, 'fastq')
+	n = 0
+	for rec in seqs:
+		n += 1
+	ok_(n==226)
+	shutil.rmtree(tf)
+
+def test_main_paired_slow():
+	parser = itsxpress.main.myparser()
+	tf = tempfile.mkdtemp()
+	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	outfile = os.path.join(tf,'testout.fastq')
+	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
+	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--slow', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = 0
