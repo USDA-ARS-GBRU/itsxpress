@@ -99,6 +99,9 @@ Usage
 						Oomycota, Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,
 						Tracheophyta, Eustigmatophyceae, All}. Default Fungi.
 
+--cluster_id            The percent identity for clustering reads, set to 1
+                        for exact dereplication. Default 0.987.
+
 --log		          	Log file. Default is ITSxpress.log.
 
 --threads		     	Number of processor threads to use. Default is 1.
