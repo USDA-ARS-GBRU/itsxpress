@@ -41,11 +41,18 @@ import logging
 import time
 import os
 import shutil
+import math
 
 from Bio import SeqIO
 
-from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, cluster_id
+from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict
 
+def restricted_float(x):
+    x = float(x)
+    if x < 0.97 or x > 1.0:
+        raise argparse.ArgumentTypeError("%r not in range [0.97, 1.0]"%(x,))
+    return x
+    
 def myparser():
 	parser = argparse.ArgumentParser(description='ITSxpress: A python module to rapidly \
 		trim ITS amplicon sequences from Fastq files.')
@@ -61,7 +68,7 @@ def myparser():
 	parser.add_argument('--keeptemp' ,help="Should intermediate files be kept?", action='store_true')
 	parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
 	parser.add_argument('--taxa', help='The taxonomic group sequenced.', choices=taxa_choices, default="Fungi")
-	parser.add_argument('--slow', help='Turn off {} percent identity clustering, and use exact dereplication'.format(str(cluster_id*100)), action='store_true')
+	parser.add_argument('--cluster_id', help='The percent identity for clustering reads, set to 1 for exact dereplication.', type=restricted_float, default=0.987)
 	parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
 	parser.add_argument('--threads' ,help="Number of processor threads to use.", type=int, default=1)
 	return parser
@@ -365,7 +372,7 @@ class SeqSample:
 
 
 
-	def _deduplicate(self, threads=1):
+	def deduplicate(self, threads=1):
 		"""Runs Vsearch dereplication to create a FASTA file of non-redundant sequences.
 
 		Args:
@@ -393,7 +400,7 @@ class SeqSample:
 			raise f
 
 
-	def _cluster(self, threads=1):
+	def cluster(self, threads=1, cluster_id=0.987):
 		"""Runs Vsearch clustering to create a FASTA file of non-redundant sequences.
 
 		Args:
@@ -588,6 +595,7 @@ def main(args=None):
 
 	_logger_setup(args.log)
 	try:
+		print(args.cluster_id)
 		logging.info("Verifying the input sequences.")
 		_check_fastqs(args.fastq, args.fastq2)
 		# Parse input types
@@ -607,10 +615,10 @@ def main(args=None):
 		logging.info("Temporary directory is: {}".format(sobj.tempdir))
 		# Deduplicate
 		logging.info("Unique sequences are being written to a temporary FASTA file with Vsearch.")
-		if args.slow:
-			sobj._deduplicate(threads=str(args.threads))
+		if math.isclose(args.cluster_id, 1, rel_tol=1e-05):
+			sobj.deduplicate(threads=str(args.threads))
 		else:
-			sobj._cluster(threads=str(args.threads))
+			sobj.cluster(threads=str(args.threads),cluster_id=args.cluster_id)
 		# HMMSearch for ITS regions
 		logging.info("Searching for ITS start and stop sites using HMMSearch. This step takes a while.")
 		hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict[args.taxa])
