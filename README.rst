@@ -99,8 +99,8 @@ Usage
 						Oomycota, Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,
 						Tracheophyta, Eustigmatophyceae, All}. Default Fungi.
 
---cluster_id            The percent identity for clustering reads, set to 1
-                        for exact dereplication. Default 0.987.
+--cluster_id            The percent identity for clustering reads range [0.98-1.0], set to 1
+                        for exact dereplication. Default 0.995.
 
 --log		          	Log file. Default is ITSxpress.log.
 

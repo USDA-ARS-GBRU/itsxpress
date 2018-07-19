@@ -49,8 +49,8 @@ from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict
 
 def restricted_float(x):
     x = float(x)
-    if x < 0.97 or x > 1.0:
-        raise argparse.ArgumentTypeError("%r not in range [0.97, 1.0]"%(x,))
+    if x < 0.98 or x > 1.0:
+        raise argparse.ArgumentTypeError("%r not in range [0.98, 1.0]"%(x,))
     return x
     
 def myparser():
@@ -68,7 +68,7 @@ def myparser():
 	parser.add_argument('--keeptemp' ,help="Should intermediate files be kept?", action='store_true')
 	parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
 	parser.add_argument('--taxa', help='The taxonomic group sequenced.', choices=taxa_choices, default="Fungi")
-	parser.add_argument('--cluster_id', help='The percent identity for clustering reads, set to 1 for exact dereplication.', type=restricted_float, default=0.987)
+	parser.add_argument('--cluster_id', help='The percent identity for clustering reads range [0.98-1.0], set to 1 for exact dereplication.', type=restricted_float, default=0.995)
 	parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
 	parser.add_argument('--threads' ,help="Number of processor threads to use.", type=int, default=1)
 	return parser
@@ -400,7 +400,7 @@ class SeqSample:
 			raise f
 
 
-	def cluster(self, threads=1, cluster_id=0.987):
+	def cluster(self, threads=1, cluster_id=0.995):
 		"""Runs Vsearch clustering to create a FASTA file of non-redundant sequences.
 
 		Args:
