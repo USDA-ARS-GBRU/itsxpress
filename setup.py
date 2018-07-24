@@ -16,7 +16,7 @@ setup(
     test_suite ='nose.collector',
     author='Adam R. Rivers',
     author_email='adam.rivers@ars.usda.gov',
-    install_requires=['biopython>=1.60'],
+    install_requires=['biopython>=1.60', 'skbio'],
     python_requires='>3.5',
     tests_require=['nose'],
     include_package_data=True,
