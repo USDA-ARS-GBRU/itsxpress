@@ -44,6 +44,8 @@ import shutil
 import math
 
 from Bio import SeqIO
+from skbio.io.registry import read as skread
+from skbio.io import UnrecognizedFormatError, FormatIdentificationWarning
 
 from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict
 
@@ -559,29 +561,22 @@ def _logger_setup(logfile):
 		raise e
 
 def _check_fastqs(fastq, fastq2=None):
-	"""Verifies the input files are valid fastq or fastq.gz files.
+    """Verifies the input files are valid fastq or fastq.gz files.
 
-	Args:
-		fastq (str): The path to a fastq or fastq.gz file
-		fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
-
-	Raises:
-		FileNotFound: Error if BBTools was not found.
-		subprocess.CalledProcessError: Error if there was an issue processing files
-	"""
-	try:
-		parameters=['reformat.sh', 'in='+fastq, 'reads=50']
-		if fastq2:
-			parameters.append('in2=' + fastq2)
-		p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
-		p1.check_returncode()
-	except subprocess.CalledProcessError as e:
-		logging.error("There appears to be an issue with your input fastq or fastq.gz file(s).")
-		raise e
-	except FileNotFoundError as e:
-		logging.error("BBtools was not found. check that the BBtools reformat.sh package is executable")
-		raise e
-
+    Args:
+    	fastq (str): The path to a fastq or fastq.gz file
+    	fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
+    Raises:
+    	UnrecognizedFormatError: Error if there was an issue processing files
+    	FormatIdentificationWarning: Error if there was an issue processing files
+    """
+    try:
+        skread(file=fastq,format="fastq",into=None,verify=True)
+        if fastq2:
+            skread(file=fastq2,format="fastq",into=None, verify=True)
+    except (UnrecognizedFormatError, FormatIdentificationWarning) as e:
+        logging.error("There appears to be an issue with your input fastq or fastq.gz file(s).")
+        raise e
 
 def main(args=None):
 	"""Run Complete ITS trimming workflow.
