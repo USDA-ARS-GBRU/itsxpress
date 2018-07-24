@@ -7,6 +7,8 @@ import subprocess
 import filecmp
 
 from Bio import SeqIO
+from skbio.io.registry import read as skread
+from skbio.io import UnrecognizedFormatError, FormatIdentificationWarning
 from nose.tools import ok_, eq_, assert_raises
 
 import itsxpress
@@ -19,7 +21,7 @@ hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict["Fungi"])
 def test_check_fastqs():
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
 	fastq2 = os.path.join(TEST_DIR, "test_data", "broken.fastq")
-	assert_raises(subprocess.CalledProcessError, itsxpress.main._check_fastqs, fastq, fastq2)
+	assert_raises((UnrecognizedFormatError or FormatIdentificationWarning), itsxpress.main._check_fastqs, fastq, fastq2)
 
 def test_its_position_init():
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
