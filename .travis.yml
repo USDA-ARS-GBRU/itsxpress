@@ -14,7 +14,9 @@ before_install:
   - tar -xvf /tmp/hmmer-3.1b2-linux-intel-x86_64.tar.gz
   - ls -la
   - export PATH=$PATH:$PWD/hmmer-3.1b2-linux-intel-x86_64/binaries
-  - pip install scikit-bio
+  - wget https://files.pythonhosted.org/packages/98/ee/08995b89efccf2bf8a0307a1eb7825dceb199e64a3db24cec832c0ca0baf/scikit-bio-0.5.2.tar.gz -O /tmp/scikit-bio-0.5.2.tar.gz
+  - tar -xvf /tmp/scikit-bio-0.5.2.tar.gz
+  - export PATH=$PATH:$PWD/scikit-bio
 
 install:
   - pip install codecov
