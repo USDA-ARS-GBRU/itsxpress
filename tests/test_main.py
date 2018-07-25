@@ -20,6 +20,11 @@ def test_check_fastqs():
 	fastq2 = os.path.join(TEST_DIR, "test_data", "broken.fastq")
 	assert_raises(ValueError, itsxpress.main._check_fastqs, fastq, fastq2)
 
+def test_check_fastq_gzs():
+	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq.gz")
+	fastq2 = os.path.join(TEST_DIR, "test_data", "broken.fastq.gz")
+	assert_raises(ValueError, itsxpress.main._check_fastqs, fastq, fastq2)
+
 def test_its_position_init():
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	exp1 = {'left': {'score': '53.7', 'pos': '128'}, 'right': {'score': '60.0', 'pos': '282'}}

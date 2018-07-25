@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='itsxpress',
-    version='1.6.2',
+    version='1.6.3',
     packages=['itsxpress'],
     license='License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication',
     description="Rapidly trim sequences down to their Internally Transcribed Spacer (ITS) regions",

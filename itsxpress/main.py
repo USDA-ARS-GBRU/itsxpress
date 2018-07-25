@@ -572,7 +572,7 @@ def _check_fastqs(fastq, fastq2=None):
 	def core(file):
 		try:
 			if file.endswith('.gz.'):
-				f = gzip.open(file, 'rb')
+				f = gzip.open(file, 'rt')
 			else:
 				f = open(file, 'r')
 			n=0
