@@ -52,7 +52,8 @@ def restricted_float(x):
     if x < 0.98 or x > 1.0:
         raise argparse.ArgumentTypeError("%r not in range [0.98, 1.0]"%(x,))
     return x
-    
+
+
 def myparser():
 	parser = argparse.ArgumentParser(description='ITSxpress: A python module to rapidly \
 		trim ITS amplicon sequences from Fastq files.')
@@ -566,21 +567,35 @@ def _check_fastqs(fastq, fastq2=None):
 		fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
 
 	Raises:
-		FileNotFound: Error if BBTools was not found.
-		subprocess.CalledProcessError: Error if there was an issue processing files
+		ValueError: If Biopython detected invalid FASTQ files
 	"""
+	def core(file):
+		try:
+			if file.endswith('.gz.'):
+				f = gzip.open(file, 'rb')
+			else:
+				f = open(file, 'r')
+			n=0
+			for record in SeqIO.parse(f, 'fastq'):
+				while n < 100:
+					n +=1
+		except Exception as e:
+			raise e
+		finally:
+			f.close()
+
 	try:
-		parameters=['reformat.sh', 'in='+fastq, 'reads=50']
-		if fastq2:
-			parameters.append('in2=' + fastq2)
-		p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
-		p1.check_returncode()
-	except subprocess.CalledProcessError as e:
-		logging.error("There appears to be an issue with your input fastq or fastq.gz file(s).")
+		core(fastq)
+	except ValueError as e:
+		logging.error("There appears to be an issue with the input file {}.".format(fastq))
 		raise e
-	except FileNotFoundError as e:
-		logging.error("BBtools was not found. check that the BBtools reformat.sh package is executable")
-		raise e
+
+	if fastq2:
+		try:
+			core(fastq2)
+		except ValueError as e:
+			logging.error("There appears to be an issue with the input file {}.".format(fastq2))
+			raise e
 
 
 def main(args=None):

@@ -4,10 +4,9 @@ import tempfile
 import shutil
 import gzip
 import subprocess
-import filecmp
 
 from Bio import SeqIO
-from nose.tools import ok_, eq_, assert_raises
+from nose.tools import ok_, assert_raises
 
 import itsxpress
 
@@ -19,7 +18,7 @@ hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict["Fungi"])
 def test_check_fastqs():
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
 	fastq2 = os.path.join(TEST_DIR, "test_data", "broken.fastq")
-	assert_raises(subprocess.CalledProcessError, itsxpress.main._check_fastqs, fastq, fastq2)
+	assert_raises(ValueError, itsxpress.main._check_fastqs, fastq, fastq2)
 
 def test_its_position_init():
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
@@ -124,13 +123,10 @@ def test_main_interleaved():
 	tf = tempfile.mkdtemp()
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_interleaved.fastq")
 	outfile = os.path.join(tf,'testout.fastq')
-	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
 	args = parser.parse_args(['--fastq', fastq,'--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
-	n = 0
-	for rec in seqs:
-		n += 1
+	n = sum(1 for _ in seqs)
 	ok_(n==226)
 	shutil.rmtree(tf)
 
@@ -144,9 +140,7 @@ def test_main_paired():
 	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
-	n = 0
-	for rec in seqs:
-		n += 1
+	n = sum(1 for _ in seqs)
 	ok_(n==226)
 	shutil.rmtree(tf)
 
@@ -160,9 +154,7 @@ def test_main_merged():
 	args = parser.parse_args(['--fastq', fastq, '--single_end', '--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
-	n = 0
-	for rec in seqs:
-		n += 1
+	n = sum(1 for _ in seqs)
 	ok_(n==226)
 	shutil.rmtree(tf)
 
@@ -176,9 +168,6 @@ def test_main_paired_no_cluster():
 	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--cluster_id', '1', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
-	n = 0
-	for rec in seqs:
-		n += 1
+	n = sum(1 for _ in seqs)
 	ok_(n==226)
 	shutil.rmtree(tf)
-
