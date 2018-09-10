@@ -574,9 +574,32 @@ class SeqSamplePairedInterleaved(SeqSample):
     """SeqSample class extended to paired, interleaved format.
 
     """
+    def split_interleaved(self):
+        try:
+            seq_r1 = os.path.join(self.tempdir, 'seq_r1.fq.gz')
+            seq_r2 = os.path.join(self.tempdir, 'seq_r2.fq.gz')
+            parameters = ['reformat.sh',
+                          'in=' + self.fastq,
+                          'out=' + seq_r1,
+                          'out2=' + seq_r2,
+                          ]
+            p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
+            p1.check_returncode()
+            self.r1 = seq_r1
+            self.fastq2 = seq_r2
+            logging.info(p1.stderr.decode('utf-8'))
+        except subprocess.CalledProcessError as e:
+            logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
+            raise e
+        except FileNotFoundError as f:
+            logging.error("BBmerge was not found, make sure BBmerge is executable")
+            raise f
+
     def __init__(self, fastq, tempdir):
         SeqSample.__init__(self, fastq, tempdir)
+        self.r1 = None
         self.fastq2 = None
+        self.split_interleaved()
 
     def _merge_reads(self, threads):
         try:
@@ -602,6 +625,7 @@ class SeqSamplePairedNotInterleaved(SeqSample):
     """
     def __init__(self, fastq, tempdir, fastq2):
         SeqSample.__init__(self, fastq, tempdir)
+        self.r1 =  fastq
         self.fastq2 = fastq2
 
     def _merge_reads(self, threads):
@@ -631,6 +655,7 @@ class SeqSampleNotPaired(SeqSample):
     def __init__(self, fastq, tempdir):
         SeqSample.__init__(self, fastq, tempdir)
         self.seq_file = self.fastq
+        self.r1 = self.fastq
         self.fastq2 = None
 
 
@@ -758,7 +783,7 @@ def main(args=None):
         logging.info("Parsing HMM results.")
         its_pos = ItsPosition(domtable=sobj.dom_file, region=args.region)
         # Create deduplication object
-        dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file, fastq=sobj.fastq, fastq2=sobj.fastq2)
+        dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file, fastq=sobj.r1, fastq2=sobj.fastq2)
         # Create trimmed sequences
         logging.info("Writing out sequences")
         if args.outfile2:
