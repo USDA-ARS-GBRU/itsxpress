@@ -266,7 +266,7 @@ class Dedup:
 
     def _get_paired_seq_generator(self, zipseqgen, itspos):
         """This function takes a zipped object of two Biopython SeqIO sequence generators, and
-        returns a generator of paired sequences suitable for Dada2. Sequences where the ITS ends could
+        returns a two generators of Biopython SeqRecords for Dada2. Sequences where the ITS ends could
         not be determined are omitted.
 
         Args:
@@ -275,7 +275,7 @@ class Dedup:
             ispos (obj): An itsxpress ItsPosition object
 
         Returns:
-            (obj): A map object generator that yields filtered, trimmed sequence records.
+            (obj): A two Python SeqRecord generators that yield filtered, trimmed sequence records.
 
         """
         def _filterfunc(ziprecord):
@@ -309,7 +309,7 @@ class Dedup:
                 record (obj): a Biopython SeqRecord object
 
             Returns:
-                obj: a Biopython SeqRecord object trimmed to the ITS region
+                obj: two Biopython SeqRecord objects; forward and reverse reads trimmed to the ITS region
             """
             record1, record2 = ziprecord
             repseq = self.matchdict[record1.id]
@@ -328,12 +328,13 @@ class Dedup:
 
 
     def create_paired_trimmed_seqs(self, outfile1, outfile2, gzipped, itspos):
-        """Creates a FASTQ file, optionally gzipped, with the reads trimmed to the
+        """Writes two FASTQ files, optionally gzipped, with the reads trimmed to the
             selected region.
 
         Args:
-            outfile (str): The file to write the sequences to.
-            gzip (bool): Should the files be gzipped?
+            outfile1 (str): The file to write the forward sequences to.
+            outfile2 (str): The file to write the reverse sequences to.
+            gzip (bool): Should the output files be gzipped?
             itspos (object): an ItsPosition object
 
         Returns:
@@ -436,9 +437,6 @@ class Dedup:
             outfile (str): The file to write the sequences to.
             gzip (bool): Should the files be gzipped?
             itspos (object): an ItsPosition object
-
-        Returns:
-            str: Name of the file written
 
         """
 
