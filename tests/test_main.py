@@ -4,6 +4,7 @@ import tempfile
 import shutil
 import gzip
 import subprocess
+import filecmp
 
 from Bio import SeqIO
 from nose.tools import ok_, assert_raises
@@ -185,3 +186,33 @@ def test_get_paired_seq_generator():
 	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq, fastq=fastq, fastq2=fastq2)
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
+	f = open(fastq, 'r')
+	g = open(fastq2, 'r')
+	seqgen1 = SeqIO.parse(f, 'fastq')
+	seqgen2 = SeqIO.parse(g, 'fastq')
+	zipseqgen = zip(seqgen1, seqgen2)
+	seqs1, seqs2  = dedup._get_paired_seq_generator(zipseqgen, itspos)
+	n1 = 0
+	n2 = 0
+	for rec in seqs1:
+		n1 += 1
+	for rec in seqs2:
+		n2 += 1
+	ok_(n1==226)
+	ok_(n2==226)
+
+def test_create_paired_trimmed_seqs():
+	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
+	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq, fastq=fastq, fastq2=fastq2)
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
+	tf = tempfile.mkdtemp(".")
+	t1 = os.path.join(tf,'t2_r1.fq')
+	t2 = os.path.join(tf,'t2_r2.fq')
+	dedup.create_paired_trimmed_seqs(t1, t2, False, itspos)
+	ok_(filecmp.cmp(t1, os.path.join(TEST_DIR, "test_data", "t2_r1.fq")))
+	ok_(filecmp.cmp(t2, os.path.join(TEST_DIR, "test_data", "t2_r2.fq")))
+	shutil.rmtree(tf)
