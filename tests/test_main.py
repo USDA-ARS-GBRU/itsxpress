@@ -27,9 +27,9 @@ def test_check_fastq_gzs():
 
 def test_its_position_init():
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
-	exp1 = {'left': {'score': '53.7', 'pos': '128'}, 'right': {'score': '60.0', 'pos': '282'}}
+	exp1 = {'left': {'score': '53.7', 'pos': '128'}, 'tlen': '341', 'right': {'score': '60.0', 'pos': '282'}}
 	ok_(exp1 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"])
-	exp2 = {'right': {'score': '35.1', 'pos': '327'}}
+	exp2 = {'right': {'score': '35.1', 'pos': '327'},'tlen': '385'}
 	ok_(exp2 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:23011:4341"])
 	ok_(len(itspos.ddict) == 137)
 
@@ -176,3 +176,12 @@ def test_main_paired_no_cluster():
 	n = sum(1 for _ in seqs)
 	ok_(n==226)
 	shutil.rmtree(tf)
+
+def test_get_paired_seq_generator():
+	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
+	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq, fastq=fastq, fastq2=fastq2)
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
