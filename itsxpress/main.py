@@ -701,24 +701,20 @@ def _check_fastqs(fastq, fastq2=None):
             for record in SeqIO.parse(f, 'fastq'):
                 while n < 100:
                     n +=1
-        except Exception as e:
-            raise e
-        finally:
             f.close()
-
-    try:
-        core(fastq)
-    except ValueError as e:
-        logging.error("There appears to be an issue with the input file {}.".format(fastq))
-        raise e
-
-    if fastq2:
-        try:
-            core(fastq2)
         except ValueError as e:
-            logging.error("There appears to be an issue with the input file {}.".format(fastq2))
+            logging.error("There appears to be an issue with the format of input file {}.".format(file))
             raise e
+        except FileNotFoundError as f:
+            logging.error("The input file {} could not be found.".format(file))
+            raise f
+        except Exception as g:
+            logging.error("There appears to be an issue reading the input file {}.".format(file))
+            raise g
 
+    core(fastq)
+    if fastq2:
+        core(fastq2)
 
 def main(args=None):
     """Run Complete ITS trimming workflow.
