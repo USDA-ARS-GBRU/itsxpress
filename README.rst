@@ -87,6 +87,8 @@ Usage
 
 --outfile				The trimmed FASTQ file, if it ends in ``gz`` it will be gzipped.
 
+--outfile2			The trimmed FASTQ read 2 file, if it ends in ``gz`` it will be gzipped. If used, reads will be retuned as unmerged pairs rather than than merged.
+
 --tempdir				Specify the temp file directory. Default is None.
 
 --keeptemp				Should intermediate files be kept? Default is false.
@@ -111,7 +113,19 @@ Examples
 ---------
 
 Use case 1: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
-forward and reverse gzipped FASTQ files using two cpu threads.
+forward and reverse gzipped FASTQ files using two cpu threads. Return a single merged file for use in Deblur.
+
+.. code-block:: bash
+
+    itsxpress --fastq r1.fastq.gz --fastq2 r2.fastq.gz --region ITS2 \
+    --taxa Fungi --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
+
+ITSxpress can take gzipped or un-gzipped FASTQ files and it can write gzipped or
+un-gzipped FASTQ files. It expects FASTQ files to end in: .fq, .fastq, .fq.gz or fastq.gz.
+
+Use case 2: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
+forward and reverse gzipped FASTQ files using two cpu threads. Return a forward
+and reverse read files  for use in Dada2.
 
 .. code-block:: bash
 
@@ -122,8 +136,8 @@ ITSxpress can take gzipped or un-gzipped FASTQ files and it can write gzipped or
 un-gzipped FASTQ files. It expects FASTQ files to end in: .fq, .fastq, .fq.gz or fastq.gz.
 
 
-Use case 2: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
-an interleaved gzipped FASTQ files using two cpu threads.
+Use case 3: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
+an interleaved gzipped FASTQ files using two cpu threads. Return a single merged file for use in Deblur.
 
 .. code-block:: bash
 
@@ -131,7 +145,7 @@ an interleaved gzipped FASTQ files using two cpu threads.
     --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
 
 
-Use case 3: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
+Use case 4: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
 an single-ended gzipped FASTQ files using two cpu threads.
 
 .. code-block:: bash
@@ -142,7 +156,7 @@ an single-ended gzipped FASTQ files using two cpu threads.
 Single ended data is less common and may come from a dataset where the reads have already
 been merged.
 
-Use case 4: Trimming the ITS1 region from a Alveolata amplicon sequencing dataset with
+Use case 5: Trimming the ITS1 region from a Alveolata amplicon sequencing dataset with
 an interleaved gzipped FASTQ files using 40 cpu threads.
 
 .. code-block:: bash
