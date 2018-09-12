@@ -3,6 +3,10 @@ ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) reg
 .. image:: https://travis-ci.org/USDA-ARS-GBRU/itsxpress.svg?branch=master
     :target: https://travis-ci.org/USDA-ARS-GBRU/itsxpress
 
+.. image:: https://readthedocs.org/projects/itsxpress/badge/?version=latest
+    :target: https://itsxpress.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
 .. image:: https://codecov.io/gh/USDA-ARS-GBRU/itsxpress/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/USDA-ARS-GBRU/itsxpress
 
@@ -16,6 +20,15 @@ Author
 -------
 * Adam R. Rivers, US Department of Agriculture, Agricultural Research Service
 
+
+Citation
+--------
+Rivers AR, Weber KC, Gardner TG et al. ITSxpress: Software to rapidly trim
+internally transcribed spacer sequences with quality scores for marker gene
+analysis [version 1; referees: awaiting peer review]. F1000Research 2018, 7:1418
+(doi: `10.12688/f1000research.15704.1`_)
+
+.. _`10.12688/f1000research.15704.1`: https://doi.org/10.12688/f1000research.15704.1
 
 Introduction
 -------------
