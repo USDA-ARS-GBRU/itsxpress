@@ -208,6 +208,8 @@ class ItsPosition:
                 stop = None
             if "tlen" in self.ddict[sequence]:
                 tlen = int(self.ddict[sequence]["tlen"])
+            else:
+                tlen = None
             return(start, stop, tlen)
         except KeyError:
             logging.debug("No ITS stop or start sites were identified for sequence {}, skipping.".format(sequence))
