@@ -28,9 +28,9 @@ def test_check_fastq_gzs():
 
 def test_its_position_init():
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
-	exp1 = {'left': {'score': '53.7', 'pos': '128'}, 'tlen': '341', 'right': {'score': '60.0', 'pos': '282'}}
+	exp1 = {'right': {'score': '59.1', 'pos': '282'}, 'tlen': '341', 'left': {'score': '52.2', 'pos': '128'}}
 	ok_(exp1 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"])
-	exp2 = {'right': {'score': '35.1', 'pos': '327'},'tlen': '385'}
+	exp2 = {'right': {'score': '34.0', 'pos': '327'}, 'tlen': '385'}
 	ok_(exp2 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:23011:4341"])
 	ok_(len(itspos.ddict) == 137)
 
@@ -48,6 +48,7 @@ def test_dedup():
 
 def test_dedup_create_trimmed_seqs():
 	tf = tempfile.mkdtemp()
+	print(tf)
 	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
 	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
 	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
@@ -63,11 +64,12 @@ def test_dedup_create_trimmed_seqs():
 			n += 1
 			length += len(rec)
 	assert n == 226
-	assert length == 42637
+	assert length == 42435
 	shutil.rmtree(tf)
 
 def test_dedup_create_trimmed_seqs_gzipped():
 	tf = tempfile.mkdtemp()
+	print(tf)
 	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
 	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
 	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
@@ -83,7 +85,7 @@ def test_dedup_create_trimmed_seqs_gzipped():
 			n += 1
 			length += len(rec)
 	assert n == 226
-	assert length == 42637
+	assert length == 42435
 	shutil.rmtree(tf)
 
 def test_seq_sample_paired_interleaved():

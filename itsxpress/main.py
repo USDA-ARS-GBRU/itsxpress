@@ -154,7 +154,7 @@ class ItsPosition:
                         ll=line.split()
                         sequence=ll[0]
                         hmmprofile=ll[3]
-                        score=ll[7]
+                        score=ll[13]
                         from_pos=ll[19]
                         to_pos=ll[20]
                         tlen=ll[2]
@@ -296,7 +296,8 @@ class Dedup:
                     repseq = self.matchdict[record1.id]
                     start, stop, tlen = itspos.get_position(repseq)
                     if start and stop:
-                        return True
+                        if start < stop:
+                            return True
                 else:
                     return False
             except KeyError:
@@ -345,7 +346,13 @@ class Dedup:
         """
 
         def _write_seqs(seqs, outfile):
-            print("in write seqs")
+            """Helper function to optionally write sequences in compressed format
+
+            Args:
+                seqs (obj): A biopython SeqRecord generators
+                outfile (str): A file name to writ the fastq data to.
+
+            """
             if gzipped:
                 with gzip.open(outfile, 'wt') as g:
                     SeqIO.write(seqs, g, "fastq")
@@ -354,6 +361,13 @@ class Dedup:
                     SeqIO.write(seqs, g, "fastq")
 
         def _create_gen(f, g):
+            """Create a sequence generator
+
+            Args:
+                f (str): a file name for read 1 fastq data
+                g (str): a file name for read 2 fastq data
+
+            """
             seqgen1 = SeqIO.parse(f, 'fastq')
             seqgen2 = SeqIO.parse(g, 'fastq')
             zipseqgen = zip(seqgen1, seqgen2)
@@ -406,7 +420,8 @@ class Dedup:
                     repseq = self.matchdict[record.id]
                     start, stop, tlen = itspos.get_position(repseq)
                     if start and stop:
-                        return True
+                        if start < stop:
+                            return True
                 else:
                     return False
             except KeyError:
