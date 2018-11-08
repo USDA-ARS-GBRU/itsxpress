@@ -28,9 +28,11 @@ def test_check_fastq_gzs():
 
 def test_its_position_init():
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
-	exp1 = {'right': {'score': '59.1', 'pos': '282'}, 'tlen': '341', 'left': {'score': '52.2', 'pos': '128'}}
+	exp1 = {'tlen': 341, 'right': {'score': 59.1, 'pos': 282}, 'left': {'score': 52.2, 'pos': 128}}
+	print(itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"])
 	ok_(exp1 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"])
-	exp2 = {'right': {'score': '34.0', 'pos': '327'}, 'tlen': '385'}
+	exp2 = {'right': {'score': 34.0, 'pos': 327}, 'tlen': 385}
+	print(itspos.ddict["M02696:28:000000000-ATWK5:1:1101:23011:4341"])
 	ok_(exp2 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:23011:4341"])
 	ok_(len(itspos.ddict) == 137)
 
@@ -63,8 +65,9 @@ def test_dedup_create_trimmed_seqs():
 		for rec in recs:
 			n += 1
 			length += len(rec)
+	print("n: {}, length: {}".format(n,length))
 	assert n == 226
-	assert length == 42435
+	assert length == 42637
 	shutil.rmtree(tf)
 
 def test_dedup_create_trimmed_seqs_gzipped():
@@ -84,8 +87,9 @@ def test_dedup_create_trimmed_seqs_gzipped():
 		for rec in recs:
 			n += 1
 			length += len(rec)
+	print("n: {}, length: {}".format(n,length))
 	assert n == 226
-	assert length == 42435
+	assert length == 42637
 	shutil.rmtree(tf)
 
 def test_seq_sample_paired_interleaved():
