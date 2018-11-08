@@ -114,8 +114,8 @@ Usage
 						Oomycota, Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,
 						Tracheophyta, Eustigmatophyceae, All}. Default Fungi.
 
---cluster_id            The percent identity for clustering reads range [0.98-1.0], set to 1
-                        for exact dereplication. Default 0.995.
+--cluster_id            The percent identity for clustering reads range [0.99-1.0], set to 1
+                        for exact dereplication. Default 1.0.
 
 --log		          	Log file. Default is ITSxpress.log.
 
@@ -170,12 +170,12 @@ Single ended data is less common and may come from a dataset where the reads hav
 been merged.
 
 Use case 5: Trimming the ITS1 region from a Alveolata amplicon sequencing dataset with
-an interleaved gzipped FASTQ files using 40 cpu threads.
+an interleaved gzipped FASTQ files using 8 cpu threads.
 
 .. code-block:: bash
 
     itsxpress --fastq interleaved.fastq.gz --region ITS1 --taxa Alveolata \
-    --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 40
+    --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 8
 
 
 License information
