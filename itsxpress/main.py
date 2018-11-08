@@ -32,7 +32,6 @@ Reference:
     eukaryotes for use in environmental sequencing. Methods in Ecology and Evolution,
     4: 914-919, 2013 (DOI: 10.1111/2041-210X.12073)
 """
-
 import gzip
 import tempfile
 import argparse
@@ -50,8 +49,8 @@ from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict
 
 def restricted_float(x):
     x = float(x)
-    if x < 0.98 or x > 1.0:
-        raise argparse.ArgumentTypeError("%r not in range [0.98, 1.0]"%(x,))
+    if x < 0.99 or x > 1.0:
+        raise argparse.ArgumentTypeError("%r not in range [0.99, 1.0]"%(x,))
     return x
 
 
@@ -72,7 +71,7 @@ def myparser():
     parser.add_argument('--keeptemp' ,help="Should intermediate files be kept?", action='store_true')
     parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
     parser.add_argument('--taxa', help='The taxonomic group sequenced.', choices=taxa_choices, default="Fungi")
-    parser.add_argument('--cluster_id', help='The percent identity for clustering reads range [0.98-1.0], set to 1 for exact dereplication.', type=restricted_float, default=0.995)
+    parser.add_argument('--cluster_id', help='The percent identity for clustering reads range [0.99-1.0], set to 1 for exact dereplication.', type=restricted_float, default=1.0)
     parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
     parser.add_argument('--threads' ,help="Number of processor threads to use.", type=int, default=1)
     return parser
@@ -111,13 +110,13 @@ class ItsPosition:
 
         if "left" in self.ddict[sequence]:
             if score > self.ddict[sequence]["left"]["score"]:
-                 self.ddict[sequence]["left"]["score"]=score
-                 self.ddict[sequence]["left"]["pos"]=to_pos
+                self.ddict[sequence]["left"]["score"] = score
+                self.ddict[sequence]["left"]["pos"] = to_pos
         else:
-            self.ddict[sequence]["left"]={}
-            self.ddict[sequence]["left"]["score"]=score
-            self.ddict[sequence]["left"]["pos"]=to_pos
-            self.ddict[sequence]["tlen"]=tlen
+            self.ddict[sequence]["left"] = {}
+            self.ddict[sequence]["left"]["score"] = score
+            self.ddict[sequence]["left"]["pos"] = to_pos
+            self.ddict[sequence]["tlen"] = tlen
 
     def _right_score(self, sequence, score, from_pos, tlen):
         """Evaluates right scores and positions form the new line of a domtable file and
@@ -131,8 +130,8 @@ class ItsPosition:
         """
         if "right" in self.ddict[sequence]:
             if score > self.ddict[sequence]["right"]["score"]:
-                 self.ddict[sequence]["right"]["score"]=score
-                 self.ddict[sequence]["right"]["pos"]=from_pos
+                self.ddict[sequence]["right"]["score"] = score
+                self.ddict[sequence]["right"]["pos"] = from_pos
         else:
             self.ddict[sequence]["right"] = {}
             self.ddict[sequence]["right"]["score"] = score
@@ -148,18 +147,18 @@ class ItsPosition:
 
         """
         try:
-            with open(self.domtable , 'r') as f:
-                for line in f:
+            with open(self.domtable, 'r') as f:
+                for num, line in enumerate(f):
                     if not line.startswith("#"):
-                        ll=line.split()
-                        sequence=ll[0]
-                        hmmprofile=ll[3]
-                        score=ll[7]
-                        from_pos=ll[19]
-                        to_pos=ll[20]
-                        tlen=ll[2]
+                        ll = line.split()
+                        sequence = ll[0]
+                        hmmprofile = ll[3]
+                        score = float(ll[13])
+                        from_pos = int(ll[19])
+                        to_pos = int(ll[20])
+                        tlen = int(ll[2])
                         if sequence not in self.ddict:
-                            self.ddict[sequence]={}
+                            self.ddict[sequence] = {}
                         if hmmprofile.startswith(self.leftprefix):
                             self._left_score(sequence, score, to_pos, tlen)
                         elif hmmprofile.startswith(self.rightprefix):
@@ -171,15 +170,15 @@ class ItsPosition:
     def __init__(self, domtable, region):
         self.domtable = domtable
         self.ddict = {}
-        if region=="ITS2":
-            self.leftprefix='3_'
-            self.rightprefix='4_'
-        elif region=="ITS1":
-            self.leftprefix='1_'
-            self.rightprefix='2_'
-        elif region=="ALL":
-            self.leftprefix='1_'
-            self.rightprefix='4_'
+        if region == "ITS2":
+            self.leftprefix = '3_'
+            self.rightprefix = '4_'
+        elif region == "ITS1":
+            self.leftprefix = '1_'
+            self.rightprefix = '2_'
+        elif region == "ALL":
+            self.leftprefix = '1_'
+            self.rightprefix = '4_'
         self.parse()
 
 
@@ -203,7 +202,7 @@ class ItsPosition:
             else:
                 start = None
             if "right" in self.ddict[sequence]:
-                stop =  int(self.ddict[sequence]["right"]["pos"]) - 1
+                stop = int(self.ddict[sequence]["right"]["pos"]) - 1
             else:
                 stop = None
             if "tlen" in self.ddict[sequence]:
@@ -296,7 +295,8 @@ class Dedup:
                     repseq = self.matchdict[record1.id]
                     start, stop, tlen = itspos.get_position(repseq)
                     if start and stop:
-                        return True
+                        if start < stop:
+                            return True
                 else:
                     return False
             except KeyError:
@@ -345,7 +345,13 @@ class Dedup:
         """
 
         def _write_seqs(seqs, outfile):
-            print("in write seqs")
+            """Helper function to optionally write sequences in compressed format
+
+            Args:
+                seqs (obj): A biopython SeqRecord generators
+                outfile (str): A file name to writ the fastq data to.
+
+            """
             if gzipped:
                 with gzip.open(outfile, 'wt') as g:
                     SeqIO.write(seqs, g, "fastq")
@@ -354,6 +360,13 @@ class Dedup:
                     SeqIO.write(seqs, g, "fastq")
 
         def _create_gen(f, g):
+            """Create a sequence generator
+
+            Args:
+                f (str): a file name for read 1 fastq data
+                g (str): a file name for read 2 fastq data
+
+            """
             seqgen1 = SeqIO.parse(f, 'fastq')
             seqgen2 = SeqIO.parse(g, 'fastq')
             zipseqgen = zip(seqgen1, seqgen2)
@@ -362,7 +375,7 @@ class Dedup:
             _write_seqs(seqs2, outfile2)
 
         try:
-            if self.fastq.endswith(".gz") and self.fastq2.endswith(".gz") :
+            if self.fastq.endswith(".gz") and self.fastq2.endswith(".gz"):
                 with gzip.open(self.fastq, 'rt') as f:
                     with gzip.open(self.fastq2, 'rt') as g:
                         _create_gen(f, g)
@@ -406,7 +419,8 @@ class Dedup:
                     repseq = self.matchdict[record.id]
                     start, stop, tlen = itspos.get_position(repseq)
                     if start and stop:
-                        return True
+                        if start < stop:
+                            return True
                 else:
                     return False
             except KeyError:
@@ -479,7 +493,7 @@ class SeqSample:
     def __init__(self, fastq, tempdir=None):
         if tempdir:
             if not os.path.exists(tempdir):
-                logging.warning("Secified location for tempfile ({}) does not exist, using default location.".format(tempdir))
+                logging.warning("Specified location for tempfile ({}) does not exist, using default location.".format(tempdir))
                 self.tempdir = tempfile.mkdtemp(prefix='itsxpress_')
             else:
                 self.tempdir = tempfile.mkdtemp(prefix='itsxpress_', dir=tempdir)
@@ -529,8 +543,8 @@ class SeqSample:
 
         """
         try:
-            self.uc_file=os.path.join(self.tempdir, 'uc.txt')
-            self.rep_file=os.path.join(self.tempdir,'rep.fa')
+            self.uc_file = os.path.join(self.tempdir, 'uc.txt')
+            self.rep_file = os.path.join(self.tempdir,'rep.fa')
             parameters = ["vsearch",
                           "--cluster_size", self.seq_file,
                           "--centroids", self.rep_file,
@@ -550,7 +564,7 @@ class SeqSample:
 
     def _search(self, hmmfile, threads=1):
         try:
-            self.dom_file=os.path.join(self.tempdir, 'domtbl.txt')
+            self.dom_file = os.path.join(self.tempdir, 'domtbl.txt')
             #Run Hmmsearch
             parameters = ["hmmsearch",
                           "--domtblout",
@@ -563,7 +577,7 @@ class SeqSample:
                           "--F3", "1e-6",
                           hmmfile,
                           self.rep_file]
-            p4 = subprocess.run(parameters,stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
+            p4 = subprocess.run(parameters, stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
             p4.check_returncode()
         except subprocess.CalledProcessError as e :
             logging.exception("Could not perform ITS identification with hmmserach. The error was:\n {}".format(p4.stderr.decode('utf-8')))
@@ -584,7 +598,7 @@ class SeqSamplePairedInterleaved(SeqSample):
                           'in=' + self.fastq,
                           'out=' + seq_r1,
                           'out2=' + seq_r2,
-                          ]
+                         ]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             p1.check_returncode()
             self.r1 = seq_r1
@@ -607,9 +621,9 @@ class SeqSamplePairedInterleaved(SeqSample):
         try:
             seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
             parameters = ['bbmerge.sh',
-                      'in=' + self.fastq,
-                      'out=' + seq_file,
-                      't=' + str(threads)]
+                          'in=' + self.fastq,
+                          'out=' + seq_file,
+                          't=' + str(threads)]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             self.seq_file = seq_file
             p1.check_returncode()
@@ -627,17 +641,17 @@ class SeqSamplePairedNotInterleaved(SeqSample):
     """
     def __init__(self, fastq, tempdir, fastq2):
         SeqSample.__init__(self, fastq, tempdir)
-        self.r1 =  fastq
+        self.r1 = fastq
         self.fastq2 = fastq2
 
     def _merge_reads(self, threads):
         try:
             seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
             parameters = ['bbmerge.sh',
-                      'in=' + self.fastq,
-                      'in2=' + self.fastq2,
-                      'out=' + seq_file,
-                      't=' + str(threads)]
+                          'in=' + self.fastq,
+                          'in2=' + self.fastq2,
+                          'out=' + seq_file,
+                          't=' + str(threads)]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             self.seq_file = seq_file
             p1.check_returncode()
@@ -675,8 +689,8 @@ def _is_paired(fastq, fastq2, single_end):
         paired_end = False
         interleaved = False
     else:
-        paired_end=True
-        interleaved=True
+        paired_end = True
+        interleaved = True
     return paired_end, interleaved
 
 def _logger_setup(logfile):
@@ -689,10 +703,10 @@ def _logger_setup(logfile):
     """
     try:
         logging.basicConfig(level=logging.DEBUG,
-                        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                        datefmt='%m-%d %H:%M',
-                        filename=logfile,
-                        filemode='w')
+                            format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                            datefmt='%m-%d %H:%M',
+                            filename=logfile,
+                            filemode='w')
         # define a Handler which writes INFO messages or higher to the sys.stderr
         console = logging.StreamHandler()
         console.setLevel(logging.INFO)
@@ -722,10 +736,10 @@ def _check_fastqs(fastq, fastq2=None):
                 f = gzip.open(file, 'rt')
             else:
                 f = open(file, 'r')
-            n=0
+            n = 0
             for record in SeqIO.parse(f, 'fastq'):
                 while n < 100:
-                    n +=1
+                    n += 1
             f.close()
         except ValueError as e:
             logging.error("There appears to be an issue with the format of input file {}.".format(file))
@@ -779,7 +793,7 @@ def main(args=None):
             sobj.cluster(threads=str(args.threads),cluster_id=args.cluster_id)
         # HMMSearch for ITS regions
         logging.info("Searching for ITS start and stop sites using HMMSearch. This step takes a while.")
-        hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict[args.taxa])
+        hmmfile = os.path.join(ROOT_DIR, "ITSx_db","HMMs", taxa_dict[args.taxa])
         sobj._search(hmmfile=hmmfile, threads=str(args.threads))
         # Parse Hmmsearch output
         logging.info("Parsing HMM results.")
@@ -789,7 +803,7 @@ def main(args=None):
         # Create trimmed sequences
         logging.info("Writing out sequences")
         if args.outfile2:
-            if args.outfile.split('.')[-1] =='gz' and args.outfile2.split('.')[-1] =='gz':
+            if args.outfile.split('.')[-1] == 'gz' and args.outfile2.split('.')[-1] == 'gz':
                 dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True, itspos=its_pos)
             else:
                 dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, itspos=its_pos)
@@ -799,7 +813,7 @@ def main(args=None):
             else:
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, itspos=its_pos)
         t1 = time.time()
-        fmttime = time.strftime("%H:%M:%S",time.gmtime(t1-t0))
+        fmttime = time.strftime("%H:%M:%S", time.gmtime(t1-t0))
         logging.info("ITSxpress ran in {}".format(fmttime))
     except Exception as e:
         logging.error("ITSxpress terminated with errors. See the log file for details.")
