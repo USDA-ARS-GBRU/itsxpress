@@ -45,7 +45,7 @@ from itertools import tee
 
 from Bio import SeqIO
 
-from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict
+from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio
 
 def restricted_float(x):
     x = float(x)
@@ -72,6 +72,7 @@ def myparser():
     parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
     parser.add_argument('--taxa', help='The taxonomic group sequenced.', choices=taxa_choices, default="Fungi")
     parser.add_argument('--cluster_id', help='The percent identity for clustering reads range [0.99-1.0], set to 1 for exact dereplication.', type=restricted_float, default=1.0)
+    parser.add_argument('--reversed_primers', '-rp',  help="Primers are in reverse orientation as in Taylor et al. 2016, DOI:10.1128/AEM.02576-16", action='store_true')
     parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
     parser.add_argument('--threads' ,help="Number of processor threads to use.", type=int, default=1)
     return parser
@@ -81,7 +82,6 @@ def myparser():
 
 class ItsPosition:
     """Class for ITS positional information derived from hmmserach domtable files.
-
 
     Args:
         domtable (str):  the path locating the domtable file from HMMER 3 hmmsearch.
@@ -94,48 +94,31 @@ class ItsPosition:
         leftprefix (str): the left prefix to search for (set by type variable).
         rightprefix (str): the right prefix to search for (set by type variable).
 
-
     """
-
-    def _left_score(self, sequence, score, to_pos, tlen):
-        """Evaluates left scores and positions from the new line of a domtable file and
+    def _score(self, sequence, stype, score, from_pos, to_pos, tlen):
+        """Evaluates scores and positions from the new line of a domtable file and
             updates ddict if necessary.
 
         Args:
             sequence (str): The name of the sequence.
+            stype (str): {'left', 'right'}
             score (int): The bit score from HMMSearch.
             to_pos (int): the ending position of the left sequence.
-
-        """
-
-        if "left" in self.ddict[sequence]:
-            if score > self.ddict[sequence]["left"]["score"]:
-                self.ddict[sequence]["left"]["score"] = score
-                self.ddict[sequence]["left"]["pos"] = to_pos
-        else:
-            self.ddict[sequence]["left"] = {}
-            self.ddict[sequence]["left"]["score"] = score
-            self.ddict[sequence]["left"]["pos"] = to_pos
-            self.ddict[sequence]["tlen"] = tlen
-
-    def _right_score(self, sequence, score, from_pos, tlen):
-        """Evaluates right scores and positions form the new line of a domtable file and
-        updates ddict if necessary.
-
-        Args:
-            sequence (str): The name of the sequence.
-            score (int): The bit score from HMMSearch.
             from_pos (int): The beginning position of the right sequence.
+            tlen (int): the length of the sequence
 
         """
-        if "right" in self.ddict[sequence]:
-            if score > self.ddict[sequence]["right"]["score"]:
-                self.ddict[sequence]["right"]["score"] = score
-                self.ddict[sequence]["right"]["pos"] = from_pos
+
+        if stype in self.ddict[sequence]:
+            if score > self.ddict[sequence][stype]["score"]:
+                self.ddict[sequence][stype]["score"] = score
+                self.ddict[sequence][stype]["to_pos"] = to_pos
+                self.ddict[sequence][stype]["from_pos"] = from_pos
         else:
-            self.ddict[sequence]["right"] = {}
-            self.ddict[sequence]["right"]["score"] = score
-            self.ddict[sequence]["right"]["pos"] = from_pos
+            self.ddict[sequence][stype] = {}
+            self.ddict[sequence][stype]["score"] = score
+            self.ddict[sequence][stype]["to_pos"] = to_pos
+            self.ddict[sequence][stype]["from_pos"] = from_pos
             self.ddict[sequence]["tlen"] = tlen
 
 
@@ -160,9 +143,9 @@ class ItsPosition:
                         if sequence not in self.ddict:
                             self.ddict[sequence] = {}
                         if hmmprofile.startswith(self.leftprefix):
-                            self._left_score(sequence, score, to_pos, tlen)
+                            self._score(sequence, 'left', score, from_pos, to_pos, tlen)
                         elif hmmprofile.startswith(self.rightprefix):
-                            self._right_score(sequence, score, from_pos, tlen)
+                            self._score(sequence, 'right', score, from_pos, to_pos, tlen)
         except Exception as e:
             logging.error("Exception occurred when parsing HMMSearh results")
             raise e
@@ -198,11 +181,11 @@ class ItsPosition:
 
         try:
             if "left" in self.ddict[sequence]:
-                start = int(self.ddict[sequence]["left"]["pos"])
+                start = int(self.ddict[sequence]["left"]["to_pos"]) 
             else:
                 start = None
             if "right" in self.ddict[sequence]:
-                stop = int(self.ddict[sequence]["right"]["pos"]) - 1
+                stop = int(self.ddict[sequence]["right"]["from_pos"]) - 1
             else:
                 stop = None
             if "tlen" in self.ddict[sequence]:
@@ -317,7 +300,7 @@ class Dedup:
             repseq = self.matchdict[record1.id]
             start, stop, tlen = itspos.get_position(repseq)
             r2start = tlen - stop
-            return record1[start-1:], record2[r2start:]
+            return record1[start:], record2[r2start:]
 
         def _split_gen(gen):
             gen_a, gen_b = tee(gen, 2)
@@ -623,7 +606,9 @@ class SeqSamplePairedInterleaved(SeqSample):
             parameters = ['bbmerge.sh',
                           'in=' + self.fastq,
                           'out=' + seq_file,
-                          't=' + str(threads)]
+                          't=' + str(threads),
+                          'maxmismatches=' + str(maxmismatches),
+                          'maxratio=' + str(maxratio)]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             self.seq_file = seq_file
             p1.check_returncode()
@@ -651,7 +636,9 @@ class SeqSamplePairedNotInterleaved(SeqSample):
                           'in=' + self.fastq,
                           'in2=' + self.fastq2,
                           'out=' + seq_file,
-                          't=' + str(threads)]
+                          't=' + str(threads),
+                          'maxmismatches=' + str(maxmismatches),
+                          'maxratio=' + str(maxratio)]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             self.seq_file = seq_file
             p1.check_returncode()
@@ -674,7 +661,7 @@ class SeqSampleNotPaired(SeqSample):
         self.r1 = self.fastq
         self.fastq2 = None
 
-
+## Utility Functions
 
 def _is_paired(fastq, fastq2, single_end):
     """Determines the workflow based on file inputs.
@@ -754,6 +741,8 @@ def _check_fastqs(fastq, fastq2=None):
     core(fastq)
     if fastq2:
         core(fastq2)
+
+# workflow
 
 def main(args=None):
     """Run Complete ITS trimming workflow.

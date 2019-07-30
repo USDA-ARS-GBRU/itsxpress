@@ -28,10 +28,10 @@ def test_check_fastq_gzs():
 
 def test_its_position_init():
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
-	exp1 = {'tlen': 341, 'right': {'score': 59.1, 'pos': 282}, 'left': {'score': 52.2, 'pos': 128}}
+	exp1 = {'tlen': 341, 'right': {'score': 59.1, 'to_pos': 326, 'from_pos': 282}, 'left': {'score': 52.2, 'to_pos': 128, 'from_pos': 84}}
 	print(itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"])
 	ok_(exp1 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"])
-	exp2 = {'right': {'score': 34.0, 'pos': 327}, 'tlen': 385}
+	exp2 = {'right': {'score': 34.0, 'to_pos': 370, 'from_pos': 327}, 'tlen': 385}
 	print(itspos.ddict["M02696:28:000000000-ATWK5:1:1101:23011:4341"])
 	ok_(exp2 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:23011:4341"])
 	ok_(len(itspos.ddict) == 137)
@@ -65,7 +65,7 @@ def test_dedup_create_trimmed_seqs():
 		for rec in recs:
 			n += 1
 			length += len(rec)
-	print("n: {}, length: {}".format(n,length))
+	print("n: {}, length: {}".format(n, length))
 	assert n == 226
 	assert length == 42637
 	shutil.rmtree(tf)
@@ -133,14 +133,16 @@ def test_myparser():
 def test_main_interleaved():
 	parser = itsxpress.main.myparser()
 	tf = tempfile.mkdtemp()
+	print(tf)
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_interleaved.fastq")
 	outfile = os.path.join(tf,'testout.fastq')
-	args = parser.parse_args(['--fastq', fastq,'--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi'])
+	args = parser.parse_args(['--fastq', fastq,'--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi', '--keeptemp'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = sum(1 for _ in seqs)
-	ok_(n==226)
-	shutil.rmtree(tf)
+	print(n)
+	ok_(n == 227)
+	#shutil.rmtree(tf)
 
 def test_main_paired():
 	parser = itsxpress.main.myparser()
@@ -153,21 +155,21 @@ def test_main_paired():
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = sum(1 for _ in seqs)
-	ok_(n==226)
+	ok_(n == 227)
 	shutil.rmtree(tf)
 
 def test_main_merged():
 	parser = itsxpress.main.myparser()
 	tf = tempfile.mkdtemp()
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_merged.fastq")
-
 	outfile = os.path.join(tf,'testout.fastq')
 	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
 	args = parser.parse_args(['--fastq', fastq, '--single_end', '--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = sum(1 for _ in seqs)
-	ok_(n==226)
+	print(n)
+	ok_(n == 226)
 	shutil.rmtree(tf)
 
 def test_main_paired_no_cluster():
@@ -181,7 +183,7 @@ def test_main_paired_no_cluster():
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = sum(1 for _ in seqs)
-	ok_(n==226)
+	ok_(n==227)
 	shutil.rmtree(tf)
 
 def test_get_paired_seq_generator():
