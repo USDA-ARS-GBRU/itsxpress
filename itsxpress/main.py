@@ -181,7 +181,7 @@ class ItsPosition:
 
         try:
             if "left" in self.ddict[sequence]:
-                start = int(self.ddict[sequence]["left"]["to_pos"]) 
+                start = int(self.ddict[sequence]["left"]["to_pos"])
             else:
                 start = None
             if "right" in self.ddict[sequence]:
@@ -573,7 +573,7 @@ class SeqSamplePairedInterleaved(SeqSample):
     """SeqSample class extended to paired, interleaved format.
 
     """
-    def split_interleaved(self):
+    def split_interleaved(self, reversed_primers=False):
         try:
             seq_r1 = os.path.join(self.tempdir, 'seq_r1.fq.gz')
             seq_r2 = os.path.join(self.tempdir, 'seq_r2.fq.gz')
@@ -584,8 +584,12 @@ class SeqSamplePairedInterleaved(SeqSample):
                          ]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             p1.check_returncode()
-            self.r1 = seq_r1
-            self.fastq2 = seq_r2
+            if reversed_primers:
+                self.r1 = seq_r2
+                self.fastq2 = seq_r1
+            else:
+                self.r1 = seq_r1
+                self.fastq2 = seq_r2
             logging.info(p1.stderr.decode('utf-8'))
         except subprocess.CalledProcessError as e:
             logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
@@ -594,11 +598,13 @@ class SeqSamplePairedInterleaved(SeqSample):
             logging.error("BBmerge was not found, make sure BBmerge is executable")
             raise f
 
-    def __init__(self, fastq, tempdir):
-        SeqSample.__init__(self, fastq, tempdir)
-        self.r1 = None
-        self.fastq2 = None
-        self.split_interleaved()
+    def __init__(self, fastq, tempdir, reversed_primers=False):
+        if reversed_primers:
+            SeqSample.__init__(self, fastq, tempdir)
+            self.split_interleaved(reversed_primers=True)
+        else:
+            SeqSample.__init__(self, fastq, tempdir)
+            self.split_interleaved()
 
     def _merge_reads(self, threads):
         try:
@@ -624,16 +630,20 @@ class SeqSamplePairedNotInterleaved(SeqSample):
     """SeqSample class extended to paired, two FASTQ file format.
 
     """
-    def __init__(self, fastq, tempdir, fastq2):
+    def __init__(self, fastq, tempdir, fastq2, reversed_primers=False ):
         SeqSample.__init__(self, fastq, tempdir)
-        self.r1 = fastq
-        self.fastq2 = fastq2
+        if reversed_primers:
+            self.r1 = fastq2
+            self.fastq2 = fastq
+        else:
+            self.r1 = fastq
+            self.fastq2 = fastq2
 
     def _merge_reads(self, threads):
         try:
             seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
             parameters = ['bbmerge.sh',
-                          'in=' + self.fastq,
+                          'in=' + self.r1,
                           'in2=' + self.fastq2,
                           'out=' + seq_file,
                           't=' + str(threads),
@@ -760,15 +770,15 @@ def main(args=None):
         logging.info("Verifying the input sequences.")
         _check_fastqs(args.fastq, args.fastq2)
         # Parse input types
-        paired_end, interleaved = _is_paired(args.fastq,args.fastq2, args.single_end)
+        paired_end, interleaved = _is_paired(args.fastq, args.fastq2, args.single_end)
         # create SeqSample objects and merge if needed
         if paired_end and interleaved:
             logging.info("Sequences are paired-end and interleaved. They will be merged using BBmerge.")
-            sobj = SeqSamplePairedInterleaved(fastq=args.fastq, tempdir=args.tempdir)
+            sobj = SeqSamplePairedInterleaved(fastq=args.fastq, tempdir=args.tempdir, reversed_primers=args.reversed_primers )
             sobj._merge_reads(threads=str(args.threads))
         elif paired_end and not interleaved:
             logging.info("Sequences are paired-end in two files. They will be merged using BBmerge.")
-            sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=args.tempdir)
+            sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=args.tempdir, reversed_primers=args.reversed_primers)
             sobj._merge_reads(threads=str(args.threads))
         elif not paired_end and not interleaved:
             logging.info("Sequences are assumed to be single-end.")

@@ -27,4 +27,4 @@ after_success:
 
 notifications:
   email:
-    - adam.rivers@ars.usda.gov
+    - adam.rivers@usda.gov
