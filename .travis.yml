@@ -4,8 +4,8 @@ python:
   - "3.6"
 # command to install dependencies
 before_install:
-  - wget https://sourceforge.net/projects/bbmap/files/BMap_38.60.tar.gz -O /tmp/BMap_38.60.tar.gz
-  - tar -xvf /tmp/BMap_38.60.tar.gz
+  - wget https://sourceforge.net/projects/bbmap/files/BBMap_38.60.tar.gz -O /tmp/BBMap_38.60.tar.gz
+  - tar -xvf /tmp/BBMap_38.60.tar.gz
   - export PATH=$PATH:$PWD/bbmap
   - wget https://github.com/torognes/vsearch/releases/download/v2.13.6/vsearch-2.13.6-linux-x86_64.tar.gz -O /tmp/vsearch-2.13.6-linux-x86_64.tar.gz
   - tar -xvf /tmp/vsearch-2.13.6-linux-x86_64.tar.gzz
