@@ -120,6 +120,7 @@ Usage
 --log		          	Log file. Default is ITSxpress.log.
 
 --threads		     	Number of processor threads to use. Default is 1.
+
 --reversed_primers Primers are in reverse orientation as in Taylor et al. 2016,
                     DOI:10.1128/AEM.02576-16. If selected ITSxpress returns
                     trimmed reads flipped to the forward orientation
