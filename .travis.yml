@@ -4,12 +4,12 @@ python:
   - "3.6"
 # command to install dependencies
 before_install:
-  - wget https://sourceforge.net/projects/bbmap/files/BBMap_38.00.tar.gz -O /tmp/BBMap_37.00.tar.gz
-  - tar -xvf /tmp/BBMap_37.00.tar.gz
+  - wget https://sourceforge.net/projects/bbmap/files/BBMap_38.60.tar.gz -O /tmp/BBMap_38.60.tar.gz
+  - tar -xvf /tmp/BBMap_38.60.tar.gz
   - export PATH=$PATH:$PWD/bbmap
-  - wget https://github.com/torognes/vsearch/releases/download/v2.8.0/vsearch-2.8.0-linux-x86_64.tar.gz -O /tmp/vsearch-2.8.0-linux-x86_64.tar.gz
-  - tar -xvf /tmp/vsearch-2.8.0-linux-x86_64.tar.gz
-  - export PATH=$PATH:$PWD/vsearch-2.8.0-linux-x86_64/bin
+  - wget https://github.com/torognes/vsearch/releases/download/v2.13.6/vsearch-2.13.6-linux-x86_64.tar.gz -O /tmp/vsearch-2.13.6-linux-x86_64.tar.gz
+  - tar -xvf /tmp/vsearch-2.13.6-linux-x86_64.tar.gz
+  - export PATH=$PATH:$PWD/vsearch-2.13.6-linux-x86_64/bin
   - wget http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2-linux-intel-x86_64.tar.gz -O /tmp/hmmer-3.1b2-linux-intel-x86_64.tar.gz
   - tar -xvf /tmp/hmmer-3.1b2-linux-intel-x86_64.tar.gz
   - ls -la
@@ -27,4 +27,4 @@ after_success:
 
 notifications:
   email:
-    - adam.rivers@ars.usda.gov
+    - adam.rivers@usda.gov
