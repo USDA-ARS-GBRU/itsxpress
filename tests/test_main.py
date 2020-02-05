@@ -107,6 +107,13 @@ def test_seq_sample_not_paired():
 	sobj._search(hmmfile=hmmfile, threads=1)
 	shutil.rmtree(sobj.tempdir)
 
+def test_seq_sample_not_paired_clustered():
+	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_merged.fastq")
+	sobj = itsxpress.main.SeqSampleNotPaired(fastq=fastq, tempdir=".")
+	sobj.cluster(threads=1, cluster_id=0.995)
+	sobj._search(hmmfile=hmmfile, threads=1)
+	shutil.rmtree(sobj.tempdir)
+
 def test_seq_sample_paired_not_interleaved():
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
 	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
@@ -142,7 +149,7 @@ def test_main_interleaved():
 	n = sum(1 for _ in seqs)
 	print(n)
 	ok_(n == 227)
-	#shutil.rmtree(tf)
+	shutil.rmtree(tf)
 
 def test_main_paired():
 	parser = itsxpress.main.myparser()
@@ -185,6 +192,7 @@ def test_main_paired_no_cluster():
 	n = sum(1 for _ in seqs)
 	ok_(n==227)
 	shutil.rmtree(tf)
+
 
 def test_get_paired_seq_generator():
 	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
