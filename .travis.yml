@@ -1,8 +1,9 @@
 language: python
 
+
 jobs:
   include:
-    - name: "ITSXPRESS"
+    - name: ITSXPRESS
       cache: pip
       python:
         - "3.6"
@@ -30,14 +31,10 @@ jobs:
       after_success:
         - codecov
 
-      notifications:
-        email:
-          - adam.rivers@usda.gov
 
 
-    -name: "QIIME2 ITSXPRESS"
+    - name: QIIME2 ITSXPRESS
       dist: trusty
-      sudo: false
 
       # command to install dependencies
       before_install:
@@ -65,3 +62,10 @@ jobs:
 
       after_success:
         - codecov
+
+
+
+notifications:
+   email:
+     - adam.rivers@usda.gov
+
