@@ -1,5 +1,5 @@
-"""setup.py: python package setup for ITSxpress
-
+"""
+setup.py: python package setup for ITSxpress
 """
 
 from setuptools import setup
@@ -24,5 +24,6 @@ setup(
     python_requires='>3.5',
     tests_require=['nose'],
     include_package_data=True,
-    entry_points={'console_scripts':['itsxpress=itsxpress.main:main']},
+    entry_points={'console_scripts':['itsxpress=itsxpress.main:main'],
+    'qiime2.plugins': ['itsxpress=itsxpress.plugin_setup:plugin']},
     zip_safe=False)
