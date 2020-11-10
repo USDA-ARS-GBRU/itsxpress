@@ -1,10 +1,33 @@
 """
 setup.py: python package setup for ITSxpress
 """
-
+from setuptools.command.install import install
+from setuptools.command.develop import develop
 from setuptools import setup
+import os
 
-setup(
+def custom_command():
+    import sys
+    cmd  = 'wget https://sourceforge.net/projects/bbmap/files/BBMap_38.60.tar.gz -O /tmp/BBMap_38.60.tar.gz; tar -xvf /tmp/BBMap_38.60.tar.gz; export PATH=$PATH:$PWD/bbmap'
+
+    if sys.platform in ['darwin', 'linux']:
+        os.system(cmd)
+        
+
+class CustomInstallCommand(install):
+    def run(self):
+        install.run(self)
+        custom_command()
+
+def _post_install(setup):
+    def _post_actions():
+        custom_command()
+    _post_actions()
+    return setup
+
+
+
+setup = _post_install( setup(
     name='itsxpress',
     version='1.8.0',
     packages=['itsxpress'],
@@ -17,6 +40,7 @@ setup(
                  'Development Status :: 3 - Alpha'],
     keywords='Amplicon sequencing fungal ITS',
     url='http://github.com/usda-ars-gbru/itsxpress',
+    # cmdclass={'install': CustomInstallCommand},
     test_suite='nose.collector',
     author='Adam R. Rivers',
     author_email='adam.rivers@ars.usda.gov',
@@ -27,3 +51,4 @@ setup(
     entry_points={'console_scripts':['itsxpress=itsxpress.main:main'],
     'qiime2.plugins': ['itsxpress=itsxpress.plugin_setup:plugin']},
     zip_safe=False)
+)
