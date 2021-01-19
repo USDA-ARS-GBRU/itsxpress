@@ -49,7 +49,7 @@ from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatch
 
 import os
 
-os.environ['PATH'] += os.pathsep + '/tmp/bbmap:/tmp/vsearch-2.13.6-linux-x86_64/bin:/tmp/hmmer-3.1b2-linux-intel-x86_64/binaries'
+os.environ['PATH'] += os.pathsep + '/etc/bbmap:/etc/vsearch-2.13.6-linux-x86_64/bin:/etc/hmmer-3.1b2-linux-intel-x86_64/binaries'
 
 def restricted_float(x):
     x = float(x)

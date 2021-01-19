@@ -22,7 +22,7 @@ jobs:
 
       install:
         - pip install codecov
-        - pip install .
+        - pip install -vvv .
         - pip install nose-exclude
       # command to run tests
       script:
@@ -49,11 +49,9 @@ jobs:
       - source activate test-env
       install:
         - conda config --add channels bioconda
-        - pip install .
+        - pip install -vvv .
         - pip install codecov
         - qiime itsxpress
-        # - conda install bbmap
-        # - conda install hmmer
         - qiime dev refresh-cache
       # command to run tests
       script:
