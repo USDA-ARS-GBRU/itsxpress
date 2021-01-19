@@ -8,11 +8,11 @@ import os
 
 def custom_command():
     import sys
-    cmd  = 'wget https://sourceforge.net/projects/bbmap/files/BBMap_38.60.tar.gz -O /etc/BBMap_38.60.tar.gz; tar -xvf /etc/BBMap_38.60.tar.gz -C /etc'
+    cmd  = 'wget https://sourceforge.net/projects/bbmap/files/BBMap_38.60.tar.gz -O /usr/BBMap_38.60.tar.gz; tar -xvf /usr/BBMap_38.60.tar.gz -C /usr'
 
-    cmd1 = 'wget https://github.com/torognes/vsearch/releases/download/v2.13.6/vsearch-2.13.6-linux-x86_64.tar.gz -O /etc/vsearch-2.13.6-linux-x86_64.tar.gz; tar -xvf /etc/vsearch-2.13.6-linux-x86_64.tar.gz -C /etc'
+    cmd1 = 'wget https://github.com/torognes/vsearch/releases/download/v2.13.6/vsearch-2.13.6-linux-x86_64.tar.gz -O /usr/vsearch-2.13.6-linux-x86_64.tar.gz; tar -xvf /usr/vsearch-2.13.6-linux-x86_64.tar.gz -C /usr'
 
-    cmd2 = 'wget http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2-linux-intel-x86_64.tar.gz -O /etc/hmmer-3.1b2-linux-intel-x86_64.tar.gz; tar -xvf /etc/hmmer-3.1b2-linux-intel-x86_64.tar.gz -C /etc'
+    cmd2 = 'wget http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2-linux-intel-x86_64.tar.gz -O /usr/hmmer-3.1b2-linux-intel-x86_64.tar.gz; tar -xvf /usr/hmmer-3.1b2-linux-intel-x86_64.tar.gz -C /usr'
 
     if sys.platform in ['darwin', 'linux']:
         os.system(cmd)

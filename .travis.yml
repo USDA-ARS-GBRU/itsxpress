@@ -51,8 +51,8 @@ jobs:
         - conda config --add channels bioconda
         - pip install -vvv .
         - pip install codecov
-        - qiime itsxpress
         - qiime dev refresh-cache
+        - qiime itsxpress
       # command to run tests
       script:
         - nosetests --with-coverage # or py.test for Python versions 3.5 and below
