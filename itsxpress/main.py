@@ -47,6 +47,10 @@ from Bio import SeqIO
 
 from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio
 
+import os
+
+os.environ['PATH'] += os.pathsep + '/tmp/bbmap'
+
 def restricted_float(x):
     x = float(x)
     if x < 0.99 or x > 1.0:
@@ -595,7 +599,7 @@ class SeqSamplePairedInterleaved(SeqSample):
             logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
             raise e
         except FileNotFoundError as f:
-            logging.error("BBmerge was not found, make sure BBmerge is executable")
+            logging.error("BBmerge was not found, make sure BBmerge is executable | split interleaved")
             raise f
 
     def __init__(self, fastq, tempdir, reversed_primers=False):

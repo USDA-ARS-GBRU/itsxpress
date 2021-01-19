@@ -8,7 +8,16 @@ import os
 
 def custom_command():
     import sys
-    cmd  = 'wget https://sourceforge.net/projects/bbmap/files/BBMap_38.60.tar.gz -O /tmp/BBMap_38.60.tar.gz; tar -xvf /tmp/BBMap_38.60.tar.gz; export PATH=$PATH:$PWD/bbmap'
+    cmd  = 'pwd; wget https://sourceforge.net/projects/bbmap/files/BBMap_38.60.tar.gz -O /tmp/BBMap_38.60.tar.gz; tar -xvf /tmp/BBMap_38.60.tar.gz -C /tmp; echo magu;export PATH=$PATH:/tmp/bbmap; echo $PATH'
+
+        # - wget https://github.com/torognes/vsearch/releases/download/v2.13.6/vsearch-2.13.6-linux-x86_64.tar.gz -O /tmp/vsearch-2.13.6-linux-x86_64.tar.gz
+        # - tar -xvf /tmp/vsearch-2.13.6-linux-x86_64.tar.gz
+        # - export PATH=$PATH:$PWD/vsearch-2.13.6-linux-x86_64/bin
+        # - wget http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2-linux-intel-x86_64.tar.gz -O /tmp/hmmer-3.1b2-linux-intel-x86_64.tar.gz
+        # - tar -xvf /tmp/hmmer-3.1b2-linux-intel-x86_64.tar.gz
+        # - ls -la
+        # - export PATH=$PATH:$PWD/hmmer-3.1b2-linux-intel-x86_64/binaries
+
 
     if sys.platform in ['darwin', 'linux']:
         os.system(cmd)
@@ -17,17 +26,19 @@ def custom_command():
 class CustomInstallCommand(install):
     def run(self):
         install.run(self)
+        print("custom install")     
+        # raise AttributeError 
         custom_command()
 
-def _post_install(setup):
-    def _post_actions():
-        custom_command()
-    _post_actions()
-    return setup
+# def _post_install(setup):
+#     def _post_actions():
+#         custom_command()
+#     _post_actions()
+#     return setup
 
 
 
-setup = _post_install( setup(
+setup(
     name='itsxpress',
     version='1.8.0',
     packages=['itsxpress'],
@@ -40,7 +51,7 @@ setup = _post_install( setup(
                  'Development Status :: 3 - Alpha'],
     keywords='Amplicon sequencing fungal ITS',
     url='http://github.com/usda-ars-gbru/itsxpress',
-    # cmdclass={'install': CustomInstallCommand},
+    cmdclass={'install': CustomInstallCommand},
     test_suite='nose.collector',
     author='Adam R. Rivers',
     author_email='adam.rivers@ars.usda.gov',
@@ -51,4 +62,3 @@ setup = _post_install( setup(
     entry_points={'console_scripts':['itsxpress=itsxpress.main:main'],
     'qiime2.plugins': ['itsxpress=itsxpress.plugin_setup:plugin']},
     zip_safe=False)
-)
