@@ -8,21 +8,21 @@ jobs:
       python:
         - "3.6"
       # command to install dependencies
-      before_install:
-        # - wget https://sourceforge.net/projects/bbmap/files/BBMap_38.60.tar.gz -O /tmp/BBMap_38.60.tar.gz
-        # - tar -xvf /tmp/BBMap_38.60.tar.gz
-        # - export PATH=$PATH:$PWD/bbmap
-        - wget https://github.com/torognes/vsearch/releases/download/v2.13.6/vsearch-2.13.6-linux-x86_64.tar.gz -O /tmp/vsearch-2.13.6-linux-x86_64.tar.gz
-        - tar -xvf /tmp/vsearch-2.13.6-linux-x86_64.tar.gz
-        - export PATH=$PATH:$PWD/vsearch-2.13.6-linux-x86_64/bin
-        - wget http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2-linux-intel-x86_64.tar.gz -O /tmp/hmmer-3.1b2-linux-intel-x86_64.tar.gz
-        - tar -xvf /tmp/hmmer-3.1b2-linux-intel-x86_64.tar.gz
-        - ls -la
-        - export PATH=$PATH:$PWD/hmmer-3.1b2-linux-intel-x86_64/binaries
+      # before_install:
+      #   # - wget https://sourceforge.net/projects/bbmap/files/BBMap_38.60.tar.gz -O /tmp/BBMap_38.60.tar.gz
+      #   # - tar -xvf /tmp/BBMap_38.60.tar.gz
+      #   # - export PATH=$PATH:$PWD/bbmap
+      #   # - wget https://github.com/torognes/vsearch/releases/download/v2.13.6/vsearch-2.13.6-linux-x86_64.tar.gz -O /tmp/vsearch-2.13.6-linux-x86_64.tar.gz
+      #   # - tar -xvf /tmp/vsearch-2.13.6-linux-x86_64.tar.gz
+      #   # - export PATH=$PATH:$PWD/vsearch-2.13.6-linux-x86_64/bin
+      #   # - wget http://eddylab.org/software/hmmer3/3.1b2/hmmer-3.1b2-linux-intel-x86_64.tar.gz -O /tmp/hmmer-3.1b2-linux-intel-x86_64.tar.gz
+      #   # - tar -xvf /tmp/hmmer-3.1b2-linux-intel-x86_64.tar.gz
+      #   # - ls -la
+      #   # - export PATH=$PATH:$PWD/hmmer-3.1b2-linux-intel-x86_64/binaries
 
       install:
         - pip install codecov
-        - pip install -e .
+        - pip install .
         - pip install nose-exclude
       # command to run tests
       script:
