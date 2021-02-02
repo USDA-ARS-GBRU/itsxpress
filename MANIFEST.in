@@ -2,3 +2,4 @@ include itsxpress/ITSx_db/HMMs/*
 include tests/test_data/*
 include tests/test_data/ex_tmpdir/*
 include LICENSE.txt
+include itsxpress/citations.bib
