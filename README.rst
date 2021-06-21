@@ -148,7 +148,7 @@ and reverse read files  for use in Dada2.
 .. code-block:: bash
 
     itsxpress --fastq r1.fastq.gz --fastq2 r2.fastq.gz --region ITS2 \
-    --taxa Fungi --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
+    --taxa Fungi --log logfile.txt --outfile trimmed_reads_r1.fastq.gz --outfile2 trimmed_reads_r2.fastq.gz --threads 2
 
 ITSxpress can take gzipped or un-gzipped FASTQ files and it can write gzipped or
 un-gzipped FASTQ files. It expects FASTQ files to end in: .fq, .fastq, .fq.gz or fastq.gz.
