@@ -32,6 +32,7 @@ Reference:
     eukaryotes for use in environmental sequencing. Methods in Ecology and Evolution,
     4: 914-919, 2013 (DOI: 10.1111/2041-210X.12073)
 """
+ 
 
 
 import gzip
@@ -681,7 +682,7 @@ def _is_paired(fastq, fastq2, single_end):
         paired_end = True
     elif single_end:
         paired_end = False
-
+    print(paired_end,' ',interleaved)
 
     return paired_end
 
