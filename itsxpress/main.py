@@ -32,6 +32,8 @@ Reference:
     eukaryotes for use in environmental sequencing. Methods in Ecology and Evolution,
     4: 914-919, 2013 (DOI: 10.1111/2041-210X.12073)
 """
+
+
 import gzip
 import tempfile
 import argparse
@@ -569,58 +571,58 @@ class SeqSample:
             logging.error("hmmsearch was not found, make sure HMMER3 is installed and executable")
             raise f
 
-class SeqSamplePairedInterleaved(SeqSample):
-    """SeqSample class extended to paired, interleaved format.
+# class SeqSamplePairedInterleaved(SeqSample):
+#     """SeqSample class extended to paired, interleaved format.
 
-    """
-    def split_interleaved(self, reversed_primers=False):
-        try:
-            seq_r1 = os.path.join(self.tempdir, 'seq_r1.fq.gz')
-            seq_r2 = os.path.join(self.tempdir, 'seq_r2.fq.gz')
-            parameters = ['reformat.sh',
-                          'in=' + self.fastq,
-                          'out=' + seq_r1,
-                          'out2=' + seq_r2,
-                         ]
-            p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
-            p1.check_returncode()
-            if reversed_primers:
-                self.r1 = seq_r2
-                self.fastq2 = seq_r1
-            else:
-                self.r1 = seq_r1
-                self.fastq2 = seq_r2
-            logging.info(p1.stderr.decode('utf-8'))
-        except subprocess.CalledProcessError as e:
-            logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
-            raise e
-        except FileNotFoundError as f:
-            logging.error("BBmerge was not found, make sure BBmerge is executable")
-            raise f
+#     """
+#     def split_interleaved(self, reversed_primers=False):
+#         try:
+#             seq_r1 = os.path.join(self.tempdir, 'seq_r1.fq.gz')
+#             seq_r2 = os.path.join(self.tempdir, 'seq_r2.fq.gz')
+#             parameters = ['reformat.sh',
+#                           'in=' + self.fastq,
+#                           'out=' + seq_r1,
+#                           'out2=' + seq_r2,
+#                          ]
+#             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
+#             p1.check_returncode()
+#             if reversed_primers:
+#                 self.r1 = seq_r2
+#                 self.fastq2 = seq_r1
+#             else:
+#                 self.r1 = seq_r1
+#                 self.fastq2 = seq_r2
+#             logging.info(p1.stderr.decode('utf-8'))
+#         except subprocess.CalledProcessError as e:
+#             logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
+#             raise e
+#         except FileNotFoundError as f:
+#             logging.error("BBmerge was not found, make sure BBmerge is executable")
+#             raise f
 
-    def __init__(self, fastq, tempdir, reversed_primers=False):
-            SeqSample.__init__(self, fastq, tempdir)
-            self.split_interleaved(reversed_primers=reversed_primers)
+#     def __init__(self, fastq, tempdir, reversed_primers=False):
+#             SeqSample.__init__(self, fastq, tempdir)
+#             self.split_interleaved(reversed_primers=reversed_primers)
 
-    def _merge_reads(self, threads):
-        try:
-            seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
-            parameters = ['bbmerge.sh',
-                          'in=' + self.fastq,
-                          'out=' + seq_file,
-                          't=' + str(threads),
-                          'maxmismatches=' + str(maxmismatches),
-                          'maxratio=' + str(maxratio)]
-            p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
-            self.seq_file = seq_file
-            p1.check_returncode()
-            logging.info(p1.stderr.decode('utf-8'))
-        except subprocess.CalledProcessError as e:
-            logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
-            raise e
-        except FileNotFoundError as f:
-            logging.error("BBmerge was not found, make sure BBmerge is executable")
-            raise f
+#     def _merge_reads(self, threads):
+#         try:
+#             seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
+#             parameters = ['bbmerge.sh',
+#                           'in=' + self.fastq,
+#                           'out=' + seq_file,
+#                           't=' + str(threads),
+#                           'maxmismatches=' + str(maxmismatches),
+#                           'maxratio=' + str(maxratio)]
+#             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
+#             self.seq_file = seq_file
+#             p1.check_returncode()
+#             logging.info(p1.stderr.decode('utf-8'))
+#         except subprocess.CalledProcessError as e:
+#             logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
+#             raise e
+#         except FileNotFoundError as f:
+#             logging.error("BBmerge was not found, make sure BBmerge is executable")
+#             raise f
 
 class SeqSamplePairedNotInterleaved(SeqSample):
     """SeqSample class extended to paired, two FASTQ file format.
@@ -677,14 +679,11 @@ def _is_paired(fastq, fastq2, single_end):
     """
     if fastq and fastq2:
         paired_end = True
-        interleaved = False
     elif single_end:
         paired_end = False
-        interleaved = False
-    else:
-        paired_end = True
-        interleaved = True
-    return paired_end, interleaved
+
+
+    return paired_end
 
 def _logger_setup(logfile):
     """Set up logging to a logfile and the terminal standard out.
@@ -766,17 +765,17 @@ def main(args=None):
         logging.info("Verifying the input sequences.")
         _check_fastqs(args.fastq, args.fastq2)
         # Parse input types
-        paired_end, interleaved = _is_paired(args.fastq, args.fastq2, args.single_end)
+        paired_end = _is_paired(args.fastq, args.fastq2, args.single_end)
         # create SeqSample objects and merge if needed
-        if paired_end and interleaved:
-            logging.info("Sequences are paired-end and interleaved. They will be merged using BBmerge.")
-            sobj = SeqSamplePairedInterleaved(fastq=args.fastq, tempdir=args.tempdir, reversed_primers=args.reversed_primers )
-            sobj._merge_reads(threads=str(args.threads))
-        elif paired_end and not interleaved:
+        # if paired_end and interleaved:
+        #     logging.info("Sequences are paired-end and interleaved. They will be merged using BBmerge.")
+        #     sobj = SeqSamplePairedInterleaved(fastq=args.fastq, tempdir=args.tempdir, reversed_primers=args.reversed_primers )
+        #     sobj._merge_reads(threads=str(args.threads))
+        if paired_end:
             logging.info("Sequences are paired-end in two files. They will be merged using BBmerge.")
             sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=args.tempdir, reversed_primers=args.reversed_primers)
             sobj._merge_reads(threads=str(args.threads))
-        elif not paired_end and not interleaved:
+        elif not paired_end:
             logging.info("Sequences are assumed to be single-end.")
             sobj = SeqSampleNotPaired(fastq=args.fastq, tempdir=args.tempdir)
         logging.info("Temporary directory is: {}".format(sobj.tempdir))
