@@ -682,9 +682,8 @@ def _is_paired(fastq, fastq2, single_end):
         paired_end = True
     elif single_end:
         paired_end = False
-    print(paired_end,' ',interleaved)
-
-
+    else:
+        paired_end = True
     return paired_end
 
 def _logger_setup(logfile):

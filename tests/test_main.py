@@ -125,15 +125,15 @@ def test_seq_sample_paired_not_interleaved():
 
 
 def test_is_paired():
-	paired_end, interleaved = itsxpress.main._is_paired("fastq1.fq", "fastq2.fq", single_end=False)
-	assert paired_end == True and interleaved == False
-	print(interleaved)
-	paired_end, interleaved = itsxpress.main._is_paired("fastq1.fq", None, single_end=False)
-	assert paired_end == True and interleaved == True
-	print(interleaved)
-	paired_end, interleaved = itsxpress.main._is_paired("fastq1.fq", None, single_end=True)
-	assert paired_end == False and interleaved == False
-	print(interleaved)
+	paired_end= itsxpress.main._is_paired("fastq1.fq", "fastq2.fq", single_end=False)
+	assert paired_end == True
+
+	paired_end= itsxpress.main._is_paired("fastq1.fq", None, single_end=False)
+	assert paired_end == True
+
+	paired_end= itsxpress.main._is_paired("fastq1.fq", None, single_end=True)
+	assert paired_end == False
+
 test_is_paired()
 def test_myparser():
 	parser = itsxpress.main.myparser()
