@@ -16,6 +16,7 @@ from itsxpress.definitions import ROOT_DIR, taxa_dict
 hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict["Fungi"])
 
 
+
 def test_check_fastqs():
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
 	fastq2 = os.path.join(TEST_DIR, "test_data", "broken.fastq")

@@ -46,6 +46,8 @@ import shutil
 import math
 from itertools import tee
 
+from numpy import empty
+
 from Bio import SeqIO
 
 from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio
@@ -441,20 +443,27 @@ class Dedup:
             itspos (object): an ItsPosition object
 
         """
-
+        print(gzipped)
         def _write_seqs():
             if gzipped:
                 with gzip.open(outfile, 'wt') as g:
+                    print('Gzipped_write_seqs')
                     SeqIO.write(seqs, g, "fastq")
+                    
             else:
                 with open(outfile, 'w') as g:
+                    print('Not gzipped_write_seqs')
                     SeqIO.write(seqs, g, "fastq")
+                    
 
         if self.seq_file.endswith(".gz"):
             with gzip.open(self.seq_file, 'rt') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
+                print(seqgen)
                 seqs = self._get_trimmed_seq_generator(seqgen, itspos)
+                print(seqgen)
                 _write_seqs()
+                print('Makes it here')
 
         else:
             with open(self.seq_file, 'r') as f:
@@ -641,22 +650,30 @@ class SeqSamplePairedNotInterleaved(SeqSample):
     def _merge_reads(self, threads):
         try:
             seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
-            parameters = ['bbmerge.sh',
-                          'in=' + self.r1,
-                          'in2=' + self.fastq2,
-                          'out=' + seq_file,
-                          't=' + str(threads),
-                          'maxmismatches=' + str(maxmismatches),
-                          'maxratio=' + str(maxratio)]
+            parameters = ['vsearch',
+                          '--fastq_mergepairs' , self.r1,
+                          '--reverse' , self.fastq2,
+                          '--fastqout' ,seq_file,
+                          '--fastq_maxdiffs' , str(maxmismatches),
+                          '--fastq_maxee_rate' , str(maxratio),
+                          '--threads'  ,str(threads)]
+            #parameters = ''.join(parameters)
+            # parameters = ['bbmerge.sh',
+            #               'in=' + self.r1,
+            #               'in2=' + self.fastq2,
+            #               'out=' + seq_file,
+            #               't=' + str(threads),
+            #               'maxmismatches=' + str(maxmismatches),
+            #               'maxratio=' + str(maxratio)]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             self.seq_file = seq_file
             p1.check_returncode()
             logging.info(p1.stderr.decode('utf-8'))
         except subprocess.CalledProcessError as e:
-            logging.exception("Could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
+            logging.exception("Could not perform read merging with vsearch. Error from vsearch was: \n  {}".format(p1.stderr.decode('utf-8')))
             raise e
         except FileNotFoundError as f:
-            logging.error("BBmerge was not found, make sure BBmerge is executable")
+            logging.error("vsearch was not found, make sure vsearch is installed on this environment")
             raise f
 
 class SeqSampleNotPaired(SeqSample):
@@ -723,7 +740,12 @@ def _check_fastqs(fastq, fastq2=None):
     Raises:
         ValueError: If Biopython detected invalid FASTQ files
     """
-    def core(file):
+    # Check if file is interleaved, 
+    #Function to decide which format it is in, does the file/s meet criteria for run
+    #parse at \, does id match exactly
+    #Biostars, different formats
+        #Push warning
+    def core(file):   
         try:
             if file.endswith('.gz'):
                 f = gzip.open(file, 'rt')
@@ -733,6 +755,16 @@ def _check_fastqs(fastq, fastq2=None):
             for record in SeqIO.parse(f, 'fastq'):
                 while n < 100:
                     n += 1
+            f.close()
+            if fastq2:
+                if fastq2.endswith('.gz'):
+                    f = gzip.open(fastq2, 'rt')
+                else:
+                    f = open(fastq2, 'r')
+                n = 0
+                for record in SeqIO.parse(f, 'fastq'):
+                    while n < 100:
+                        n += 1
             f.close()
         except ValueError as e:
             logging.error("There appears to be an issue with the format of input file {}.".format(file))
@@ -745,9 +777,14 @@ def _check_fastqs(fastq, fastq2=None):
             raise g
 
     core(fastq)
-    if fastq2:
-        core(fastq2)
+    #Determine format
+    #Check if 2 files
+        #Check if names between them
+            #check if seqs are subsequent or interleaved in each file
+    #When 1 file
+        #Check if interleaved, check if seqs are subsequent or interleaved in each file
 
+#def _check_format(fastq)
 # workflow
 
 def main(args=None):
@@ -798,11 +835,14 @@ def main(args=None):
         # Create trimmed sequences
         logging.info("Writing out sequences")
         if args.outfile2:
+            print('Outfile2 if statement')
             if args.outfile.split('.')[-1] == 'gz' and args.outfile2.split('.')[-1] == 'gz':
                 dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True, itspos=its_pos)
             else:
                 dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, itspos=its_pos)
         else:
+            print('Outfile if statement')
+            print(args.outfile.split('.')[-1])
             if args.outfile.split('.')[-1] =='gz':
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True, itspos=its_pos)
             else:
@@ -812,7 +852,10 @@ def main(args=None):
         logging.info("ITSxpress ran in {}".format(fmttime))
     except Exception as e:
         logging.error("ITSxpress terminated with errors. See the log file for details.")
-        logging.error(e)
+        #logging.error(e)
+        #Raise e, print full stack of errors
+        raise e
+        #May get rid of SystemExit for now
         raise SystemExit(1)
     finally:
         try:
