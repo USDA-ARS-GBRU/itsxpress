@@ -446,8 +446,9 @@ class Dedup:
         print(gzipped)
         def _write_seqs():
             if gzipped:
-                with gzip.open(outfile, 'wt') as g:
+                with gzip.open(outfile, 'r') as g:
                     print('Gzipped_write_seqs')
+                    print(seqs,"   ",g)
                     SeqIO.write(seqs, g, "fastq")
                     
             else:
@@ -649,7 +650,7 @@ class SeqSamplePairedNotInterleaved(SeqSample):
 
     def _merge_reads(self, threads):
         try:
-            seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
+            seq_file = os.path.join(self.tempdir, 'seq.fq')
             parameters = ['vsearch',
                           '--fastq_mergepairs' , self.r1,
                           '--reverse' , self.fastq2,
@@ -667,6 +668,7 @@ class SeqSamplePairedNotInterleaved(SeqSample):
             #               'maxratio=' + str(maxratio)]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             self.seq_file = seq_file
+
             p1.check_returncode()
             logging.info(p1.stderr.decode('utf-8'))
         except subprocess.CalledProcessError as e:
