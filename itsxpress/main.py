@@ -446,10 +446,14 @@ class Dedup:
         print(gzipped)
         def _write_seqs():
             if gzipped:
-                with gzip.open(outfile, 'r') as g:
+                tempf = os.path.join('./','temp.fa')
+                with open(tempf, 'w') as g:
                     print('Gzipped_write_seqs')
                     print(seqs,"   ",g)
                     SeqIO.write(seqs, g, "fastq")
+                with open(tempf,'rb') as f_in:
+                    with gzip.open(outfile,'wb') as f_out:
+                        f_out.writelines(f_in)
                     
             else:
                 with open(outfile, 'w') as g:
@@ -667,8 +671,8 @@ class SeqSamplePairedNotInterleaved(SeqSample):
             #               'maxmismatches=' + str(maxmismatches),
             #               'maxratio=' + str(maxratio)]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
+            #seq_file_gz = os.path.join(self.tempdir, 'seq.fq.gz')
             self.seq_file = seq_file
-
             p1.check_returncode()
             logging.info(p1.stderr.decode('utf-8'))
         except subprocess.CalledProcessError as e:
@@ -812,7 +816,7 @@ def main(args=None):
         #     sobj = SeqSamplePairedInterleaved(fastq=args.fastq, tempdir=args.tempdir, reversed_primers=args.reversed_primers )
         #     sobj._merge_reads(threads=str(args.threads))
         if paired_end:
-            logging.info("Sequences are paired-end in two files. They will be merged using BBmerge.")
+            logging.info("Sequences are paired-end in two files. They will be merged using Vsearch.")
             sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=args.tempdir, reversed_primers=args.reversed_primers)
             sobj._merge_reads(threads=str(args.threads))
         elif not paired_end:
