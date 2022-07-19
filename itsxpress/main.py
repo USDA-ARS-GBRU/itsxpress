@@ -738,6 +738,7 @@ def _logger_setup(logfile):
 
 def _check_fastqs(fastq, fastq2=None):
     """Verifies the input files are valid fastq or fastq.gz files.
+    Add interleaved explanation
 
     Args:
         fastq (str): The path to a fastq or fastq.gz file
@@ -746,11 +747,31 @@ def _check_fastqs(fastq, fastq2=None):
     Raises:
         ValueError: If Biopython detected invalid FASTQ files
     """
-    # Check if file is interleaved, 
-    #Function to decide which format it is in, does the file/s meet criteria for run
-    #parse at \, does id match exactly
-    #Biostars, different formats
-        #Push warning
+    def check_interleaved(file):
+        try:
+            if file.endswith('.gz'):
+                f = gzip.open(file, 'rt')
+            else:
+                f = open(file, 'r')
+            lines = f.readlines()
+            L1 = lines[0:96:8]
+            L2 = lines[3:96:8]
+            L1_old = [i.strip().split('/', 1)[0] for i in L1]
+            L2_old = [i.strip().split('/', 1)[0] for i in L2]
+            L1_new = [i.strip().split(' ', 1)[0] for i in L1]
+            L2_new = [i.strip().split(' ', 1)[0] for i in L2]
+            print(L1_old)
+            print(L1_new)
+            assert L1_old == L2_old or L1_new == L2_new
+
+        except AssertionError as a:
+            logging.error("'File seems to be interleaved. ITSxpress will run with errors. Check BBmap reformat.sh to split interleaved files.")
+            raise a 
+        except IOError as f:
+            logging.error("File may ")
+            raise f
+        
+  
     def core(file):   
         try:
             if file.endswith('.gz'):
@@ -761,6 +782,8 @@ def _check_fastqs(fastq, fastq2=None):
             for record in SeqIO.parse(f, 'fastq'):
                 while n < 100:
                     n += 1
+            check_interleaved(file)
+           
             f.close()
             if fastq2:
                 if fastq2.endswith('.gz'):
@@ -783,15 +806,6 @@ def _check_fastqs(fastq, fastq2=None):
             raise g
 
     core(fastq)
-    #Determine format
-    #Check if 2 files
-        #Check if names between them
-            #check if seqs are subsequent or interleaved in each file
-    #When 1 file
-        #Check if interleaved, check if seqs are subsequent or interleaved in each file
-
-#def _check_format(fastq)
-# workflow
 
 def main(args=None):
     """Run Complete ITS trimming workflow.
