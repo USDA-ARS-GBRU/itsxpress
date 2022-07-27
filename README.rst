@@ -70,9 +70,12 @@ ITSxpress can be installed from:
   - Example:
 .. code-block:: bash
 
+    conda install hmmer==3.1b2
+    or
     mamba install hmmer==3.1b2
-    mamba install bbmap==38.96
-    mamba install vsearch==2.7.0
+    .....
+    conda install bbmap==38.96
+    conda install vsearch==2.7.0
 Then install itsxpress using pip:
 
 .. code-block:: bash
