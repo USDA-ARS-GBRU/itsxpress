@@ -55,7 +55,7 @@ ITSxpress is also available as a `QIIME2 Plugin`_
 .. _`QIIME2 Plugin`: https://github.com/USDA-ARS-GBRU/q2_itsxpress
 
 
-Installation
+Installation of ITSxpress version 1 end of life: BBmap is no longer used in ITSxpress version 2
 -------------
 ITSxpress can be installed from:
 
@@ -66,6 +66,14 @@ ITSxpress can be installed from:
     conda install itsxpress
 
 2. Pip: https://pypi.org/project/itsxpress/:
+  - If using Pip, you will need to specify the versions of the dependencies listed below.
+  - Example:
+.. code-block:: bash
+
+    mamba install hmmer==3.1b2
+    mamba install bbmap==38.96
+    mamba install vsearch==2.7.0
+Then install itsxpress using pip:
 
 .. code-block:: bash
 
@@ -81,7 +89,7 @@ ITSxpress can be installed from:
 
 Dependencies
 -------------
-The software requires Vsearch, BBtools, Hmmer >= 3.1b and Biopython. Bioconda
+This software requires Vsearch=2.7.0, BBtools=38.96, Hmmer=3.1b2 and Biopython>=1.79. Bioconda
 takes care of this for you so it is the preferred installation method.
 
 

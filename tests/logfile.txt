@@ -1,0 +1,58 @@
+07-27 12:03 root         INFO     Verifying the input sequences.
+07-27 12:03 root         INFO     Sequences are paired-end and interleaved. They will be merged using BBmerge.
+07-27 12:03 root         INFO     java -ea -Xms300m -cp /home/sveinn/anaconda3/envs/mamba/opt/bbmap-38.96-1/current/ jgi.ReformatReads in=4774-1-MSITS3_interleaved.fastq out=/tmp/itsxpress_ipw8ijtq/seq_r1.fq.gz out2=/tmp/itsxpress_ipw8ijtq/seq_r2.fq.gz
+Executing jgi.ReformatReads [in=4774-1-MSITS3_interleaved.fastq, out=/tmp/itsxpress_ipw8ijtq/seq_r1.fq.gz, out2=/tmp/itsxpress_ipw8ijtq/seq_r2.fq.gz]
+
+Set INTERLEAVED to true
+Input is being processed as paired
+Input:                  	500 reads          	125275 bases
+Output:                 	500 reads (100.00%) 	125275 bases (100.00%)
+
+Time:                         	0.059 seconds.
+Reads Processed:         500 	8.41k reads/sec
+Bases Processed:        125k 	2.11m bases/sec
+
+07-27 12:03 root         INFO     java -ea -Xmx1000m -Xms1000m -Djava.library.path=/home/sveinn/anaconda3/envs/mamba/opt/bbmap-38.96-1/jni/ -cp /home/sveinn/anaconda3/envs/mamba/opt/bbmap-38.96-1/current/ jgi.BBMerge in=4774-1-MSITS3_interleaved.fastq out=/tmp/itsxpress_ipw8ijtq/seq.fq.gz t=16 maxmismatches=40 maxratio=0.3
+Executing jgi.BBMerge [in=4774-1-MSITS3_interleaved.fastq, out=/tmp/itsxpress_ipw8ijtq/seq.fq.gz, t=16, maxmismatches=40, maxratio=0.3]
+Version 38.96
+
+Set threads to 16
+Writing mergable reads merged.
+Started output threads.
+Total time: 0.091 seconds.
+
+Pairs:               	250
+Joined:              	228       	91.200%
+Ambiguous:           	18       	7.200%
+No Solution:         	4       	1.600%
+Too Short:           	0       	0.000%
+
+Avg Insert:          	376.8
+Standard Deviation:  	46.2
+Mode:                	343
+
+Insert range:        	330 - 441
+90th percentile:     	441
+75th percentile:     	436
+50th percentile:     	343
+25th percentile:     	340
+10th percentile:     	335
+
+07-27 12:03 root         INFO     Temporary directory is: /tmp/itsxpress_ipw8ijtq
+07-27 12:03 root         INFO     Unique sequences are being written to a temporary FASTA file with Vsearch.
+07-27 12:03 root         INFO     vsearch v2.7.0_linux_x86_64, 31.3GB RAM, 16 cores
+https://github.com/torognes/vsearch
+
+Reading file /tmp/itsxpress_ipw8ijtq/seq.fq.gz 100%
+85908 nt in 228 seqs, min 330, max 441, avg 377
+Dereplicating 100%
+Sorting 100%
+138 unique sequences, avg cluster 1.7, median 1, max 15
+Writing output file 100%
+Writing uc file, first part 100%
+Writing uc file, second part 100%
+
+07-27 12:03 root         INFO     Searching for ITS start and stop sites using HMMSearch. This step takes a while.
+07-27 12:03 root         INFO     Parsing HMM results.
+07-27 12:03 root         INFO     Writing out sequences
+07-27 12:03 root         INFO     ITSxpress ran in 00:00:03

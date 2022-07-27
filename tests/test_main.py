@@ -7,7 +7,7 @@ import subprocess
 import filecmp
 
 from Bio import SeqIO
-from nose.tools import ok_, assert_raises
+import pytest
 
 import itsxpress
 
@@ -16,15 +16,16 @@ from itsxpress.definitions import ROOT_DIR, taxa_dict
 hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict["Fungi"])
 
 
+
 def test_check_fastqs():
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
 	fastq2 = os.path.join(TEST_DIR, "test_data", "broken.fastq")
-	assert_raises(ValueError, itsxpress.main._check_fastqs, fastq, fastq2)
+	pytest.raises(ValueError, itsxpress.main._check_fastqs, fastq, fastq2)
 
 def test_check_fastq_gzs():
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq.gz")
 	fastq2 = os.path.join(TEST_DIR, "test_data", "broken.fastq.gz")
-	assert_raises(ValueError, itsxpress.main._check_fastqs, fastq, fastq2)
+	pytest.raises(ValueError, itsxpress.main._check_fastqs, fastq, fastq2)
 
 def test_its_position_init():
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
@@ -125,13 +126,16 @@ def test_seq_sample_paired_not_interleaved():
 
 
 def test_is_paired():
-	paired_end, interleaved = itsxpress.main._is_paired("fastq1.fq", "fastq2.fq", single_end=False)
-	assert paired_end == True and interleaved == False
-	paired_end, interleaved = itsxpress.main._is_paired("fastq1.fq", None, single_end=False)
-	assert paired_end == True and interleaved == True
-	paired_end, interleaved = itsxpress.main._is_paired("fastq1.fq", None, single_end=True)
-	assert paired_end == False and interleaved == False
+	paired_end= itsxpress.main._is_paired("fastq1.fq", "fastq2.fq", single_end=False)
+	assert paired_end == True
 
+	paired_end= itsxpress.main._is_paired("fastq1.fq", None, single_end=False)
+	assert paired_end == True
+
+	paired_end= itsxpress.main._is_paired("fastq1.fq", None, single_end=True)
+	assert paired_end == False
+
+test_is_paired()
 def test_myparser():
 	parser = itsxpress.main.myparser()
 	args = parser.parse_args(['--fastq', 'test.fastq','--outfile', 'test.out','--tempdir', 'dirt','--region','ITS1','--taxa', 'Fungi'])
@@ -233,3 +237,9 @@ def test_create_paired_trimmed_seqs():
 	ok_(filecmp.cmp(t1, os.path.join(TEST_DIR, "test_data", "t2_r1.fq")))
 	ok_(filecmp.cmp(t2, os.path.join(TEST_DIR, "test_data", "t2_r2.fq")))
 	shutil.rmtree(tf)
+
+#test_check_fastqs()
+test_dedup()
+test_dedup_create_trimmed_seqs()
+test_dedup_create_trimmed_seqs_gzipped()
+test_check_fastqs()

@@ -1,0 +1,4 @@
+07-27 11:56 root         INFO     Verifying the input sequences.
+07-27 11:56 root         ERROR    The input file 4774-1-MSITS3_interleaved.fastq could not be found.
+07-27 11:56 root         ERROR    ITSxpress terminated with errors. See the log file for details.
+07-27 11:56 root         ERROR    [Errno 2] No such file or directory: '4774-1-MSITS3_interleaved.fastq'
