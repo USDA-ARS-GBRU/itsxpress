@@ -55,7 +55,7 @@ ITSxpress is also available as a `QIIME2 Plugin`_
 .. _`QIIME2 Plugin`: https://github.com/USDA-ARS-GBRU/q2_itsxpress
 
 
-Installation of ITSxpress version 1 end of life: BBmap is no longer used in ITSxpress version 2
+Installation of the final iteration of ITSxpress version 1: (BBmap is no longer used in ITSxpress version 2)
 -------------
 ITSxpress can be installed from:
 
