@@ -443,13 +443,10 @@ class Dedup:
             itspos (object): an ItsPosition object
 
         """
-        print(gzipped)
         def _write_seqs():
             if gzipped:
                 tempf = os.path.join('./','temp.fa')
                 with open(tempf, 'w') as g:
-                    print('Gzipped_write_seqs')
-                    print(seqs,"   ",g)
                     SeqIO.write(seqs, g, "fastq")
                 with open(tempf,'rb') as f_in:
                     with gzip.open(outfile,'wb') as f_out:
@@ -457,18 +454,14 @@ class Dedup:
                     
             else:
                 with open(outfile, 'w') as g:
-                    print('Not gzipped_write_seqs')
                     SeqIO.write(seqs, g, "fastq")
                     
 
         if self.seq_file.endswith(".gz"):
             with gzip.open(self.seq_file, 'rt') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
-                print(seqgen)
                 seqs = self._get_trimmed_seq_generator(seqgen, itspos)
-                print(seqgen)
                 _write_seqs()
-                print('Makes it here')
 
         else:
             with open(self.seq_file, 'r') as f:
@@ -586,58 +579,6 @@ class SeqSample:
             logging.error("hmmsearch was not found, make sure HMMER3 is installed and executable")
             raise f
 
-# class SeqSamplePairedInterleaved(SeqSample):
-#     """SeqSample class extended to paired, interleaved format.
-
-#     """
-#     def split_interleaved(self, reversed_primers=False):
-#         try:
-#             seq_r1 = os.path.join(self.tempdir, 'seq_r1.fq.gz')
-#             seq_r2 = os.path.join(self.tempdir, 'seq_r2.fq.gz')
-#             parameters = ['reformat.sh',
-#                           'in=' + self.fastq,
-#                           'out=' + seq_r1,
-#                           'out2=' + seq_r2,
-#                          ]
-#             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
-#             p1.check_returncode()
-#             if reversed_primers:
-#                 self.r1 = seq_r2
-#                 self.fastq2 = seq_r1
-#             else:
-#                 self.r1 = seq_r1
-#                 self.fastq2 = seq_r2
-#             logging.info(p1.stderr.decode('utf-8'))
-#         except subprocess.CalledProcessError as e:
-#             logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
-#             raise e
-#         except FileNotFoundError as f:
-#             logging.error("BBmerge was not found, make sure BBmerge is executable")
-#             raise f
-
-#     def __init__(self, fastq, tempdir, reversed_primers=False):
-#             SeqSample.__init__(self, fastq, tempdir)
-#             self.split_interleaved(reversed_primers=reversed_primers)
-
-#     def _merge_reads(self, threads):
-#         try:
-#             seq_file = os.path.join(self.tempdir, 'seq.fq.gz')
-#             parameters = ['bbmerge.sh',
-#                           'in=' + self.fastq,
-#                           'out=' + seq_file,
-#                           't=' + str(threads),
-#                           'maxmismatches=' + str(maxmismatches),
-#                           'maxratio=' + str(maxratio)]
-#             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
-#             self.seq_file = seq_file
-#             p1.check_returncode()
-#             logging.info(p1.stderr.decode('utf-8'))
-#         except subprocess.CalledProcessError as e:
-#             logging.exception("could not perform read merging with BBmerge. Error from BBmerge was: \n  {}".format(p1.stderr.decode('utf-8')))
-#             raise e
-#         except FileNotFoundError as f:
-#             logging.error("BBmerge was not found, make sure BBmerge is executable")
-#             raise f
 
 class SeqSamplePairedNotInterleaved(SeqSample):
     """SeqSample class extended to paired, two FASTQ file format.
@@ -662,16 +603,7 @@ class SeqSamplePairedNotInterleaved(SeqSample):
                           '--fastq_maxdiffs' , str(maxmismatches),
                           '--fastq_maxee_rate' , str(maxratio),
                           '--threads'  ,str(threads)]
-            #parameters = ''.join(parameters)
-            # parameters = ['bbmerge.sh',
-            #               'in=' + self.r1,
-            #               'in2=' + self.fastq2,
-            #               'out=' + seq_file,
-            #               't=' + str(threads),
-            #               'maxmismatches=' + str(maxmismatches),
-            #               'maxratio=' + str(maxratio)]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
-            #seq_file_gz = os.path.join(self.tempdir, 'seq.fq.gz')
             self.seq_file = seq_file
             p1.check_returncode()
             logging.info(p1.stderr.decode('utf-8'))
@@ -760,15 +692,13 @@ def _check_fastqs(fastq, fastq2=None):
             L2_old = [i.strip().split('/', 1)[0] for i in L2]
             L1_new = [i.strip().split(' ', 1)[0] for i in L1]
             L2_new = [i.strip().split(' ', 1)[0] for i in L2]
-            print(L1_old)
-            print(L1_new)
             assert L1_old == L2_old or L1_new == L2_new
 
         except AssertionError as a:
             logging.error("'File seems to be interleaved. ITSxpress will run with errors. Check BBmap reformat.sh to split interleaved files.")
             raise a 
         except IOError as f:
-            logging.error("File may ")
+            logging.error("File may be wrong format for interleaved file check.")
             raise f
         
   
@@ -819,16 +749,10 @@ def main(args=None):
 
     _logger_setup(args.log)
     try:
-        print(args.cluster_id)
         logging.info("Verifying the input sequences.")
         _check_fastqs(args.fastq, args.fastq2)
         # Parse input types
         paired_end = _is_paired(args.fastq, args.fastq2, args.single_end)
-        # create SeqSample objects and merge if needed
-        # if paired_end and interleaved:
-        #     logging.info("Sequences are paired-end and interleaved. They will be merged using BBmerge.")
-        #     sobj = SeqSamplePairedInterleaved(fastq=args.fastq, tempdir=args.tempdir, reversed_primers=args.reversed_primers )
-        #     sobj._merge_reads(threads=str(args.threads))
         if paired_end:
             logging.info("Sequences are paired-end in two files. They will be merged using Vsearch.")
             sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=args.tempdir, reversed_primers=args.reversed_primers)
@@ -855,14 +779,11 @@ def main(args=None):
         # Create trimmed sequences
         logging.info("Writing out sequences")
         if args.outfile2:
-            print('Outfile2 if statement')
             if args.outfile.split('.')[-1] == 'gz' and args.outfile2.split('.')[-1] == 'gz':
                 dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True, itspos=its_pos)
             else:
                 dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, itspos=its_pos)
         else:
-            print('Outfile if statement')
-            print(args.outfile.split('.')[-1])
             if args.outfile.split('.')[-1] =='gz':
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True, itspos=its_pos)
             else:
@@ -872,10 +793,8 @@ def main(args=None):
         logging.info("ITSxpress ran in {}".format(fmttime))
     except Exception as e:
         logging.error("ITSxpress terminated with errors. See the log file for details.")
-        #logging.error(e)
-        #Raise e, print full stack of errors
-        raise e
-        #May get rid of SystemExit for now
+        logging.error(e)
+        #raise e
         raise SystemExit(1)
     finally:
         try:
