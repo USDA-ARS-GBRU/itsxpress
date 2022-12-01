@@ -32,7 +32,7 @@ Reference:
     eukaryotes for use in environmental sequencing. Methods in Ecology and Evolution,
     4: 914-919, 2013 (DOI: 10.1111/2041-210X.12073)
 """
- 
+
 
 
 import gzip
@@ -50,7 +50,7 @@ from numpy import empty
 
 from Bio import SeqIO
 
-from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio
+from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio,maxee
 
 def restricted_float(x):
     x = float(x)
@@ -451,11 +451,11 @@ class Dedup:
                 with open(tempf,'rb') as f_in:
                     with gzip.open(outfile,'wb') as f_out:
                         f_out.writelines(f_in)
-                    
+
             else:
                 with open(outfile, 'w') as g:
                     SeqIO.write(seqs, g, "fastq")
-                    
+
 
         if self.seq_file.endswith(".gz"):
             with gzip.open(self.seq_file, 'rt') as f:
@@ -601,8 +601,9 @@ class SeqSamplePairedNotInterleaved(SeqSample):
                           '--reverse' , self.fastq2,
                           '--fastqout' ,seq_file,
                           '--fastq_maxdiffs' , str(maxmismatches),
-                          '--fastq_maxee_rate' , str(maxratio),
+                          '--fastq_maxee' , str(maxee),
                           '--threads'  ,str(threads)]
+                          #'--fastq_maxee_rate' , str(maxratio),
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             self.seq_file = seq_file
             p1.check_returncode()
@@ -687,22 +688,23 @@ def _check_fastqs(fastq, fastq2=None):
                 f = open(file, 'r')
             lines = f.readlines()
             L1 = lines[0:96:8]
-            L2 = lines[3:96:8]
+            L2 = lines[4:96:8]
+            #logging.info(L1)
+            #logging.info(L2)
             L1_old = [i.strip().split('/', 1)[0] for i in L1]
             L2_old = [i.strip().split('/', 1)[0] for i in L2]
             L1_new = [i.strip().split(' ', 1)[0] for i in L1]
             L2_new = [i.strip().split(' ', 1)[0] for i in L2]
-            assert L1_old == L2_old or L1_new == L2_new
+            assert L1_old != L2_old or L1_new != L2_new
 
         except AssertionError as a:
             logging.error("'File seems to be interleaved. ITSxpress will run with errors. Check BBmap reformat.sh to split interleaved files.")
-            raise a 
         except IOError as f:
             logging.error("File may be wrong format for interleaved file check.")
             raise f
-        
-  
-    def core(file):   
+
+
+    def core(file):
         try:
             if file.endswith('.gz'):
                 f = gzip.open(file, 'rt')
@@ -713,7 +715,7 @@ def _check_fastqs(fastq, fastq2=None):
                 while n < 100:
                     n += 1
             check_interleaved(file)
-           
+
             f.close()
             if fastq2:
                 if fastq2.endswith('.gz'):
