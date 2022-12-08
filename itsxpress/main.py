@@ -314,9 +314,9 @@ class Dedup:
         filt = filter(_filterfunc, zipseqgen)
         gen1 = map(_map_func, filt)
         gen1_split_a, gen1_split_b = _split_gen(gen1)
-        print(list(gen1_split_a))
-        print("  ")
-        print(list(gen1_split_b))
+        #print(list(gen1_split_a))
+        #print("  ")
+        #print(list(gen1_split_b))
         return gen1_split_a, gen1_split_b
 
 
