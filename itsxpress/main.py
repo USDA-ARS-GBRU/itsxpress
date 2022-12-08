@@ -314,6 +314,9 @@ class Dedup:
         filt = filter(_filterfunc, zipseqgen)
         gen1 = map(_map_func, filt)
         gen1_split_a, gen1_split_b = _split_gen(gen1)
+        print(list(gen1_split_a))
+        print("  ")
+        print(list(gen1_split_b))
         return gen1_split_a, gen1_split_b
 
 
@@ -343,6 +346,7 @@ class Dedup:
             if gzipped:
                 with gzip.open(outfile, 'wt') as g:
                     SeqIO.write(seqs, g, "fastq")
+
             else:
                 with open(outfile, 'w') as g:
                     SeqIO.write(seqs, g, "fastq")
@@ -430,7 +434,14 @@ class Dedup:
             return record[start:stop]
 
         filt = filter(_filterfunc, seqgen)
-        return map(map_func, filt)
+        r1 = map(map_func, filt)
+        zeroseqctr = 0
+        for i in list(r1):
+            if i.seq == "":
+                zeroseqctr+1
+                print(i.id)
+        print(zeroseqctr)
+        return r1
 
 
     def create_trimmed_seqs(self, outfile, gzipped, itspos):
@@ -440,7 +451,7 @@ class Dedup:
         Args:
             outfile (str): The file to write the sequences to.
             gzip (bool): Should the files be gzipped?
-            itspos (object): an ItsPosition object
+            itspos (object): an ItsPosition objectconda activate /project/gbru_fy21_tomato_ralstonia/ITSxpress/software/qiime2-2022.8_ITSxpressV2
 
         """
         def _write_seqs():
@@ -448,12 +459,14 @@ class Dedup:
                 tempf = os.path.join('./','temp.fa')
                 with open(tempf, 'w') as g:
                     SeqIO.write(seqs, g, "fastq")
+                    #print(seqs)
                 with open(tempf,'rb') as f_in:
                     with gzip.open(outfile,'wb') as f_out:
                         f_out.writelines(f_in)
 
             else:
                 with open(outfile, 'w') as g:
+                    #print(seqs)
                     SeqIO.write(seqs, g, "fastq")
 
 
@@ -461,12 +474,14 @@ class Dedup:
             with gzip.open(self.seq_file, 'rt') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
                 seqs = self._get_trimmed_seq_generator(seqgen, itspos)
+                #print(seqs)
                 _write_seqs()
 
         else:
             with open(self.seq_file, 'r') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
                 seqs = self._get_trimmed_seq_generator(seqgen, itspos)
+                #print(seqs)
                 _write_seqs()
 
 
@@ -510,13 +525,19 @@ class SeqSample:
         try:
             self.uc_file=os.path.join(self.tempdir, 'uc.txt')
             self.rep_file=os.path.join(self.tempdir,'rep.fa')
+            # parameters = ["vsearch",
+            #               "--derep_fulllength",
+            #               self.seq_file,
+            #               "--output", self.rep_file,
+            #               "--uc", self.uc_file,
+            #               "--strand", "both",
+            #               "--threads", str(threads)]
             parameters = ["vsearch",
-                          "--derep_fulllength",
+                          "--fastx_uniques",
                           self.seq_file,
-                          "--output", self.rep_file,
+                          "--fastaout", self.rep_file,
                           "--uc", self.uc_file,
-                          "--strand", "both",
-                          "--threads", str(threads)]
+                          "--strand", "both"]
             p2 = subprocess.run(parameters, stderr=subprocess.PIPE)
             logging.info(p2.stderr.decode('utf-8'))
             p2.check_returncode()
