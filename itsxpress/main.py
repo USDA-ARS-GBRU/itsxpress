@@ -315,8 +315,20 @@ class Dedup:
         gen1 = map(_map_func, filt)
         gen1_split_a, gen1_split_b = _split_gen(gen1)
         #print(list(gen1_split_a))
-        #print("  ")
+        zeroseqctr = 0
+        for i in list(gen1_split_a):
+            if i.seq == "":
+                zeroseqctr=zeroseqctr+1
+                print(i.id)
+        print("Total number of sequences that are empty Split A: ",zeroseqctr)
+        print("  ")
         #print(list(gen1_split_b))
+        zeroseqctr = 0
+        for i in list(gen1_split_b):
+            if i.seq == "":
+                zeroseqctr=zeroseqctr+1
+                print(i.id)
+        print("Total number of sequences that are empty Split B: ",zeroseqctr)
         return gen1_split_a, gen1_split_b
 
 
@@ -438,9 +450,9 @@ class Dedup:
         zeroseqctr = 0
         for i in list(r1):
             if i.seq == "":
-                zeroseqctr+1
+                zeroseqctr=zeroseqctr+1
                 print(i.id)
-        print(zeroseqctr)
+        print("Total number of sequences that are empty: ",zeroseqctr)
         return r1
 
 
