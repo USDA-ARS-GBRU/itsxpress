@@ -56,6 +56,8 @@ ITSxpress is also available as a `QIIME2 Plugin`_
 
 
 Installation of the final iteration of ITSxpress version 1: (BBmap is no longer used in ITSxpress version 2)
+
+Qiime2 version 2022.8 is the required version to using the ITSxpress plugin with Qiime2.
 -------------
 ITSxpress can be installed from:
 
@@ -75,7 +77,7 @@ ITSxpress can be installed from:
     mamba install hmmer==3.1b2
     .....
     conda install bbmap==38.96
-    conda install vsearch==2.7.0
+    conda install vsearch==2.21.1
 Then install itsxpress using pip:
 
 .. code-block:: bash
