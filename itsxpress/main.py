@@ -1,28 +1,22 @@
 #!/usr/bin/env python
 """ITSxpress: A python module to rapidly trim ITS amplicon sequences from FASTQ files.
-
 Authors: Adam Rivers, Kyle weber, USDA Agricultural Research Service
-
 The internally transcribed spacer region is a region between the highly conserved small
 subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. The eukaryotic ITS contains
 the 5.8s gene and two variable length spacer regions. In amplicon sequencing studies it is
 common practice to trim off the conserved (SSU, 5,8S or LSU) regions. Bengtsson-Palme
 et al. (2013) published software the software package ITSx to do this.
-
 ITSxpress is a high-speed implementation of the methods in ITSx than also allows FASTQ
 files to be processed. Processing FASTQ files Which is essential for analyzing
 sequences using the newer exact Sequence Variant methods in Qiime2, Dada2, Deblur
 and Unoise that are replacing OTU clustering.
-
 ITSxpress is also available as a QIIME Plugin. See
 https://github.com/USDA-ARS-GBRU/q2_itsxpress for details.
-
 Process:
     * Merges and error corrects reads using bbduk if reads are paired-end
     * Deduplicates reads using Vmatch to eliminate redundant hmm searches
     * Searches for conserved regions using the ITSx hmms, using HMMsearch:
     * Parses everything in python returning (optionally gzipped) fastq files.
-
 Reference:
     Johan Bengtsson-Palme, Vilmar Veldre, Martin Ryberg, Martin Hartmann, Sara Branco,
     Zheng Wang, Anna Godhe, Yann Bertrand, Pierre De Wit, Marisol Sanchez,
@@ -32,7 +26,7 @@ Reference:
     eukaryotes for use in environmental sequencing. Methods in Ecology and Evolution,
     4: 914-919, 2013 (DOI: 10.1111/2041-210X.12073)
 """
-
+ 
 
 
 import gzip
@@ -50,7 +44,7 @@ from numpy import empty
 
 from Bio import SeqIO
 
-from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio,maxee
+from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio
 
 def restricted_float(x):
     x = float(x)
@@ -87,23 +81,19 @@ def myparser():
 
 class ItsPosition:
     """Class for ITS positional information derived from hmmserach domtable files.
-
     Args:
         domtable (str):  the path locating the domtable file from HMMER 3 hmmsearch.
         region (str): The region of the ITS to extract choices: ["ITS1", "ITS2", "ALL"].
-
     Attributes:
         ddict (dict): A dictionary holding the scores and start and stop
             positions for the selected segment of each sequence.
             Example: {sample:{left:{score:31, pos:15}, right:{score:32, pos:354}, tlen:449}
         leftprefix (str): the left prefix to search for (set by type variable).
         rightprefix (str): the right prefix to search for (set by type variable).
-
     """
     def _score(self, sequence, stype, score, from_pos, to_pos, tlen):
         """Evaluates scores and positions from the new line of a domtable file and
             updates ddict if necessary.
-
         Args:
             sequence (str): The name of the sequence.
             stype (str): {'left', 'right'}
@@ -111,7 +101,6 @@ class ItsPosition:
             to_pos (int): the ending position of the left sequence.
             from_pos (int): The beginning position of the right sequence.
             tlen (int): the length of the sequence
-
         """
 
         if stype in self.ddict[sequence]:
@@ -129,10 +118,8 @@ class ItsPosition:
 
     def parse(self):
         """Parses dom table from HMMsearch.
-
         The dom table is parsed and the start and stop position from the top scoring
         hmm math is saved. The start and stop positions of reach sequence are added to the ddict attribute.
-
         """
         try:
             with open(self.domtable, 'r') as f:
@@ -172,16 +159,12 @@ class ItsPosition:
 
     def get_position(self, sequence):
         """ Returns the start and stop positions for a given sequence.
-
         Args:
             sequence (str): The name of the sequence.
-
         Returns:
             (tuple): (start position, end position) zero indexed
-
         Raises:
             KeyError: If input sequence is not present in dictionary (no ITS start or stop sites were found)
-
         """
 
         try:
@@ -204,10 +187,8 @@ class ItsPosition:
 
 class Dedup:
     """A class to handle deduplicated sequence data.
-
     To speed processing Vmatch is used to remove duplicate amplicons so that the
     start and stop sites are determined only once.
-
     Attributes:
         matchdict (dict): a dictionary of each sequence ID as a key and
             its representative sequence ID as a value {seq1:rep1, seq2:rep1, seq3:rep2}.
@@ -216,16 +197,13 @@ class Dedup:
         seq_file (str): The location of the complete sequences file.
         fastq (str): the location of the input fastq
         fastq2 (str) the location of optional Read2 input fastq if paired
-
     """
 
 
     def parse(self):
         """Parse the uc data file to populate the matchdict attribute.
-
         Raises:
             Exception: General exception if uc file is not parsed properly
-
         """
         try:
             with open(self.uc_file, 'r') as f:
@@ -253,29 +231,23 @@ class Dedup:
         self.parse()
 
 
-    def _get_paired_seq_generator(self, zipseqgen, itspos):
+    def _get_paired_seq_generator(self, zipseqgen, itspos,wri_file):
         """This function takes a zipped object of two Biopython SeqIO sequence generators, and
         returns a two generators of Biopython SeqRecords for Dada2. Sequences where the ITS ends could
         not be determined are omitted.
-
         Args:
             zipseqgen (obj): A zipped object with two Biopython SeqIO generators
                           for the forward and reverse input sequences
             ispos (obj): An itsxpress ItsPosition object
-
         Returns:
             (obj): A two Python SeqRecord generators that yield filtered, trimmed sequence records.
-
         """
         def _filterfunc(ziprecord):
             """ Filters records down to those that contain a valid ITS start and stop position
-
             Args:
                 record (obj): a Biopython SeqRecord object
-
             Returns:
                 bool: True if an ITS start and stop positions are present false otherwise
-
             """
             try:
                 record1, record2 = ziprecord
@@ -294,10 +266,8 @@ class Dedup:
 
         def _map_func(ziprecord):
             """Trims the record down to the selected ITS region
-
             Args:
                 record (obj): a Biopython SeqRecord object
-
             Returns:
                 obj: two Biopython SeqRecord objects; forward and reverse reads trimmed to the ITS region
             """
@@ -314,69 +284,67 @@ class Dedup:
         filt = filter(_filterfunc, zipseqgen)
         gen1 = map(_map_func, filt)
         gen1_split_a, gen1_split_b = _split_gen(gen1)
-        #print(list(gen1_split_a))
-        zeroseqctr = 0
-        for i in list(gen1_split_a):
-            if i.seq == "":
-                zeroseqctr=zeroseqctr+1
-                print(i.id)
-        print("Total number of sequences that are empty Split A: ",zeroseqctr)
-        print("  ")
-        #print(list(gen1_split_b))
-        zeroseqctr = 0
-        for i in list(gen1_split_b):
-            if i.seq == "":
-                zeroseqctr=zeroseqctr+1
-                print(i.id)
-        print("Total number of sequences that are empty Split B: ",zeroseqctr)
+        if wri_file == False:
+            zeroseqctr1 = 0
+            seqlist1=[]
+            seqlist2=[]
+            for i in list(gen1_split_a):
+                if i.seq == "":
+                    zeroseqctr1=zeroseqctr1+1
+                    seqlist1.append(i.id)
+            zeroseqctr2 = 0
+            for i in list(gen1_split_b):
+                if i.seq == "":
+                    zeroseqctr2=zeroseqctr2+1
+                    seqlist2.append(i.id)
+            if zeroseqctr1 or zeroseqctr2 !=0:
+                print("Total number of sequences that are empty Split A: ",zeroseqctr1)
+                print("Sequence IDs: ")
+                print(seqlist1)
+                print("Total number of sequences that are empty Split B: ",zeroseqctr2)
+                print("Sequence IDs: ")
+                print(seqlist2) 
         return gen1_split_a, gen1_split_b
 
 
-    def create_paired_trimmed_seqs(self, outfile1, outfile2, gzipped, itspos):
+    def create_paired_trimmed_seqs(self, outfile1, outfile2, gzipped, itspos,wri_file):
         """Writes two FASTQ files, optionally gzipped, with the reads trimmed to the
             selected region.
-
         Args:
             outfile1 (str): The file to write the forward sequences to.
             outfile2 (str): The file to write the reverse sequences to.
             gzip (bool): Should the output files be gzipped?
             itspos (object): an ItsPosition object
-
         Returns:
             str: Name of the file written
-
         """
 
         def _write_seqs(seqs, outfile):
             """Helper function to optionally write sequences in compressed format
-
             Args:
                 seqs (obj): A biopython SeqRecord generators
                 outfile (str): A file name to writ the fastq data to.
-
             """
             if gzipped:
                 with gzip.open(outfile, 'wt') as g:
                     SeqIO.write(seqs, g, "fastq")
-
             else:
                 with open(outfile, 'w') as g:
                     SeqIO.write(seqs, g, "fastq")
 
         def _create_gen(f, g):
             """Create a sequence generator
-
             Args:
                 f (str): a file name for read 1 fastq data
                 g (str): a file name for read 2 fastq data
-
             """
             seqgen1 = SeqIO.parse(f, 'fastq')
             seqgen2 = SeqIO.parse(g, 'fastq')
             zipseqgen = zip(seqgen1, seqgen2)
-            seqs1, seqs2 = self._get_paired_seq_generator(zipseqgen, itspos)
-            _write_seqs(seqs1, outfile1)
-            _write_seqs(seqs2, outfile2)
+            seqs1, seqs2 = self._get_paired_seq_generator(zipseqgen, itspos,wri_file)
+            if wri_file:
+                _write_seqs(seqs1, outfile1)
+                _write_seqs(seqs2, outfile2)
 
         try:
             if self.fastq.endswith(".gz") and self.fastq2.endswith(".gz"):
@@ -395,28 +363,22 @@ class Dedup:
             raise e
 
 
-    def _get_trimmed_seq_generator(self, seqgen, itspos):
+    def _get_trimmed_seq_generator(self, seqgen, itspos,wri_file):
         """This function takes a Biopython SeqIO sequence generator, and
         returns a generator of trimmed sequences suitable for Deblur. Sequences where the ITS ends could
         not be determined are omitted.
-
         Args:
             seqgen (obj): A Biopython SeqIO generator of all input sequences
             ispos (obj): An itsxpress ItsPosition object
-
         Returns:
             (obj): A map object generator that yields filtered, trimmed sequence records.
-
         """
         def _filterfunc(record):
             """ Filters records down to those that contain a valid ITS start and stop position
-
             Args:
                 record (obj): a Biopython SeqRecord object
-
             Returns:
                 bool: True if an ITS start and stop positions are present false otherwise
-
             """
             try:
                 if record.id in self.matchdict:
@@ -434,10 +396,8 @@ class Dedup:
 
         def map_func(record):
             """Trims the record down to the selected ITS region
-
             Args:
                 record (obj): a Biopython SeqRecord object
-
             Returns:
                 obj: a Biopython SeqRecord object trimmed to the ITS region
             """
@@ -446,67 +406,68 @@ class Dedup:
             return record[start:stop]
 
         filt = filter(_filterfunc, seqgen)
-        r1 = map(map_func, filt)
-        zeroseqctr = 0
-        for i in list(r1):
-            if i.seq == "":
-                zeroseqctr=zeroseqctr+1
-                print(i.id)
-        print("Total number of sequences that are empty: ",zeroseqctr)
-        return r1
+        if wri_file == False:
+            zeroseqctr = 0
+            seqlist=[]
+            r1 = map(map_func, filt)
+            for i in list(r1):
+                if i.seq == "":
+                    zeroseqctr=zeroseqctr+1
+                    seqlist.append(i.id)
+            
+            if zeroseqctr !=0:
+                print("Total number of sequences that are empty: ",zeroseqctr)
+                print("Sequence IDs: ")
+                print(seqlist)
+        return map(map_func, filt)
 
 
-    def create_trimmed_seqs(self, outfile, gzipped, itspos):
+    def create_trimmed_seqs(self, outfile, gzipped, itspos,wri_file):
         """Creates a FASTQ file, optionally gzipped, with the reads trimmed to the
             selected region.
-
         Args:
             outfile (str): The file to write the sequences to.
             gzip (bool): Should the files be gzipped?
-            itspos (object): an ItsPosition objectconda activate /project/gbru_fy21_tomato_ralstonia/ITSxpress/software/qiime2-2022.8_ITSxpressV2
-
+            itspos (object): an ItsPosition object
+            wri_file (bool): Should file be written or checked for empty sequences?
         """
         def _write_seqs():
             if gzipped:
                 tempf = os.path.join('./','temp.fa')
                 with open(tempf, 'w') as g:
                     SeqIO.write(seqs, g, "fastq")
-                    #print(seqs)
                 with open(tempf,'rb') as f_in:
                     with gzip.open(outfile,'wb') as f_out:
                         f_out.writelines(f_in)
-
+                    
             else:
                 with open(outfile, 'w') as g:
-                    #print(seqs)
                     SeqIO.write(seqs, g, "fastq")
-
+                    
 
         if self.seq_file.endswith(".gz"):
             with gzip.open(self.seq_file, 'rt') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
-                seqs = self._get_trimmed_seq_generator(seqgen, itspos)
-                #print(seqs)
-                _write_seqs()
+                seqs = self._get_trimmed_seq_generator(seqgen, itspos,wri_file)
+                if wri_file:
+                    _write_seqs()
 
         else:
             with open(self.seq_file, 'r') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
-                seqs = self._get_trimmed_seq_generator(seqgen, itspos)
-                #print(seqs)
-                _write_seqs()
+                seqs = self._get_trimmed_seq_generator(seqgen, itspos,wri_file)
+                if wri_file:
+                    _write_seqs()
 
 
 class SeqSample:
     """The class for processing sequence data into trimmed sequences.
-
     Attributes:
         tempdir (obj): A temporary directory object
         fastq (str): The path to the input FASTQ file
         uc_file (str): The path to the Vsearch uc mapping file
         rep_file: (str) the path to the representative sequences FASTA file created by Vsearch
         seq_file (str): the location of the fastq or fastq.gz sequence file used for analysis
-
     """
 
 
@@ -529,21 +490,12 @@ class SeqSample:
 
     def deduplicate(self, threads=1):
         """Runs Vsearch dereplication to create a FASTA file of non-redundant sequences.
-
         Args:
             threads (int or str):the number of processor threads to use
-
         """
         try:
             self.uc_file=os.path.join(self.tempdir, 'uc.txt')
             self.rep_file=os.path.join(self.tempdir,'rep.fa')
-            # parameters = ["vsearch",
-            #               "--derep_fulllength",
-            #               self.seq_file,
-            #               "--output", self.rep_file,
-            #               "--uc", self.uc_file,
-            #               "--strand", "both",
-            #               "--threads", str(threads)]
             parameters = ["vsearch",
                           "--fastx_uniques",
                           self.seq_file,
@@ -563,10 +515,8 @@ class SeqSample:
 
     def cluster(self, threads=1, cluster_id=0.995):
         """Runs Vsearch clustering to create a FASTA file of non-redundant sequences.
-
         Args:
             threads (int or str):the number of processor threads to use
-
         """
         try:
             self.uc_file = os.path.join(self.tempdir, 'uc.txt')
@@ -615,7 +565,6 @@ class SeqSample:
 
 class SeqSamplePairedNotInterleaved(SeqSample):
     """SeqSample class extended to paired, two FASTQ file format.
-
     """
     def __init__(self, fastq, tempdir, fastq2, reversed_primers=False ):
         SeqSample.__init__(self, fastq, tempdir)
@@ -634,9 +583,8 @@ class SeqSamplePairedNotInterleaved(SeqSample):
                           '--reverse' , self.fastq2,
                           '--fastqout' ,seq_file,
                           '--fastq_maxdiffs' , str(maxmismatches),
-                          '--fastq_maxee' , str(maxee),
+                          '--fastq_maxee' , str(2),
                           '--threads'  ,str(threads)]
-                          #'--fastq_maxee_rate' , str(maxratio),
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             self.seq_file = seq_file
             p1.check_returncode()
@@ -650,7 +598,6 @@ class SeqSamplePairedNotInterleaved(SeqSample):
 
 class SeqSampleNotPaired(SeqSample):
     """SeqSample class extended to unpaired format.
-
     """
 
     def __init__(self, fastq, tempdir):
@@ -663,9 +610,7 @@ class SeqSampleNotPaired(SeqSample):
 
 def _is_paired(fastq, fastq2, single_end):
     """Determines the workflow based on file inputs.
-
     Args:
-
     """
     if fastq and fastq2:
         paired_end = True
@@ -677,11 +622,9 @@ def _is_paired(fastq, fastq2, single_end):
 
 def _logger_setup(logfile):
     """Set up logging to a logfile and the terminal standard out.
-
     Args:
         fastq (str): The path to a fastq or fastq.gz file
         fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
-
     """
     try:
         logging.basicConfig(level=logging.DEBUG,
@@ -705,11 +648,9 @@ def _logger_setup(logfile):
 def _check_fastqs(fastq, fastq2=None):
     """Verifies the input files are valid fastq or fastq.gz files.
     Add interleaved explanation
-
     Args:
         fastq (str): The path to a fastq or fastq.gz file
         fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
-
     Raises:
         ValueError: If Biopython detected invalid FASTQ files
     """
@@ -721,9 +662,7 @@ def _check_fastqs(fastq, fastq2=None):
                 f = open(file, 'r')
             lines = f.readlines()
             L1 = lines[0:96:8]
-            L2 = lines[4:96:8]
-            #logging.info(L1)
-            #logging.info(L2)
+            L2 = lines[3:96:8]
             L1_old = [i.strip().split('/', 1)[0] for i in L1]
             L2_old = [i.strip().split('/', 1)[0] for i in L2]
             L1_new = [i.strip().split(' ', 1)[0] for i in L1]
@@ -731,13 +670,14 @@ def _check_fastqs(fastq, fastq2=None):
             assert L1_old != L2_old or L1_new != L2_new
 
         except AssertionError as a:
-            logging.error("'File seems to be interleaved. ITSxpress will run with errors. Check BBmap reformat.sh to split interleaved files.")
+            logging.error("'File may be interleaved. ITSxpress will run with errors. Check BBmap reformat.sh to split interleaved files.")
+            raise a 
         except IOError as f:
             logging.error("File may be wrong format for interleaved file check.")
             raise f
-
-
-    def core(file):
+        
+  
+    def core(file):   
         try:
             if file.endswith('.gz'):
                 f = gzip.open(file, 'rt')
@@ -747,43 +687,7 @@ def _check_fastqs(fastq, fastq2=None):
             for record in SeqIO.parse(f, 'fastq'):
                 while n < 100:
                     n += 1
-            check_interleaved(file)
-
-            f.close()
-            if fastq2:
-                if fastq2.endswith('.gz'):
-                    f = gzip.open(fastq2, 'rt')
-                else:
-                    f = open(fastq2, 'r')
-                n = 0
-                for record in SeqIO.parse(f, 'fastq'):
-                    while n < 100:
-                        n += 1
-            f.close()
-        except ValueError as e:
-            logging.error("There appears to be an issue with the format of input file {}.".format(file))
-            raise e
-        except FileNotFoundError as f:
-            logging.error("The input file {} could not be found.".format(file))
-            raise f
-        except Exception as g:
-            logging.error("There appears to be an issue reading the input file {}.".format(file))
-            raise g
-
-    core(fastq)
-
-def main(args=None):
-    """Run Complete ITS trimming workflow.
-
-    """
-    # Set up logging
-    t0 = time.time()
-    parser = myparser()
-    if not args:
-        args = parser.parse_args()
-
-    _logger_setup(args.log)
-    try:
+            check_interleaved(file)taxa
         logging.info("Verifying the input sequences.")
         _check_fastqs(args.fastq, args.fastq2)
         # Parse input types
@@ -815,14 +719,22 @@ def main(args=None):
         logging.info("Writing out sequences")
         if args.outfile2:
             if args.outfile.split('.')[-1] == 'gz' and args.outfile2.split('.')[-1] == 'gz':
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True, itspos=its_pos)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True, itspos=its_pos,wri_file=True)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True, itspos=its_pos,wri_file=False)
             else:
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, itspos=its_pos)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, itspos=its_pos,wri_file=True)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, itspos=its_pos,wri_file=False)
+
         else:
             if args.outfile.split('.')[-1] =='gz':
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True, itspos=its_pos)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True, itspos=its_pos,wri_file=True)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True, itspos=its_pos,wri_file=False)
+                #add function with above create_trimmed_seqs
+                #use said function to check for 0 length seqs
             else:
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, itspos=its_pos)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, itspos=its_pos,wri_file=True)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, itspos=its_pos,wri_file=False)
+
         t1 = time.time()
         fmttime = time.strftime("%H:%M:%S", time.gmtime(t1-t0))
         logging.info("ITSxpress ran in {}".format(fmttime))
