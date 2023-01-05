@@ -20,7 +20,7 @@ setup(
     test_suite='pytest',
     author='Adam R. Rivers',
     author_email='adam.rivers@usda.gov',
-    install_requires=['biopython>=1.79','hmmer==3.1b2','bbmap==38.96','vsearch==2.21.1'],
+    install_requires=['biopython>=1.79','hmmer=3.1b2','bbmap=38.96','vsearch=2.21.1'],
     python_requires='>3.5',
     tests_require=['pytest'],
     include_package_data=True,
