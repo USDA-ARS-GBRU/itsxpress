@@ -185,6 +185,8 @@ def _check_fastqs(fastq, fastq2=None):
             raise g
 
     core(fastq)
+    if fastq2:
+        core(fastq2)
 
 def main(args=None):
     """Run Complete ITS trimming workflow.
