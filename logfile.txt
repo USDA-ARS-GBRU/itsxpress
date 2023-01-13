@@ -1,3 +1,0 @@
-06-30 10:18 root         INFO     Verifying the input sequences.
-06-30 10:18 root         ERROR    The input file 4774-1-MSITS3_R1.fastq.gz could not be found.
-06-30 10:18 root         ERROR    ITSxpress terminated with errors. See the log file for details.
