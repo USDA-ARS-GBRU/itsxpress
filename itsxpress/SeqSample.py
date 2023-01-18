@@ -83,7 +83,7 @@ class SeqSample:
             logging.error("Vsearch was not found, make sure Vsearch is installed and executable")
             raise f
 
-    def _search(self, hmmfile, threads=1):
+    def _search(self, hmmfile, threads):
         try:
             self.dom_file = os.path.join(self.tempdir, 'domtbl.txt')
             #Run Hmmsearch

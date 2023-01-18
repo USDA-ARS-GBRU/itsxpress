@@ -30,6 +30,7 @@ Reference:
 
 
 import gzip
+import pyzstd as zstd
 import tempfile
 import argparse
 import subprocess
@@ -133,6 +134,8 @@ def _check_fastqs(fastq, fastq2=None):
         try:
             if file.endswith('.gz'):
                 f = gzip.open(file, 'rt')
+            elif file.endswith('.zst'):
+                f = zstd.open(file, 'rt')
             else:
                 f = open(file, 'r')
             lines = f.readlines()
@@ -145,7 +148,7 @@ def _check_fastqs(fastq, fastq2=None):
             assert L1_old != L2_old or L1_new != L2_new
 
         except AssertionError as a:
-            logging.error("'File may be interleaved. ITSxpress will run with errors. Check BBmap reformat.sh to split interleaved files.")
+            logging.error("'File may be interleaved. ITSxpress will run with errors. Check BBmap reformat.sh to split interleaved files before using ITSxpress.")
             raise a 
         except IOError as f:
             logging.error("File may be wrong format for interleaved file check.")
@@ -156,6 +159,8 @@ def _check_fastqs(fastq, fastq2=None):
         try:
             if file.endswith('.gz'):
                 f = gzip.open(file, 'rt')
+            elif file.endswith('.zst'):
+                f = zstd.open(file, 'rt')
             else:
                 f = open(file, 'r')
             n = 0
@@ -167,6 +172,8 @@ def _check_fastqs(fastq, fastq2=None):
             if fastq2:
                 if fastq2.endswith('.gz'):
                     f = gzip.open(fastq2, 'rt')
+                elif file.endswith('.zst'):
+                    f = zstd.open(file, 'rt')
                 else:
                     f = open(fastq2, 'r')
                 n = 0
@@ -230,23 +237,28 @@ def main(args=None):
         logging.info("Writing out sequences")
         if args.outfile2:
             if args.outfile.split('.')[-1] == 'gz' and args.outfile2.split('.')[-1] == 'gz':
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True, itspos=its_pos,wri_file=True)
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True, itspos=its_pos,wri_file=False)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True,zstd_file = False,  itspos=its_pos,wri_file=True)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True,zstd_file = False,  itspos=its_pos,wri_file=False)
+            elif args.outfile.split('.')[-1] == 'zst' and args.outfile2.split('.')[-1] == 'zst':
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=True)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=False)
             else:
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, itspos=its_pos,wri_file=True)
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, itspos=its_pos,wri_file=False)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False,zstd_file = False,  itspos=its_pos,wri_file=True)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False,zstd_file = False,  itspos=its_pos,wri_file=False)
 
         else:
             if args.outfile.split('.')[-1] =='gz':
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True, itspos=its_pos,wri_file=True)
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True, itspos=its_pos,wri_file=False)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=True)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=False)
                 #add function with above create_trimmed_seqs
                 #use said function to check for 0 length seqs
+            if args.outfile.split('.')[-1] =='zst':
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=True)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=False)
             else:
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, itspos=its_pos,wri_file=True)
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, itspos=its_pos,wri_file=False)
-
-                t1 = time.time()
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=True)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=False)
+        t1 = time.time()
         fmttime = time.strftime("%H:%M:%S", time.gmtime(t1-t0))
         logging.info("ITSxpress ran in {}".format(fmttime))
     except Exception as e:

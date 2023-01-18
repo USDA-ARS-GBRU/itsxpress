@@ -1,5 +1,6 @@
 import logging
 import gzip
+import pyzstd as zstd
 import os
 from itertools import tee
 
@@ -127,7 +128,7 @@ class Dedup:
         return gen1_split_a, gen1_split_b
 
 
-    def create_paired_trimmed_seqs(self, outfile1, outfile2, gzipped, itspos,wri_file):
+    def create_paired_trimmed_seqs(self, outfile1, outfile2, gzipped,zstd_file, itspos,wri_file):
         """Writes two FASTQ files, optionally gzipped, with the reads trimmed to the
             selected region.
         Args:
@@ -147,6 +148,9 @@ class Dedup:
             """
             if gzipped:
                 with gzip.open(outfile, 'wt') as g:
+                    SeqIO.write(seqs, g, "fastq")
+            elif zstd_file:
+                with zstd.open(outfile, 'wt')as g:
                     SeqIO.write(seqs, g, "fastq")
             else:
                 with open(outfile, 'w') as g:
@@ -171,13 +175,16 @@ class Dedup:
                 with gzip.open(self.fastq, 'rt') as f:
                     with gzip.open(self.fastq2, 'rt') as g:
                         _create_gen(f, g)
-
-            elif not (self.fastq2.endswith(".gz") or self.fastq2.endswith(".gz")):
+            elif self.fastq.endswith(".zst") and self.fastq2.endswith(".zst"):
+                with zstd.open(self.fastq,'rt') as f:
+                    with zstd.open(self.fastq2, 'rt') as g:
+                        _create_gen(f,g)
+            elif  (self.fastq2.endswith(".fastq") or self.fastq2.endswith(".fastq")):
                 with open(self.fastq, 'r') as f:
                     with open(self.fastq2, 'r') as g:
                         _create_gen(f, g)
             else:
-                raise ValueError("Fastq and Fastq2 files should both be gzipped or both be un-gzipped. Mixed input is not accepted.")
+                raise ValueError("Fastq and Fastq2 files should both be gzipped (.gz), zstd compressed (.zst) or both be uncompressed. Mixed input is not accepted.")
 
         except Exception as e:
             raise e
@@ -242,7 +249,7 @@ class Dedup:
         return map(map_func, filt)
 
 
-    def create_trimmed_seqs(self, outfile, gzipped, itspos,wri_file):
+    def create_trimmed_seqs(self, outfile, gzipped,zstd_file, itspos,wri_file):
         """Creates a FASTQ file, optionally gzipped, with the reads trimmed to the
             selected region.
         Args:
@@ -259,7 +266,13 @@ class Dedup:
                 with open(tempf,'rb') as f_in:
                     with gzip.open(outfile,'wb') as f_out:
                         f_out.writelines(f_in)
-                    
+            elif zstd_file:
+                tempf = os.path.join('./','temp.fa')
+                with open(tempf, 'w') as g:
+                    SeqIO.write(seqs, g, "fastq")
+                with open(tempf,'rb') as f_in:
+                    with zstd.open(outfile,'wb') as f_out:
+                        f_out.writelines(f_in)            
             else:
                 with open(outfile, 'w') as g:
                     SeqIO.write(seqs, g, "fastq")
@@ -271,7 +284,12 @@ class Dedup:
                 seqs = self._get_trimmed_seq_generator(seqgen, itspos,wri_file)
                 if wri_file:
                     _write_seqs()
-
+        elif self.seq_file.endswith(".zst"):
+            with zstd.open(self.seq_file, 'rt') as f:
+                seqgen = SeqIO.parse(f, 'fastq')
+                seqs = self._get_trimmed_seq_generator(seqgen, itspos,wri_file)
+                if wri_file:
+                    _write_seqs()
         else:
             with open(self.seq_file, 'r') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
