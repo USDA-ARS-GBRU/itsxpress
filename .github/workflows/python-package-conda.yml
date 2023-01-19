@@ -25,9 +25,8 @@ jobs:
       run: |
         conda create --name testenv python=3.10
         source activate testenv
-        python -m pip install --upgrade pip
-        conda install -c bioconda vsearch
-        conda install -c hmmer
+        conda install -c bioconda vsearch>2.20
+        conda install -c bioconda hmmer
         conda install biopython
         pip install pyzstd
     - name: Test with pytest
