@@ -29,7 +29,7 @@ jobs:
         source activate testenv
         conda install -c bioconda vsearch>=2.22.1
         conda update vsearch
-        vsearch --version
+        run vsearch --version
         conda install -c bioconda hmmer
         conda install biopython
         pip install pyzstd
