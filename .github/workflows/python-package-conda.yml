@@ -28,6 +28,7 @@ jobs:
     - name: Install Dependencies
       run: |
         source activate testenv
+        conda remove vsearch
         conda install -c bioconda vsearch>=2.22.1
         conda update vsearch
         vsearch --version
