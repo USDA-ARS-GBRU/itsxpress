@@ -26,9 +26,11 @@ jobs:
         conda create --name testenv python=3.10
         source activate testenv
     - name: Install Dependencies
+      run: |
         source activate testenv
         conda install -c bioconda vsearch>=2.22.1
         conda update vsearch
+        vsearch --version
         conda install -c bioconda hmmer
         conda install biopython
         pip install pyzstd
