@@ -23,7 +23,7 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Set up environment
       run: |
-        conda create --name testenv python
+        conda create --name testenv python=3.9
         source activate testenv
     - name: Install Dependencies
       run: |
