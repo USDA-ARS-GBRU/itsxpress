@@ -28,7 +28,7 @@ jobs:
     - name: Install Dependencies
       run: |
         source activate testenv
-        conda install -c "bioconda/label/cf201901" vsearch
+        conda install -c bioconda vsearch=2.22.1
         vsearch --version
         conda install -c bioconda hmmer
         conda install biopython
