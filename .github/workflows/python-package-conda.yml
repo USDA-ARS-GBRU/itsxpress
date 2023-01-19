@@ -29,7 +29,8 @@ jobs:
         conda install -c bioconda hmmer
         conda install biopython
         pip install pyzstd
+        pip install pytest
     - name: Test with pytest
       run: |
-        pip install pytest
+        source activate testenv
         pytest
