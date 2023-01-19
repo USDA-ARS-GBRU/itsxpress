@@ -16,14 +16,14 @@ jobs:
     - name: Set up Python 3.8
       uses: actions/setup-python@v3
       with:
-        python-version: '3.8'
+        python-version: '3.8.10'
     - name: Add conda to system path
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Set up environment
       run: |
-        conda create --name testenv python=3.8
+        conda create --name testenv python=3.8.10
         source activate testenv
         conda search zlib
     - name: Install Dependencies
