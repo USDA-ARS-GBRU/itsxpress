@@ -25,7 +25,7 @@ jobs:
       run: |
         conda create --name testenv python=3.9
         source activate testenv
-        pip show zlib
+        conda search zlib
     - name: Install Dependencies
       run: |
         source activate testenv
