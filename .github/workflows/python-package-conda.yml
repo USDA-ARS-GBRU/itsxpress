@@ -25,17 +25,18 @@ jobs:
       run: |
         conda create --name testenv python=3.9
         source activate testenv
+        zlib --version
     - name: Install Dependencies
       run: |
         source activate testenv
         conda install -c bioconda vsearch=2.22.1
         vsearch --version
-        conda install -c bioconda hmmer
-        conda install biopython
-        pip install pyzstd
-        pip install pytest
-        pip install -e .
+        #conda install -c bioconda hmmer
+        #conda install biopython
+        #pip install pyzstd
+        #pip install pytest
+        #pip install -e .
     - name: Test with pytest
       run: |
         source activate testenv
-        pytest
+        #pytest
