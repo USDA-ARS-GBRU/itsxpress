@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - version2
-
+  schedule:
+    - cron: "0 13 1 * *"
+    
 jobs:
   build-linux:
-    runs-on: ubuntu-20.04    
+    runs-on: ubuntu-latest   
     strategy:
       max-parallel: 5
 
@@ -39,12 +41,10 @@ jobs:
       run: |
         conda create --name testenv python=3.7
         source activate testenv
-        conda search zlib
     - name: Install Dependencies
       run: |
         source activate testenv
-        conda install -c bioconda vsearch=2.22.1
-        vsearch --version
+        conda install -c bioconda vsearch
         conda install -c bioconda hmmer
         conda install biopython
         pip install pyzstd
