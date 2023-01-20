@@ -24,9 +24,6 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
-        env:
-          CC:   gcc-10
-          CXX:  g++-10
     - name: Set up environment
       run: |
         conda create --name testenv python=3.7
