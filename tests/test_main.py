@@ -130,13 +130,13 @@ def test_seq_sample_paired_not_interleaved():
 
 
 def test_is_paired():
-	paired_end= itsxpress.main._is_paired("fastq1.fq", "fastq2.fq", single_end=False)
+	paired_end,interleaved = itsxpress.main._is_paired("fastq1.fq", "fastq2.fq", single_end=False)
 	assert paired_end == True
 
-	paired_end= itsxpress.main._is_paired("fastq1.fq", None, single_end=False)
+	paired_end,interleaved= itsxpress.main._is_paired("fastq1.fq", None, single_end=False)
 	assert paired_end == True
 
-	paired_end= itsxpress.main._is_paired("fastq1.fq", None, single_end=True)
+	paired_end,interleaved= itsxpress.main._is_paired("fastq1.fq", None, single_end=True)
 	assert paired_end == False
 
 
@@ -238,7 +238,7 @@ def test_create_paired_trimmed_seqs():
 	print(tf)
 	t1 = os.path.join(tf,'t2_r1.fq')
 	t2 = os.path.join(tf,'t2_r2.fq')
-	dedup.create_paired_trimmed_seqs(t1, t2, False,False, itspos,True)
+	dedup.create_paired_trimmed_seqs(t1, t2, False, itspos)
 	assert (filecmp.cmp(t1, os.path.join(TEST_DIR, "test_data", "t2_r1.fq")))
 	assert (filecmp.cmp(t2, os.path.join(TEST_DIR, "test_data", "t2_r2.fq")))
 	shutil.rmtree(tf)
