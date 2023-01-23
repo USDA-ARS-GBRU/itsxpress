@@ -1,28 +1,11 @@
 """setup.py: python package setup for ITSxpress
-
 """
 
 from setuptools import setup
+import subprocess
 
-setup(
-    name='itsxpress',
-    version='1.8.1',
-    packages=['itsxpress'],
-    license='License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication',
-    description="Rapidly trim sequences down to their Internally Transcribed Spacer (ITS) regions",
-    long_description=open('README.rst').read(),
-    classifiers=['Topic :: Scientific/Engineering :: Bio-Informatics',
-                 'Programming Language :: Python :: 3.6',
-                 'Programming Language :: Python :: 3.5',
-                 'Development Status :: 3 - Alpha'],
-    keywords='Amplicon sequencing fungal ITS',
-    url='http://github.com/usda-ars-gbru/itsxpress',
-    test_suite='pytest',
-    author='Adam R. Rivers',
-    author_email='adam.rivers@usda.gov',
-    install_requires=['biopython>=1.79','hmmer=3.1b2','bbmap=38.96','vsearch=2.21.1'],
-    python_requires='>3.5',
-    tests_require=['pytest'],
-    include_package_data=True,
-    entry_points={'console_scripts':['itsxpress=itsxpress.main:main']},
-    zip_safe=False)
+if __name__ == "__main__":
+    subprocess.run("conda install -y -c conda-forge hmmer==3.1b2",shell=True)
+    subprocess.run("conda install -y -c bioconda bbmap==38.69",shell=True)
+    subprocess.run("conda install -y -c bioconda vsearch==2.21.1",shell=True)
+    setup()
