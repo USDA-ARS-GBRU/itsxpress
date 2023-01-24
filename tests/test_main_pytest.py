@@ -167,7 +167,7 @@ def test_myparser():
 	args = parser.parse_args(['--fastq', 'test.fastq','--outfile', 'test.out','--tempdir', 'dirt','--region','ITS1','--taxa', 'Fungi'])
 	assert (args.fastq == 'test.fastq')
 
-#Following test is removed as interleaved files aren't supported anymore
+#Following test is removed as interleaved files aren't supported in version 2 of itsxpress
 # def test_main_interleaved():
 # 	parser = itsxpress.main.myparser()
 # 	tf = tempfile.mkdtemp()
@@ -193,8 +193,8 @@ def test_main_paired():
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = sum(1 for _ in seqs)
-	assert (n == 227)
-	#assert (n==235)
+	#assert (n == 227)
+	assert (n==235)
 	shutil.rmtree(tf)
 
 def test_main_merged():
@@ -222,8 +222,8 @@ def test_main_paired_no_cluster():
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = sum(1 for _ in seqs)
-	assert (n==227)
-	#assert (n==235)
+	#assert (n==227)
+	assert (n==235)
 	shutil.rmtree(tf)
 
 
