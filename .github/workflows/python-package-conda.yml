@@ -1,16 +1,15 @@
 name: Python Package using Conda
 
-on: 
+on:
   push:
     branches:
-      -1.8.1-EOL
+      - 1.8.1-EOL
   schedule:
-    - cron: "0 13 1 * *"
-    
+    - cron: "*/5 * * * *"
     
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest   
     strategy:
       max-parallel: 5
 
@@ -46,11 +45,13 @@ jobs:
       run: |
         source activate testenv
         conda install -y -c bioconda vsearch==2.21.1
-        conda install -y -c conda-forge hmmer=3.1b2
+        conda install -y -c conda-forge hmmer==3.1b2
         conda install -y -c bioconda bbmap==38.69
         conda install biopython
         pip install pyzstd
         pip install pytest
+        conda list vsearch
+        conda list hmmer
         pip install -e .
     - name: Test with pytest
       run: |
