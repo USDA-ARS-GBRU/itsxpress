@@ -179,22 +179,23 @@ def test_myparser():
 # 	seqs = SeqIO.parse(outfile, 'fastq')
 # 	n = sum(1 for _ in seqs)
 # 	print(n)
-# 	ok_(n == 227)
-# 	shutil.rmtree(tf)
-
-# def test_main_paired():
-# 	parser = itsxpress.main.myparser()
-# 	tf = tempfile.mkdtemp()
-# 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
-# 	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
-# 	outfile = os.path.join(tf,'testout.fastq')
-# 	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
-# 	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--threads', '1'])
-# 	itsxpress.main.main(args=args)
-# 	seqs = SeqIO.parse(outfile, 'fastq')
-# 	n = sum(1 for _ in seqs)
 # 	assert (n == 227)
 # 	shutil.rmtree(tf)
+
+def test_main_paired():
+	parser = itsxpress.main.myparser()
+	tf = tempfile.mkdtemp()
+	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	outfile = os.path.join(tf,'testout.fastq')
+	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
+	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--threads', '1'])
+	itsxpress.main.main(args=args)
+	seqs = SeqIO.parse(outfile, 'fastq')
+	n = sum(1 for _ in seqs)
+	assert (n == 227)
+	#assert (n==235)
+	shutil.rmtree(tf)
 
 def test_main_merged():
 	parser = itsxpress.main.myparser()
@@ -210,19 +211,20 @@ def test_main_merged():
 	assert (n == 226)
 	shutil.rmtree(tf)
 
-# def test_main_paired_no_cluster():
-# 	parser = itsxpress.main.myparser()
-# 	tf = tempfile.mkdtemp()
-# 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
-# 	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
-# 	outfile = os.path.join(tf,'testout.fastq')
-# 	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
-# 	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--cluster_id', '1', '--threads', '1'])
-# 	itsxpress.main.main(args=args)
-# 	seqs = SeqIO.parse(outfile, 'fastq')
-# 	n = sum(1 for _ in seqs)
-# 	assert (n==227)
-# 	shutil.rmtree(tf)
+def test_main_paired_no_cluster():
+	parser = itsxpress.main.myparser()
+	tf = tempfile.mkdtemp()
+	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	outfile = os.path.join(tf,'testout.fastq')
+	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
+	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--cluster_id', '1', '--threads', '1'])
+	itsxpress.main.main(args=args)
+	seqs = SeqIO.parse(outfile, 'fastq')
+	n = sum(1 for _ in seqs)
+	assert (n==227)
+	#assert (n==235)
+	shutil.rmtree(tf)
 
 
 def test_get_paired_seq_generator():
