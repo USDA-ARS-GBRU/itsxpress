@@ -50,6 +50,8 @@ jobs:
         conda install biopython
         pip install pyzstd
         pip install pytest
+        conda list vsearch
+        conda list hmmer
         pip install -e .
     - name: Test with pytest
       run: |
