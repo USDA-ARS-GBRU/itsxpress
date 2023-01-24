@@ -9,6 +9,9 @@ if __name__ == "__main__":
     subprocess.run("conda install -y -c bioconda bbmap==38.69",shell=True)
     subprocess.run("conda install -y -c bioconda vsearch==2.21.1",shell=True)
     #Check dependency versions and assert
+
+
+    
     outp_hmmer = str(subprocess.run("conda list hmmer",shell=True,stdout=subprocess.PIPE))
     outp_bbmap = str(subprocess.run("conda list bbmap",shell=True,stdout=subprocess.PIPE))
     outp_vsearch = str(subprocess.run("conda list vsearch",shell=True,stdout=subprocess.PIPE))
