@@ -45,7 +45,7 @@ jobs:
       run: |
         source activate testenv
         conda install -y -c bioconda vsearch==2.21.1
-        conda install -y -c conda-forge hmmer==.1b2
+        conda install -y -c conda-forge hmmer==3.1b2
         conda install -y -c bioconda bbmap==38.69
         conda install biopython
         pip install pyzstd
