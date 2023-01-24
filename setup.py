@@ -1,28 +1,21 @@
 """setup.py: python package setup for ITSxpress
-
 """
 
 from setuptools import setup
+import subprocess
 
-setup(
-    name='itsxpress',
-    version='1.8.0',
-    packages=['itsxpress'],
-    license='License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication',
-    description="Rapidly trim sequences down to their Internally Transcribed Spacer (ITS) regions",
-    long_description=open('README.rst').read(),
-    classifiers=['Topic :: Scientific/Engineering :: Bio-Informatics',
-                 'Programming Language :: Python :: 3.6',
-                 'Programming Language :: Python :: 3.5',
-                 'Development Status :: 3 - Alpha'],
-    keywords='Amplicon sequencing fungal ITS',
-    url='http://github.com/usda-ars-gbru/itsxpress',
-    test_suite='nose.collector',
-    author='Adam R. Rivers',
-    author_email='adam.rivers@ars.usda.gov',
-    install_requires=['biopython>=1.60'],
-    python_requires='>3.5',
-    tests_require=['nose'],
-    include_package_data=True,
-    entry_points={'console_scripts':['itsxpress=itsxpress.main:main']},
-    zip_safe=False)
+if __name__ == "__main__":
+    subprocess.run("conda install -y -c conda-forge hmmer==3.1b2",shell=True)
+    subprocess.run("conda install -y -c bioconda bbmap==38.69",shell=True)
+    subprocess.run("conda install -y -c bioconda vsearch==2.21.1",shell=True)
+    #Check dependency versions and assert
+
+
+    
+    outp_hmmer = str(subprocess.run("conda list hmmer",shell=True,stdout=subprocess.PIPE))
+    outp_bbmap = str(subprocess.run("conda list bbmap",shell=True,stdout=subprocess.PIPE))
+    outp_vsearch = str(subprocess.run("conda list vsearch",shell=True,stdout=subprocess.PIPE))
+    assert (outp_hmmer.find('3.1b2') != -1),"hmmer doesn't seem to be version 3.1b2, create a fresh conda environment and install itsxpress again"
+    assert (outp_bbmap.find('38.69') != -1),"bbmap doesn't seem to be version 38.69, create a fresh conda environment and install itsxpress again"
+    assert (outp_vsearch.find('2.21.1') != -1),"vsearch doesn't seem to be version 2.21.1, create a fresh conda environment and install itsxpress"
+    setup()

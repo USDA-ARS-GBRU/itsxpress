@@ -501,12 +501,11 @@ class SeqSample:
             self.uc_file=os.path.join(self.tempdir, 'uc.txt')
             self.rep_file=os.path.join(self.tempdir,'rep.fa')
             parameters = ["vsearch",
-                          "--derep_fulllength",
+                          "--fastx_uniques",
                           self.seq_file,
-                          "--output", self.rep_file,
+                          "--fastaout", self.rep_file,
                           "--uc", self.uc_file,
-                          "--strand", "both",
-                          "--threads", str(threads)]
+                          "--strand", "both"]
             p2 = subprocess.run(parameters, stderr=subprocess.PIPE)
             logging.info(p2.stderr.decode('utf-8'))
             p2.check_returncode()
