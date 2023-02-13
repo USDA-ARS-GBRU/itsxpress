@@ -6,7 +6,7 @@ import itsxpress.SeqSample
 import itsxpress.SeqSampleNotPaired
 import itsxpress.SeqSamplePaired
 
-import q2_itsxpress._itsxpress
-import q2_itsxpress.plugin_setup
+import itsxpress._itsxpress
+import itsxpress.plugin_setup
 
 __all__ = ["main", "definitions"]
