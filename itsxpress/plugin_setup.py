@@ -34,7 +34,7 @@ plugin = Plugin(
                 'used with Illumina data. ITSxpress uses the hmm models from ITSx so results are comparable.',
     short_description='Plugin for using ITSxpress to rapidly trim the\n'
                       'internally transcribed spacer (ITS) region of FASTQ files.',
-    citations=Citations.load('citations.bib', package='q2_itsxpress')
+    citations=Citations.load('citations.bib', package='itsxpress')
 )
 
 taxaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'ALL', 'O', 'P', 'Q', 'R', 'S', 'T', 'U']
