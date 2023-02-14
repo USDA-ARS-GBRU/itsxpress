@@ -12,6 +12,6 @@ try:
 except Exception as e:
     print("could not initialize the Qiime plugin portion of ITSxpress. Command line ITSxpress should work normally")
     print(e)
-    pass
+    raise e
 
 __all__ = ["main", "definitions"]
