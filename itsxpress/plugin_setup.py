@@ -19,7 +19,7 @@ from itsxpress.q2_itsxpress import (trim_single,
 plugin = Plugin(
     name='itsxpress',
     version='2.0.0',
-    package='q2_itsxpress',
+    package='itsxpress',
     website='https://github.com/USDA-ARS-GBRU/q2_itsxpress             '
             'ITSxpress: https://github.com/USDA-ARS-GBRU/itsxpress',
     description='ITSxpress trims amplicon reads down to their ITS region. '
