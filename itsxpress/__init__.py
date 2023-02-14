@@ -9,9 +9,9 @@ import itsxpress.SeqSamplePaired
 try:
     import itsxpress.q2_itsxpress
     import itsxpress.plugin_setup
-except Exception as e:
-    print("could not initialize the Qiime plugin portion of ITSxpress. Command line ITSxpress should work normally")
-    print(e)
-    raise e
+except ModuleNotFoundError as e:
+    #logging
+    print("{e}. Could not initialize the Qiime plugin portion of ITSxpress. Command line ITSxpress should work normally".format(e)))
+    pass
 
 __all__ = ["main", "definitions"]
