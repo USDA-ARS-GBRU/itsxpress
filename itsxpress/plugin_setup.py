@@ -11,7 +11,7 @@ from qiime2.plugin import (Plugin,
                            Bool,
                            Citations)
 
-from q2_itsxpress._itsxpress import (trim_single,
+from itsxpress.q2_itsxpress import (trim_single,
                                      trim_pair,
                                      trim_pair_output_unmerged,
                                      default_cluster_id)
