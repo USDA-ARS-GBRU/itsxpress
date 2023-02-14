@@ -11,7 +11,7 @@ try:
     import itsxpress.plugin_setup
 except ModuleNotFoundError as e:
     #logging
-    print("{e}. Could not initialize the Qiime plugin portion of ITSxpress. Command line ITSxpress should work normally".format(e))
+    print("{}. Could not initialize the Qiime plugin portion of ITSxpress. Command line ITSxpress should work normally".format(e))
     pass
 
 __all__ = ["main", "definitions"]
