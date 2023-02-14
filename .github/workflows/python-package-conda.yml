@@ -50,6 +50,8 @@ jobs:
         pip install pyzstd
         pip install pytest
         pip install -e .
+        vsearch --version
+        hmmer --version
     - name: Test with pytest
       run: |
         source activate testenv
