@@ -16,14 +16,6 @@ ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) reg
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1304349.svg
   :target: https://doi.org/10.5281/zenodo.1304349
 
-#####
-
-**This is the end of life version 1 of q2_itsxpress and the command line version of ITSxpress.
-The new version 2 of ITSxpress, has the Qiime2 plugin built in with command line version of ITSxpress. See 
-master branch of ITSxpress.**
-
-#####
-
 Author
 -------
 * Adam R. Rivers, US Department of Agriculture, Agricultural Research Service
@@ -38,6 +30,14 @@ analysis [version 1; referees: awaiting peer review]. F1000Research 2018, 7:1418
 (doi: `10.12688/f1000research.15704.1`_)
 
 .. _`10.12688/f1000research.15704.1`: https://doi.org/10.12688/f1000research.15704.1
+
+#####
+
+**This is the end of life version 1 of q2_itsxpress and the command line version of ITSxpress.
+The new version 2 of ITSxpress, has the Qiime2 plugin built in with command line version of ITSxpress. See 
+master branch of ITSxpress.**
+
+#####
 
 Introduction
 -------------
