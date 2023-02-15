@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-"""ITSxpress: A python module to rapidly trim ITS amplicon sequences from FASTQ files.
+"""#####This is the end of life version 1 of q2_itsxpress and the command line version of ITSxpress.
+The new version 2 of ITSxpress, has the Qiime2 plugin built in with command line version of ITSxpress.#####
 
-Authors: Adam Rivers, Kyle weber, USDA Agricultural Research Service
+ITSxpress: A python module to rapidly trim ITS amplicon sequences from FASTQ files.
+
+Authors: Adam Rivers, Kyle weber, Sveinn Einarsson, USDA Agricultural Research Service
 
 The internally transcribed spacer region is a region between the highly conserved small
 subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. The eukaryotic ITS contains

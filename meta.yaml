@@ -28,8 +28,8 @@ requirements:
     - python >=3.5
     - biopython >=1.79
     - conda-forge::hmmer=3.1b2
-    - bioconda::bbmap = 38.96
-    - conda-forge::vsearch=2.21.1
+    - bioconda::bbmap=38.96
+    - bioconda::vsearch=2.21.1
 
 test:
   imports:
