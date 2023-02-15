@@ -74,6 +74,13 @@ This is the installation of the final iteration of ITSxpress version 1: (BBmap i
 
 Since this version is no longer supported, you **must** create a new conda environment in order for the depenendencies to be the compatible versions.
 
+0. Example on how to install and create new conda environment for this version of ITSxpress.
+
+.. code-block:: bash
+
+  conda env create -n ITSxpress_V1EOL 
+  source activate ITSxpress_V1EOL
+
 ITSxpress can be installed from:
 
 1. Bioconda: (preferred method because it handles dependencies):
