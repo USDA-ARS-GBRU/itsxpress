@@ -88,7 +88,7 @@ Within either conda environment, described above, ITSxpress can be installed fro
 
 .. code-block:: bash
 
-    conda install itsxpress
+    conda install -c bioconda itsxpress
 
 2. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
 
@@ -99,7 +99,7 @@ Within either conda environment, described above, ITSxpress can be installed fro
 
 Dependencies
 -------------
-The software requires Vsearch, BBtools, Hmmer >= 3.1b and Biopython. Bioconda
+The software requires Vsearch, Hmmer and Biopython. Bioconda
 takes care of this for you so it is the preferred installation method.
 
 
