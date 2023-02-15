@@ -19,6 +19,7 @@ ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) reg
 Author
 -------
 * Adam R. Rivers, US Department of Agriculture, Agricultural Research Service
+* Sveinn V. Einarsson, US Department of Agriculture, Agricultural Research Service
 
 
 Citation
@@ -29,6 +30,14 @@ analysis [version 1; referees: awaiting peer review]. F1000Research 2018, 7:1418
 (doi: `10.12688/f1000research.15704.1`_)
 
 .. _`10.12688/f1000research.15704.1`: https://doi.org/10.12688/f1000research.15704.1
+
+#####
+
+**This is the end of life version 1 of q2_itsxpress and the command line version of ITSxpress.
+The new version 2 of ITSxpress, has the Qiime2 plugin built in with command line version of ITSxpress. See 
+master branch of ITSxpress.**
+
+#####
 
 Introduction
 -------------
@@ -57,19 +66,32 @@ ITSxpress is also available as a `QIIME2 Plugin`_
 
 Installation
 -------------
+Installation of the final iteration of ITSxpress version 1: (BBmap is no longer used in ITSxpress version 2)
+- This version should primarily be used for reproducability with other datasets, which used ITSxpress =<1.8.1
+- The new version 2 is compatible with the newer versions of Qiime2
+
+-------------
 ITSxpress can be installed from:
 
 1. Bioconda: (preferred method because it handles dependencies):
 
 .. code-block:: bash
 
-    conda install itsxpress
+    conda install -c bioconda itsxpress==1.8.1
 
 2. Pip: https://pypi.org/project/itsxpress/:
+  - If using Pip, you will need to specify the versions of the dependencies listed below.
+  - Example:
+.. code-block:: bash
+
+    conda install -y -c conda-forge hmmer==3.1b2
+    conda install -y -c bioconda bbmap==38.69
+    conda install -y -c bioconda vsearch==2.21.1
+Then install itsxpress using pip:
 
 .. code-block:: bash
 
-    pip install itsxpress
+    pip install -I itsxpress==1.8.1
 
 
 3. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
@@ -81,9 +103,8 @@ ITSxpress can be installed from:
 
 Dependencies
 -------------
-The software requires Vsearch, BBtools, Hmmer >= 3.1b and Biopython. Bioconda
+This software requires Vsearch=2.21.1, BBtools=38.69, Hmmer=3.1b2 and Biopython>=1.79. Bioconda
 takes care of this for you so it is the preferred installation method.
-
 
 Usage
 ---------
