@@ -76,6 +76,7 @@ Example:
 If you are only installing the command line version of ITSxpress and not QIIME2:
 
 .. code-block:: bash
+
     conda env create -n ITSxpress
     source activate ITSxpress
 
