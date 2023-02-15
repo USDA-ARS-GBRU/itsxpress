@@ -50,8 +50,8 @@ jobs:
         pip install pyzstd
         pip install pytest
         pip install -e .
-        vsearch --version
-        hmmer --version
+        conda list vsearch
+        conda list hmmer
     - name: Test with pytest
       run: |
         source activate testenv
