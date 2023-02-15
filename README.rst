@@ -57,7 +57,7 @@ QIIME2 is being used.
 .. _`QIIME2 Plugin`: https://github.com/USDA-ARS-GBRU/q2_itsxpress
 
 
-Environment
+Environment with or without QIIME2
 -------------
 Create a new conda environment before installing ITSxpress.
 
