@@ -40,6 +40,7 @@ master branch of ITSxpress.**
 
 Introduction
 -------------
+##### This is the end of life version 1 of q2_ITSxpress, for version 2 check the master branch here on Github #####
 
 The internally transcribed spacer region is a region between highly conserved the small
 subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. In Eukaryotes it contains
@@ -56,6 +57,7 @@ ITS2 or the entire ITS region including the 5.8s rRNA gene can be selected. ITSx
 uses the hmm model from ITSx so results are comparable.
 
 ITSxpress is also available as a `QIIME2 Plugin`_
+Qiime2 version 2022.8 is the required version to using this end of life version 1 ITSxpress plugin with Qiime2.
 
 .. _`Bengtsson-Palme et al. (2013)`: https://doi.org/10.1111/2041-210X.12073
 .. _ITSx: http://microbiology.se/software/itsx/
@@ -63,7 +65,10 @@ ITSxpress is also available as a `QIIME2 Plugin`_
 .. _`QIIME2 Plugin`: https://github.com/USDA-ARS-GBRU/q2_itsxpress
 
 
-Installation of ITSxpress version 1 end of life: BBmap is no longer used in ITSxpress version 2
+Installation of the final iteration of ITSxpress version 1: (BBmap is no longer used in ITSxpress version 2)
+- This version should primarily be used for reproducability with other datasets, which used ITSxpress =<1.8.1
+- The new version 2 is compatible with the newer versions of Qiime2
+
 -------------
 ITSxpress can be installed from:
 
@@ -71,24 +76,21 @@ ITSxpress can be installed from:
 
 .. code-block:: bash
 
-    conda install itsxpress
+    conda install -c bioconda itsxpress==1.8.1
 
 2. Pip: https://pypi.org/project/itsxpress/:
   - If using Pip, you will need to specify the versions of the dependencies listed below.
   - Example:
 .. code-block:: bash
 
-    conda install hmmer==3.1b2
-    or
-    mamba install hmmer==3.1b2
-    .....
-    conda install bbmap==38.96
-    conda install vsearch==2.7.0
+    conda install -y -c conda-forge hmmer==3.1b2
+    conda install -y -c bioconda bbmap==38.69
+    conda install -y -c bioconda vsearch==2.21.1
 Then install itsxpress using pip:
 
 .. code-block:: bash
 
-    pip install itsxpress
+    pip install -I itsxpress==1.8.1
 
 
 3. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
@@ -100,7 +102,7 @@ Then install itsxpress using pip:
 
 Dependencies
 -------------
-This software requires Vsearch=2.7.0, BBtools=38.96, Hmmer=3.1b2 and Biopython>=1.79. Bioconda
+This software requires Vsearch=2.21.1, BBtools=38.69, Hmmer=3.1b2 and Biopython>=1.79. Bioconda
 takes care of this for you so it is the preferred installation method.
 
 
