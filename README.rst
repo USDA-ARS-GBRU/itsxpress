@@ -67,7 +67,7 @@ ITSxpress is also available as a `QIIME2 Plugin`_
 Installation
 -------------
 
-0. Installation of the final iteration of ITSxpress version 1: (BBmap is no longer used in ITSxpress version 2):
+This is the installation of the final iteration of ITSxpress version 1: (BBmap is no longer used in ITSxpress version 2):
 
 	- This version should primarily be used for reproducability with other datasets, which used ITSxpress =<1.8.1
 	- The new version 2 is compatible with the newer versions of Qiime2
@@ -78,12 +78,15 @@ ITSxpress can be installed from:
 
 .. code-block:: bash
 
-    conda install itsxpress
+    conda install -c bioconda itsxpress==1.8.1
 
 2. Pip: https://pypi.org/project/itsxpress/:
 
 .. code-block:: bash
 
+    conda install -y -c conda-forge hmmer==3.1b2
+    conda install -y -c bioconda bbmap==38.69
+    conda install -y -c bioconda vsearch==2.21.1
     pip install itsxpress
 
 
