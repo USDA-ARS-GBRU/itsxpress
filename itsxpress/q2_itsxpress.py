@@ -14,9 +14,6 @@ files to be processed. Processing FASTQ files Which is essential for analyzing
 sequences using the newer exact Sequence Variant methods in Qiime2, Dada2, Deblur
 and Unoise that are replacing OTU clustering.
 
-ITSxpress is also available as a stand-alone software package. See
-https://github.com/USDA-ARS-GBRU/itsxpress for details.
-
 """
 import os
 import pathlib

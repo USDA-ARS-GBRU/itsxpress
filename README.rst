@@ -19,7 +19,7 @@ ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) reg
 Author
 -------
 * Adam R. Rivers, US Department of Agriculture, Agricultural Research Service
-
+* Sveinn V. Einarsson, US Department of Agriculture, Agricultural Research Service
 
 Citation
 --------
@@ -47,7 +47,9 @@ sites using HMMSearch.  Results are parsed and the trimmed files are returned. T
 ITS2 or the entire ITS region including the 5.8s rRNA gene can be selected. ITSxpress
 uses the hmm model from ITSx so results are comparable.
 
-ITSxpress is also available as a `QIIME2 Plugin`_
+ITSxpress is also a QIIME2 plugin. Starting from version 2.0.0 of ITSxpress, the QIIME2 plugin is included with
+the command line version of ITSxpress. The installation method will be slightly different depending on whether 
+QIIME2 is being used.
 
 .. _`Bengtsson-Palme et al. (2013)`: https://doi.org/10.1111/2041-210X.12073
 .. _ITSx: http://microbiology.se/software/itsx/
@@ -55,24 +57,39 @@ ITSxpress is also available as a `QIIME2 Plugin`_
 .. _`QIIME2 Plugin`: https://github.com/USDA-ARS-GBRU/q2_itsxpress
 
 
+Environment
+-------------
+Create a new conda environment before installing ITSxpress.
+
+If using QIIME2, follow the installation instructions on their wiki: https://docs.qiime2.org/2022.11/install/native/
+
+As of now ITSxpress is compatible with version 2022.8 and 2022.11 of QIIME2
+
+Example:
+
+.. code-block:: bash
+
+    wget https://data.qiime2.org/distro/core/qiime2-2022.11-py38-osx-conda.yml
+    conda env create -n qiime2-2022.11 --file qiime2-2022.11-py38-osx-conda.yml
+    source activate qiime2-2022.11
+
+If you are only installing the command line version of ITSxpress and not QIIME2:
+
+.. code-block:: bash
+    conda env create -n ITSxpress
+    source activate ITSxpress
+
 Installation
 -------------
-ITSxpress can be installed from:
+Within either conda environment, described above, ITSxpress can be installed from:
 
-1. Bioconda: (preferred method because it handles dependencies):
+1. Bioconda: (preferred method because it handles dependencies, **Pip is no longer maintained for ITSxpress>=2.0.0**):
 
 .. code-block:: bash
 
     conda install itsxpress
 
-2. Pip: https://pypi.org/project/itsxpress/:
-
-.. code-block:: bash
-
-    pip install itsxpress
-
-
-3. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
+2. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
 
 .. code-block:: bash
 
