@@ -72,6 +72,8 @@ This is the installation of the final iteration of ITSxpress version 1: (BBmap i
 	- This version should primarily be used for reproducability with other datasets, which used ITSxpress =<1.8.1
 	- The new version 2 is compatible with the newer versions of Qiime2
 
+Since this version is no longer supported, you **must** create a new conda environment in order for the depenendencies to be the compatible versions.
+
 ITSxpress can be installed from:
 
 1. Bioconda: (preferred method because it handles dependencies):
@@ -81,6 +83,7 @@ ITSxpress can be installed from:
     conda install -c bioconda itsxpress==1.8.1
 
 2. Pip: https://pypi.org/project/itsxpress/:
+	- If using Pip, you will need to specify the versions of the dependencies listed below before installing itsxpress
 
 .. code-block:: bash
 
