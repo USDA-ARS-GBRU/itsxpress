@@ -33,8 +33,8 @@ analysis [version 1; referees: awaiting peer review]. F1000Research 2018, 7:1418
 
 #####
 
-**This is the end of life version 1 of q2_itsxpress and the command line version of ITSxpress.
-The new version 2 of ITSxpress, has the Qiime2 plugin built in with command line version of ITSxpress. See 
+**This is the end of life version 1 TSxpress.
+The new version 2 of ITSxpress, has the Qiime2 plugin built in with the command line version of ITSxpress. See 
 master branch of ITSxpress.**
 
 #####
@@ -102,7 +102,7 @@ ITSxpress can be installed from:
 
 Dependencies
 -------------
-The software requires Vsearch, BBtools, Hmmer >= 3.1b and Biopython. Bioconda
+This software requires Vsearch=2.21.1, BBtools=38.69, Hmmer=3.1b2 and Biopython>=1.79. Bioconda
 takes care of this for you so it is the preferred installation method.
 
 
