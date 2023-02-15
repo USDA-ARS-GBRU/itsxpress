@@ -82,11 +82,13 @@ ITSxpress can be installed from:
 2. Pip: https://pypi.org/project/itsxpress/:
   - If using Pip, you will need to specify the versions of the dependencies listed below.
   - Example:
+  
 .. code-block:: bash
 
     conda install -y -c conda-forge hmmer==3.1b2
     conda install -y -c bioconda bbmap==38.69
     conda install -y -c bioconda vsearch==2.21.1
+    
 Then install itsxpress using pip:
 
 .. code-block:: bash
