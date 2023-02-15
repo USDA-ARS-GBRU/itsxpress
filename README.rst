@@ -104,7 +104,7 @@ ITSxpress can be installed from:
 
 .. code-block:: bash
 
-    git clone https://github.com/USDA-ARS-GBRU/itsxpress.git
+    git clone -branch 1.8.1-EOL https://github.com/USDA-ARS-GBRU/itsxpress.git
 
 
 Dependencies
