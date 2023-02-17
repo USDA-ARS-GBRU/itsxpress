@@ -1,0 +1,41 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry]
+name = "itsxpress"
+version = "1.8.1"
+description = "Rapidly trim sequences down to their Internally Transcribed Spacer ITS regions"
+authors = [
+    "Adam R. Rivers <adam.rivers@usda.gov>",
+    "Sveinn V. Einarsson <seinarsson@ufl.edu>"]
+maintainers = [
+    "Adam R. Rivers <adam.rivers@usda.gov>",
+    "Sveinn V. Einarsson <seinarsson@ufl.edu>"]
+license = "License :: CC0 1.0 Universal CC0 1.0 Public Domain Dedication"
+readme = "README.rst"
+keywords = ["Amplicon", "sequencing", "fungal", "ITS"]
+requires-python = ">=3.5"
+repository = "http://github.com/usda-ars-gbru/itsxpress"
+
+classifiers = [
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.5",
+    "Development Status :: 3 - Alpha"
+]
+
+[tool.poetry.dependencies]
+biopython = ">=1.60"
+pyzstd
+
+[tool.poetry.optional-dependencies]
+test = [
+    "pytest"
+]
+
+[tool.poetry.scripts]
+"itsxpress"=itsxpress.main:main
+
+
