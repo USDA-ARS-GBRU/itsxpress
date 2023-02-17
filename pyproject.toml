@@ -28,7 +28,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 biopython = ">=1.60"
-pyzstd
+pyzstd = ">=0.15.3"
 
 [tool.poetry.optional-dependencies]
 test = [
@@ -36,6 +36,6 @@ test = [
 ]
 
 [tool.poetry.scripts]
-"itsxpress"=itsxpress.main:main
+itsxpress="itsxpress.main:main"
 
 
