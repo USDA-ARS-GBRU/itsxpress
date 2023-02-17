@@ -29,6 +29,7 @@ classifiers = [
 [tool.poetry.dependencies]
 biopython = ">=1.60"
 pyzstd = ">=0.15.3"
+pip = "^23.0"
 
 [tool.poetry.optional-dependencies]
 test = [
