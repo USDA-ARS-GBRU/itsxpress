@@ -1,9 +1,9 @@
 [build-system]
-requires = ["setuptools","pip>=23.0"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 
-[project]
+[tool.poetry]
 name = "itsxpress"
 version = "1.8.1"
 description = "Rapidly trim sequences down to their Internally Transcribed Spacer ITS regions"
@@ -26,16 +26,14 @@ classifiers = [
     "Development Status :: 3 - Alpha"
 ]
 
-[project.dependencies]
+[tool.poetry.dependencies]
 biopython = ">=1.60"
 pyzstd = ">=0.15.3"
 
-[project.optional-dependencies]
+[tool.poetry.optional-dependencies]
 test = [
     "pytest"
 ]
 
-[project.scripts]
+[tool.poetry.scripts]
 itsxpress="itsxpress.main:main"
-
-
