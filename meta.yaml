@@ -1,20 +1,20 @@
-{% set name = "itsxpress" %}
 {% set version = "2.0.0" %}
-{% set file_ext = "tar.gz" %}
-{% set hash_type = "sha256" %}
-{% set hash_value = "f96d9c6d74709498ae7bef5e7e4e736d6a32405109dfc91c78a884c574d5a4a5" %}
+{% set name = "itsxpress" %}
+{% set sha256 = "cff826d21a17a040158c00cf3f84cee2f1b712a21ac381c7931caec54a095bbd" %}
+{% set user = "USDA-ARS-GBRU" %}
 
 package:
   name: '{{ name|lower }}'
   version: '{{ version }}'
 
+# source
 source:
-  url: https://files.pythonhosted.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.{{ file_ext }}
-  '{{ hash_type }}': '{{ hash_value }}'
+  url: https://github.com/{{ user }}/{{ name }}/archive/v{{ version }}.tar.gz
+  sha256: {{ sha256 }}
 
 build:
   noarch: python
-  number: 2
+  number: 0
   entry_points:
     - itsxpress=itsxpress.main:main
     - qiime2.plugins=q2_itsxpress=itsxpress.plugin_setup:plugin
@@ -28,8 +28,8 @@ requirements:
     - pip
     - python >=3.5
     - biopython >=1.60
-    - hmmer=3.1b2
-    - vsearch=2.21.1
+    - hmmer ==3.1b2
+    - vsearch ==2.21.1
 
 test:
   imports:
