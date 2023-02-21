@@ -27,8 +27,8 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-biopython = ">=1.60"
-pyzstd = ">=0.15.3"
+biopython = "^1.79"
+pyzstd = "^0.15.3"
 
 [tool.poetry.optional-dependencies]
 test = [

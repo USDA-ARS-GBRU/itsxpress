@@ -74,12 +74,13 @@ This is the installation of the final iteration of ITSxpress version 1: (BBmap i
 
 Since this version is no longer supported, you **must** create a new conda environment in order for the depenendencies to be the compatible versions.
 
-0. Example on how to install and create new conda environment for this version of ITSxpress.
+# Recommend using mamba instead of conda to handling dependencies.
+0. Example on how to install and create new conda environment for this version of ITSxpress. We are using mamba because it resolves dependencies better and faster, but conda can be substituted.
 
 .. code-block:: bash
-
-  conda env create -n ITSxpress_V1EOL 
-  source activate ITSxpress_V1EOL
+  
+  mamba create -n ITSxpress_V1EOL python=3.8.13
+  mamba activate ITSxpress_V1EOL
 
 ITSxpress can be installed from:
 
@@ -87,16 +88,16 @@ ITSxpress can be installed from:
 
 .. code-block:: bash
 
-    conda install -c bioconda itsxpress==1.8.1
+    mamba install -y -c bioconda itsxpress==1.8.1
 
 2. Pip: https://pypi.org/project/itsxpress/:
 	- If using Pip, you will need to specify the versions of the dependencies listed below before installing itsxpress
 
 .. code-block:: bash
 
-    conda install -y -c conda-forge hmmer==3.1b2
-    conda install -y -c bioconda bbmap==38.69
-    conda install -y -c bioconda vsearch==2.21.1
+    mamba install -y -c conda-forge hmmer==3.1b2
+    mamba install -y -c bioconda bbmap==38.69
+    mamba install -y -c bioconda vsearch==2.21.1
     pip install itsxpress
 
 
