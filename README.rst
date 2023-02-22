@@ -72,12 +72,13 @@ This is the installation of the final iteration of ITSxpress version 1: (BBmap i
 
 	- This version should primarily be used for reproducability with other datasets, which used ITSxpress =<1.8.1
 	- The new version 2 is compatible with the newer versions of Qiime2
-	- **If you want to install this iteration of ITSxpress with Qiime2, then you you need to follow the install instructions here: `QIIME2 Plugin`_ **
+	- **If you want to install this iteration of ITSxpress with Qiime2, then you you need to follow the install instructions here:** `QIIME2 Plugin`_ 
 
 Since this version is no longer supported, you **must** create a new conda environment in order for the depenendencies to be the compatible versions.
 
 
-0. Example on how to install and create new conda environment for this version of ITSxpress. We are using mamba because it resolves dependencies better and faster, but conda can be substituted.
+Example on how to install and create new conda environment for this version of ITSxpress. We are using mamba because it resolves dependencies better and faster, but conda can be substituted.
+
 	- Information on installing mamba or micromamba (either highly recommended) can be found here: `mamba installation guide`_
 
 .. code-block:: bash
