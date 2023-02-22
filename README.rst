@@ -62,6 +62,7 @@ ITSxpress is also available as a `QIIME2 Plugin`_
 .. _ITSx: http://microbiology.se/software/itsx/
 .. _OTUs: https://doi.org/10.1038/ismej.2017.119
 .. _`QIIME2 Plugin`: https://github.com/USDA-ARS-GBRU/q2_itsxpress
+.. _`Mamba Information`: https://mamba.readthedocs.io/en/latest/installation.html
 
 
 Installation
@@ -71,18 +72,24 @@ This is the installation of the final iteration of ITSxpress version 1: (BBmap i
 
 	- This version should primarily be used for reproducability with other datasets, which used ITSxpress =<1.8.1
 	- The new version 2 is compatible with the newer versions of Qiime2
+    - **If you want to install this iteration of ITSxpress with Qiime2, then you you need to follow the install instructions here: `QIIME2 Plugin`_ **
 
 Since this version is no longer supported, you **must** create a new conda environment in order for the depenendencies to be the compatible versions.
 
-# Recommend using mamba instead of conda to handling dependencies.
+
 0. Example on how to install and create new conda environment for this version of ITSxpress. We are using mamba because it resolves dependencies better and faster, but conda can be substituted.
+    - Information on installing mamba or micromamba (either highly recommended) can be found here: `Mamba Information`_
 
 .. code-block:: bash
   
   mamba create -n ITSxpress_V1EOL python=3.8.13
   mamba activate ITSxpress_V1EOL
 
+
+
 ITSxpress can be installed from:
+-------------
+
 
 1. Bioconda: (preferred method because it handles dependencies):
 
