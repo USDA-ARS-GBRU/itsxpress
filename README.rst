@@ -92,14 +92,14 @@ ITSxpress can be installed in 3 ways:
 -------------
 
 
-1. Bioconda: (preferred method because it handles dependencies):
+1. **Bioconda:** (preferred method because it handles dependencies):
 
 .. code-block:: bash
 
     mamba install -y -c bioconda itsxpress==1.8.1
 
-2. Pip: https://pypi.org/project/itsxpress/:
-	- If using Pip, you will need to specify the versions of the dependencies listed below before installing itsxpress
+2. **Pip:** https://pypi.org/project/itsxpress/:
+    - If using Pip, you will need to specify the versions of the dependencies listed below before installing itsxpress
 
 .. code-block:: bash
 
@@ -109,7 +109,7 @@ ITSxpress can be installed in 3 ways:
     pip install itsxpress
 
 
-3. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
+3. **The Github repository:** https://github.com/USDA-ARS-GBRU/itsxpress
 
 .. code-block:: bash
 
