@@ -77,7 +77,7 @@ This is the installation of the final iteration of ITSxpress version 1: (BBmap i
 Since this version is no longer supported, you **must** create a new conda environment in order for the depenendencies to be the compatible versions.
 
 
-Example on how to install and create new conda environment for this version of ITSxpress. We are using mamba because it resolves dependencies better and faster, but conda can be substituted.
+Example on how to install and create new conda environment for this version of ITSxpress. We are using mamba because it resolves packages better and faster, but conda can be substituted.
 
 	- Information on installing mamba or micromamba (either highly recommended) can be found here: `mamba installation guide`_
 
