@@ -74,7 +74,7 @@ This is the installation of the final iteration of ITSxpress version 1: (BBmap i
 	- The new version 2 is compatible with the newer versions of Qiime2
 	- **If you want to install this iteration of ITSxpress with Qiime2, then you you need to follow the install instructions here:** `QIIME2 Plugin`_ 
 
-Since this version is no longer supported, you **must** create a new conda environment in order for the depenendencies to be the compatible versions.
+Since this version is no longer supported, you **must** create a new conda environment in order for the depenendencies to be compatible.
 
 
 Example on how to install and create new conda environment for this version of ITSxpress. We are using mamba because it resolves packages better and faster, but conda can be substituted.
@@ -85,11 +85,14 @@ Example on how to install and create new conda environment for this version of I
   
   mamba create -n ITSxpress_V1EOL python=3.8.13
   mamba activate ITSxpress_V1EOL
+  #or
+  conda create -n ITSxpress_V1EOL python=3.8.13
+  conda activate ITSxpress_V1EOL
 
 
 
 ITSxpress can be installed in 3 ways:
--------------
+--------------------------------------
 
 
 1. **Bioconda:** (preferred method because it handles dependencies):
@@ -103,7 +106,7 @@ ITSxpress can be installed in 3 ways:
 
 .. code-block:: bash
 
-    mamba install -y -c conda-forge hmmer==3.1b2
+    mamba install -y -c bioconda hmmer==3.1b2
     mamba install -y -c bioconda bbmap==38.69
     mamba install -y -c bioconda vsearch==2.21.1
     pip install itsxpress
