@@ -23,10 +23,10 @@ build:
 requirements:
   host:
     - pip
-    - python = 3.8.13
+    - python ==3.8.13
   run:
     - pip
-    - python = 3.8.13
+    - python ==3.8.13
     - biopython >=1.79
     - hmmer ==3.1b2
     - vsearch ==2.21.1

@@ -70,15 +70,15 @@ Example:
 .. code-block:: bash
 
     wget https://data.qiime2.org/distro/core/qiime2-2022.11-py38-osx-conda.yml
-    conda env create -n qiime2-2022.11 --file qiime2-2022.11-py38-osx-conda.yml
-    conda activate qiime2-2022.11
+    mamba env create -n qiime2-2022.11 --file qiime2-2022.11-py38-osx-conda.yml
+    mamba activate qiime2-2022.11
 
 If you are only installing the command line version of ITSxpress and not QIIME2:
 
 .. code-block:: bash
 
-    conda env create -n ITSxpress
-    conda activate ITSxpress
+    mamba env create -n ITSxpress
+    mamba activate ITSxpress
 
 Installation
 -------------
@@ -88,7 +88,7 @@ Within either conda environment, described above, ITSxpress can be installed fro
 
 .. code-block:: bash
 
-    conda install -c bioconda itsxpress
+    mamba install -c bioconda itsxpress
 
 2. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
 
