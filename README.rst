@@ -58,7 +58,7 @@ QIIME2 is being used.
 
 
 Environment with or without QIIME2
--------------
+-----------------------------------
 Create a new conda environment before installing ITSxpress.
 
 If using QIIME2, follow the installation instructions on their wiki: https://docs.qiime2.org/2022.11/install/native/

@@ -1,3 +1,42 @@
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "itsxpress"
+version = "2.0.0"
+
+description = "Rapidly trim sequences down to their Internally Transcribed Spacer ITS regions"
+authors = [
+    {name = "Adam R. Rivers", email =  "adam.rivers@usda.gov"},
+    {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}]
+maintainers = [
+    {name = "Adam R. Rivers", email =  "adam.rivers@usda.gov"},
+    {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}]
+license = {file = "LICENSE.txt"}
+readme = "README.rst"
+keywords = ["Amplicon", "sequencing", "fungal", "ITS"]
+requires-python = ">=3.5"
+
+dependencies = [
+    "biopython >=1.79",
+    "pyzstd >=0.15.3",
+    "pandas",
+]
+
+[project.urls]
+repository = "http://github.com/usda-ars-gbru/itsxpress"
+
+[project.optional-dependencies]
+tests = [
+"pytest"
+]
+
+[tool.setuptools.package-data]
+itsxpress = ["*.bib"]
+
+[project.scripts]
+itsxpress="itsxpress.main:main"
+
+[project.entry-points."qiime2.plugins"]
+itsxpress="itsxpress.plugin_setup:plugin"

@@ -17,17 +17,17 @@ build:
   number: 0
   entry_points:
     - itsxpress=itsxpress.main:main
-    - qiime2.plugins=q2_itsxpress=itsxpress.plugin_setup:plugin
+    - qiime2.plugins=itsxpress=itsxpress.plugin_setup:plugin
   script: python -m pip install --no-deps --ignore-installed .
 
 requirements:
   host:
     - pip
-    - python >=3.5
+    - python = 3.8.13
   run:
     - pip
-    - python >=3.5
-    - biopython >=1.60
+    - python = 3.8.13
+    - biopython >=1.79
     - hmmer ==3.1b2
     - vsearch ==2.21.1
 
