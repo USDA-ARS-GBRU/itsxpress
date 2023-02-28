@@ -1,6 +1,6 @@
 ﻿{% set version = "2.0.0" %}
 {% set name = "itsxpress" %}
-{% set sha256 = "d6a81e70920d886e2fad7390c48f4c95e05f267bacd598bf7052a9caa3402b62" %}
+{% set sha256 = "a651ea487a9cd42a77ed5b800dc9b6342bad5ba4b7fbffd7f39cb48034f0304b" %}
 {% set user = "USDA-ARS-GBRU" %}
 
 package:
@@ -13,7 +13,7 @@ source:
   #url: https://github.com/{{ user }}/{{ name }}/tree/version2/v{{ version }}.tar.gz
   #https://files.pythonhosted.org/packages/source/i/itsxpress/itsxpress-1.8.0.tar.gz
   #url:   https://test-files.pythonhosted.org/packages/ab/e7/8ae3d806856c1711db4a6d815063225ad832940716e008a67a068383c63a/itsxpress-2.0.2.tar.gz
-  url:   https://github.com/USDA-ARS-GBRU/itsxpress/tree/version2
+  url:   https://github.com/USDA-ARS-GBRU/itsxpress/blob/version2/dist/itsxpress-2.0.0.tar.gz
   sha256: {{ sha256 }}
 
 build:
