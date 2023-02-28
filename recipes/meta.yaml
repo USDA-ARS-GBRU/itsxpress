@@ -1,0 +1,60 @@
+﻿{% set version = "2.0.0" %}
+{% set name = "itsxpress" %}
+{% set sha256 = "d6a81e70920d886e2fad7390c48f4c95e05f267bacd598bf7052a9caa3402b62" %}
+{% set user = "USDA-ARS-GBRU" %}
+
+package:
+  name: '{{ name|lower }}'
+  version: '{{ version }}'
+
+# source
+source:
+  #url: https://github.com/{{ user }}/{{ name }}/archive/v{{ version }}.tar.gz
+  #url: https://github.com/{{ user }}/{{ name }}/tree/version2/v{{ version }}.tar.gz
+  #https://files.pythonhosted.org/packages/source/i/itsxpress/itsxpress-1.8.0.tar.gz
+  #url:   https://test-files.pythonhosted.org/packages/ab/e7/8ae3d806856c1711db4a6d815063225ad832940716e008a67a068383c63a/itsxpress-2.0.2.tar.gz
+  url:   https://github.com/USDA-ARS-GBRU/itsxpress/tree/version2
+  sha256: {{ sha256 }}
+
+build:
+  noarch: python
+  number: 0
+  entry_points:
+    - itsxpress=itsxpress.main:main
+    #- qiime2.plugins=itsxpress=itsxpress.plugin_setup:plugin
+  script: python -m pip install .
+  #python -m pip install --no-deps --ignore-installed .
+
+requirements:
+  host:
+    - pip
+    - python ==3.8.13
+  run:
+    - pip
+    - python ==3.8.13
+    - biopython >=1.79
+    - hmmer ==3.1b2
+    - vsearch ==2.21.1
+
+test:
+  imports:
+    - itsxpress
+  commands:
+    - itsxpress --help
+
+about:
+  home: http://github.com/usda-ars-gbru/itsxpress
+  license: 'CC0 1.0'
+  license_family: 'PUBLIC-DOMAIN'
+  # license_file: ''
+  summary: 'ITSxpress: Software to rapidly trim the Internally Transcribed Spacer (ITS) region from FASTQ files'
+
+
+extra:
+  recipe-maintainers:
+    - arivers
+    - sveinn.einarsson
+  identifiers:
+    - biotools:ITSxpress
+    - doi:10.5281/zenodo.1304349
+    - doi:10.12688/f1000research.15704.1
