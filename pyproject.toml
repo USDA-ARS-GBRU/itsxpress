@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "itsxpress"
-version = "1.8.9"
+version = "1.8.1"
 description = "Rapidly trim sequences down to their Internally Transcribed Spacer ITS regions"
 authors = [
     {name = "Adam R. Rivers", email =  "adam.rivers@usda.gov"},
