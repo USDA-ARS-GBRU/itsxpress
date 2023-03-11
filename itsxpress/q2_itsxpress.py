@@ -190,7 +190,7 @@ def main(per_sample_sequences,
             fastq=sample.forward,
             fastq2=sample.reverse if paired_in else None,
             sample_id=sample.Index,
-            single_end=paired_out,
+            single_end=False if paired_in == True else True,
             reversed_primers=reversed_primers,
             threads=threads)
         # Deduplicate
@@ -230,11 +230,15 @@ def main(per_sample_sequences,
             dedup_obj.create_paired_trimmed_seqs(out_path_fwd,
                                                  out_path_rev,
                                                  gzipped=True,
-                                                 itspos=its_pos)
+                                                 zstd_file=False,
+                                                 itspos=its_pos,
+                                                 wri_file=True,)
         else:
             dedup_obj.create_trimmed_seqs(out_path_fwd,
                                       gzipped=True,
-                                      itspos=its_pos)
+                                      zstd_file=False,
+                                      itspos=its_pos,
+                                      wri_file=True)
         # Deleting the temp files.
         shutil.rmtree(sobj.tempdir)
     # Writing out the results.

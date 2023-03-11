@@ -45,7 +45,7 @@ plugin.methods.register_function(
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),
                 'threads': Int,
-                'cluster_id': Float % Range(0.97, 1.0, inclusive_start=True, inclusive_end=True)},
+                'cluster_id': Float % Range(0.995, 1.0, inclusive_start=True, inclusive_end=True)},
     outputs=[('trimmed', SampleData[SequencesWithQuality])],
     input_descriptions={'per_sample_sequences': 'The artifact that contains the sequence file(s).'
                                                 ' Either Joined Paired or just a single fastq.'
@@ -92,7 +92,7 @@ plugin.methods.register_function(
                 'taxa': Str % Choices(taxaList),
                 'threads': Int,
                 'reversed_primers': Bool,
-                'cluster_id': Float % Range(0.97, 1.0, inclusive_start=True, inclusive_end=True)},
+                'cluster_id': Float % Range(0.995, 1.0, inclusive_start=True, inclusive_end=True)},
     outputs=[('trimmed', SampleData[JoinedSequencesWithQuality])],
     input_descriptions={'per_sample_sequences': 'The artifact that contains the sequence file(s). '
                                                 'Only Paired can be used. '
@@ -141,7 +141,7 @@ plugin.methods.register_function(
                 'taxa': Str % Choices(taxaList),
                 'threads': Int,
                 'reversed_primers': Bool,
-                'cluster_id': Float % Range(0.97, 1.0, inclusive_start=True, inclusive_end=True)},
+                'cluster_id': Float % Range(0.995, 1.0, inclusive_start=True, inclusive_end=True)},
     outputs=[('trimmed', SampleData[PairedEndSequencesWithQuality])],
     input_descriptions={'per_sample_sequences': 'The artifact that contains the sequence file(s). '
                                                 'Only Paired can be used. '

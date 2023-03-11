@@ -255,6 +255,7 @@ class Dedup:
         Args:
             outfile (str): The file to write the sequences to.
             gzip (bool): Should the files be gzipped?
+            zstd_file (bool): Should the files be zstd compressed? (.zst files)
             itspos (object): an ItsPosition object
             wri_file (bool): Should file be written or checked for empty sequences?
         """
