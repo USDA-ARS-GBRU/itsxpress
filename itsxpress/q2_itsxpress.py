@@ -190,7 +190,7 @@ def main(per_sample_sequences,
             fastq=sample.forward,
             fastq2=sample.reverse if paired_in else None,
             sample_id=sample.Index,
-            single_end=False if paired_in == True else True,
+            single_end=False if paired_in else True,
             reversed_primers=reversed_primers,
             threads=threads)
         # Deduplicate
