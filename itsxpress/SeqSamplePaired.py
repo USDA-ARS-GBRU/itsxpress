@@ -21,10 +21,20 @@ class SeqSamplePairedNotInterleaved(SeqSample):
             self.r1 = fastq
             self.fastq2 = fastq2
 
-    def _merge_reads(self, threads):
+    def _merge_reads(self, threads,stagger):
         try:
             seq_file = os.path.join(self.tempdir, 'seq.fq')
-            parameters = ['vsearch',
+            if stagger:
+                parameters = ['vsearch',
+                          '--fastq_mergepairs' , self.r1,
+                          '--reverse' , self.fastq2,
+                          '--fastqout' ,seq_file,
+                          '--fastq_maxdiffs' , str(maxmismatches),
+                          '--fastq_maxee' , str(2),
+                          '--threads'  ,str(threads),
+                          '--fastq_allowmergestagger']
+            else:
+                parameters = ['vsearch',
                           '--fastq_mergepairs' , self.r1,
                           '--reverse' , self.fastq2,
                           '--fastqout' ,seq_file,

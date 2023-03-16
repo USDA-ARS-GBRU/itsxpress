@@ -53,7 +53,7 @@ plugin.methods.register_function(
     parameter_descriptions={
         'region': ('\nThe regions ITS2, ITS1, and ALL that can be selected from.'),
         'taxa': ('\nThe selected taxonomic group sequenced that can be selected from.'),
-        'threads': ('\nThe number of processor threads to use in the run.'),
+        'threads': ('\nThe number of processor threads to use in the run.'),\
         'cluster_id': ('\nThe percent identity for clustering reads, set to 1 for exact dereplication.')
     },
     output_descriptions={'trimmed': 'The trimmed sequences from ITSxpress.'},
@@ -92,6 +92,7 @@ plugin.methods.register_function(
                 'taxa': Str % Choices(taxaList),
                 'threads': Int,
                 'reversed_primers': Bool,
+                'allow_staggered_reads': Bool,
                 'cluster_id': Float % Range(0.995, 1.0, inclusive_start=True, inclusive_end=True)},
     outputs=[('trimmed', SampleData[JoinedSequencesWithQuality])],
     input_descriptions={'per_sample_sequences': 'The artifact that contains the sequence file(s). '
@@ -102,6 +103,7 @@ plugin.methods.register_function(
         'taxa': ('\nThe selected taxonomic group sequenced that can be selected from.'),
         'threads': ('\nThe number of processor threads to use in the run.'),
         'cluster_id': ('\nThe percent identity for clustering reads, set to 1 for exact dereplication.'),
+        'allow_staggered_reads': ('\nAllowing staggered merged reads, allowed by default.'),
         'reversed_primers': ('\n Primers are in reverse orientation as in Taylor et al. 2016, DOI:10.1128/AEM.02576-16.')
     },
     output_descriptions={'trimmed': 'The resulting trimmed sequences from ITSxpress'},
@@ -141,6 +143,7 @@ plugin.methods.register_function(
                 'taxa': Str % Choices(taxaList),
                 'threads': Int,
                 'reversed_primers': Bool,
+                'allow_staggered_reads': Bool,
                 'cluster_id': Float % Range(0.995, 1.0, inclusive_start=True, inclusive_end=True)},
     outputs=[('trimmed', SampleData[PairedEndSequencesWithQuality])],
     input_descriptions={'per_sample_sequences': 'The artifact that contains the sequence file(s). '
@@ -151,6 +154,7 @@ plugin.methods.register_function(
         'taxa': ('\nThe selected taxonomic group sequenced that can be selected from.'),
         'threads': ('\nThe number of processor threads to use in the run.'),
         'cluster_id': ('\nThe percent identity for clustering reads, set to 1 for exact dereplication.'),
+        'allow_staggered_reads': ('\nAllowing staggered merged reads, allowed by default.'),
         'reversed_primers': ('\n Primers are in reverse orientation as in Taylor et al. 2016, DOI:10.1128/AEM.02576-16.')
     },
     output_descriptions={'trimmed': 'The resulting trimmed sequences from ITSxpress'},

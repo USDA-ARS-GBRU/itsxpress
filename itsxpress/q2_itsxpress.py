@@ -36,6 +36,7 @@ def _set_fastqs_and_check(fastq: str,
                           sample_id: str,
                           single_end: bool,
                           reversed_primers: bool,
+                          allow_staggered_reads: bool,
                           threads: int) -> object:
     """Checks and writes the fastqs as well as if they are paired end and single end.
 
@@ -72,7 +73,7 @@ def _set_fastqs_and_check(fastq: str,
                                                        fastq2=fastq2,
                                                        tempdir=None,
                                                        reversed_primers=reversed_primers)
-        sobj._merge_reads(threads=threads)
+        sobj._merge_reads(threads=threads,stagger=allow_staggered_reads)
         return sobj
 
     elif not paired_end:
@@ -112,6 +113,7 @@ def trim_single(per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt,
                    paired_in=False,
                    paired_out=False,
                    reversed_primers=False,
+                   allow_staggered_reads = False,
                    cluster_id=cluster_id)
     return results
 
@@ -122,6 +124,7 @@ def trim_pair(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
               taxa: str = "F",
               threads: int = 1,
               reversed_primers: bool = False,
+              allow_staggered_reads: bool = True,
               cluster_id: float = default_cluster_id) -> CasavaOneEightSingleLanePerSampleDirFmt:
     results = main(per_sample_sequences=per_sample_sequences,
                    threads=threads,
@@ -130,6 +133,7 @@ def trim_pair(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
                    paired_in=True,
                    paired_out=False,
                    reversed_primers=reversed_primers,
+                   allow_staggered_reads = allow_staggered_reads,
                    cluster_id=cluster_id)
     return results
 
@@ -139,6 +143,7 @@ def trim_pair_output_unmerged(per_sample_sequences: SingleLanePerSamplePairedEnd
               taxa: str = "F",
               threads: int = 1,
               reversed_primers: bool = False,
+              allow_staggered_reads: bool = True,
               cluster_id: float = default_cluster_id) -> CasavaOneEightSingleLanePerSampleDirFmt:
     results = main(per_sample_sequences=per_sample_sequences,
                    threads=threads,
@@ -147,6 +152,7 @@ def trim_pair_output_unmerged(per_sample_sequences: SingleLanePerSamplePairedEnd
                    paired_in=True,
                    paired_out=True,
                    reversed_primers=reversed_primers,
+                   allow_staggered_reads = allow_staggered_reads,
                    cluster_id=cluster_id)
     return results
 # The ITSxpress handling
@@ -157,6 +163,7 @@ def main(per_sample_sequences,
          paired_in: bool,
          paired_out: bool,
          reversed_primers: bool,
+         allow_staggered_reads: bool,
          cluster_id: float) -> CasavaOneEightSingleLanePerSampleDirFmt:
     """The main communication between the plugin and the ITSxpress program.
 
@@ -168,6 +175,7 @@ def main(per_sample_sequences,
         region (str) : The region to be used for the search.
         paired_in (bool): Declares if input files are paired.
         paired_out (bool): Declares if output files should be paired.
+        allow_staggered_reads (bool): Default True. If you don't want staggered reads included in sequence merging.
         cluster_id (float):The percent identity for clustering reads, set to 1 for exact dereplication.
 
     Returns:
@@ -192,6 +200,7 @@ def main(per_sample_sequences,
             sample_id=sample.Index,
             single_end=False if paired_in else True,
             reversed_primers=reversed_primers,
+            allow_staggered_reads=allow_staggered_reads,
             threads=threads)
         # Deduplicate
         if math.isclose(cluster_id, 1,rel_tol=1e-05):

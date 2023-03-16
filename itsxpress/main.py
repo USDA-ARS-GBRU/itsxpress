@@ -72,6 +72,7 @@ def myparser():
     parser.add_argument('--outfile2', '-o2', type=str, help="the trimmed read 2 Fastq file, if it \
                             ends in 'gz' it will be gzipped. If provided, reads will be returned unmerged.", default=None)
     parser.add_argument('--tempdir', help='The temp file directory', default=None)
+    parser.add_argument('--allow_staggered_reads', help='Allow --fastq_allowmergestagger for Vsearch --fastq_mergepairs. Default is true.', default=True)
     parser.add_argument('--keeptemp' ,help="Should intermediate files be kept?", action='store_true')
     parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
     parser.add_argument('--taxa', help='The taxonomic group sequenced.', choices=taxa_choices, default="Fungi")
@@ -213,7 +214,7 @@ def main(args=None):
         if paired_end:
             logging.info("Sequences are paired-end in two files. They will be merged using Vsearch.")
             sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=args.tempdir, reversed_primers=args.reversed_primers)
-            sobj._merge_reads(threads=str(args.threads))
+            sobj._merge_reads(threads=str(args.threads), stagger=args.allow_staggered_reads)
         elif not paired_end:
             logging.info("Sequences are assumed to be single-end.")
             sobj = SeqSampleNotPaired(fastq=args.fastq, tempdir=args.tempdir)
