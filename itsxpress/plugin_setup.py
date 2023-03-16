@@ -103,7 +103,7 @@ plugin.methods.register_function(
         'taxa': ('\nThe selected taxonomic group sequenced that can be selected from.'),
         'threads': ('\nThe number of processor threads to use in the run.'),
         'cluster_id': ('\nThe percent identity for clustering reads, set to 1 for exact dereplication.'),
-        'allow_staggered_reads': ('\nAllowing staggered merged reads, allowed by default.'),
+        'allow_staggered_reads': ('\nAllows merging of staggered reads.'),
         'reversed_primers': ('\n Primers are in reverse orientation as in Taylor et al. 2016, DOI:10.1128/AEM.02576-16.')
     },
     output_descriptions={'trimmed': 'The resulting trimmed sequences from ITSxpress'},
@@ -154,7 +154,7 @@ plugin.methods.register_function(
         'taxa': ('\nThe selected taxonomic group sequenced that can be selected from.'),
         'threads': ('\nThe number of processor threads to use in the run.'),
         'cluster_id': ('\nThe percent identity for clustering reads, set to 1 for exact dereplication.'),
-        'allow_staggered_reads': ('\nAllowing staggered merged reads, allowed by default.'),
+        'allow_staggered_reads': ('\nAllows merging of staggered reads.'),
         'reversed_primers': ('\n Primers are in reverse orientation as in Taylor et al. 2016, DOI:10.1128/AEM.02576-16.')
     },
     output_descriptions={'trimmed': 'The resulting trimmed sequences from ITSxpress'},

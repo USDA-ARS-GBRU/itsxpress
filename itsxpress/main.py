@@ -13,8 +13,8 @@ and Unoise that are replacing OTU clustering.
 ITSxpress is also available as a QIIME Plugin. See
 https://github.com/USDA-ARS-GBRU/q2_itsxpress for details.
 Process:
-    * Merges and error corrects reads using bbduk if reads are paired-end
-    * Deduplicates reads using Vmatch to eliminate redundant hmm searches
+    * Merges and error corrects reads using Vsearch if reads are paired-end
+    * Deduplicates reads using Vsearch to eliminate redundant hmm searches
     * Searches for conserved regions using the ITSx hmms, using HMMsearch:
     * Parses everything in python returning (optionally gzipped) fastq files.
 Reference:
@@ -72,7 +72,8 @@ def myparser():
     parser.add_argument('--outfile2', '-o2', type=str, help="the trimmed read 2 Fastq file, if it \
                             ends in 'gz' it will be gzipped. If provided, reads will be returned unmerged.", default=None)
     parser.add_argument('--tempdir', help='The temp file directory', default=None)
-    parser.add_argument('--allow_staggered_reads', help='Allow --fastq_allowmergestagger for Vsearch --fastq_mergepairs. Default is true.', default=True)
+    parser.add_argument('--allow_staggered_reads', help='Allow merging of staggered reads with --fastq_allowmergestagger \
+                        for Vsearch --fastq_mergepairs. See Vsearch documentation. (Optional) Default is true.', default=True)
     parser.add_argument('--keeptemp' ,help="Should intermediate files be kept?", action='store_true')
     parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
     parser.add_argument('--taxa', help='The taxonomic group sequenced.', choices=taxa_choices, default="Fungi")
