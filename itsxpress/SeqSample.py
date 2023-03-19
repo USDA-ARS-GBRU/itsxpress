@@ -58,7 +58,7 @@ class SeqSample:
             raise f
 
 
-    def cluster(self, threads=1, cluster_id=0.995):
+    def cluster(self, threads, cluster_id=0.995):
         """Runs Vsearch clustering to create a FASTA file of non-redundant sequences.
         Args:
             threads (int or str):the number of processor threads to use

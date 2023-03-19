@@ -175,7 +175,7 @@ def main(per_sample_sequences,
         region (str) : The region to be used for the search.
         paired_in (bool): Declares if input files are paired.
         paired_out (bool): Declares if output files should be paired.
-        allow_staggered_reads (bool): Default True. If you don't want staggered reads included in sequence merging.
+        allow_staggered_reads (bool):  Allows merging of staggered reads. Default True.
         cluster_id (float):The percent identity for clustering reads, set to 1 for exact dereplication.
 
     Returns:
