@@ -5,6 +5,8 @@ from itsxpress.SeqSample import SeqSample
 import subprocess
 import logging
 import os
+import pyzstd as zstd
+
 from Bio import SeqIO
 
 from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio
@@ -24,6 +26,9 @@ class SeqSamplePairedNotInterleaved(SeqSample):
     def _merge_reads(self, threads,stagger):
         try:
             seq_file = os.path.join(self.tempdir, 'seq.fq')
+            if self.r1.split('.')[-1] == 'zst' and self.fastq2.split('.')[-1] == 'zst':
+                self.r1 = zstd.open(self.r1, 'rt')
+                self.fastq2 = zstd.open(self.fastq2,'rt')
             if stagger:
                 parameters = ['vsearch',
                           '--fastq_mergepairs' , self.r1,

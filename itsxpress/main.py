@@ -249,12 +249,12 @@ def main(args=None):
                 dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False,zstd_file = False,  itspos=its_pos,wri_file=False)
 
         else:
-            if args.outfile.split('.')[-1] =='gz':
+            if args.outfile.split('.')[-1] == 'gz':
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=True)
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=False)
                 #add function with above create_trimmed_seqs
                 #use said function to check for 0 length seqs
-            if args.outfile.split('.')[-1] =='zst':
+            if args.outfile.split('.')[-1] == 'zst':
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=True)
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=False)
             else:
