@@ -27,8 +27,8 @@ class SeqSamplePairedNotInterleaved(SeqSample):
         try:
             seq_file = os.path.join(self.tempdir, 'seq.fq')
             if self.r1.split('.')[-1] == 'zst' and self.fastq2.split('.')[-1] == 'zst':
-                self.r1 = zstd.open(self.r1, 'rt')
-                self.fastq2 = zstd.open(self.fastq2,'rt')
+                self.r1 = zstd.decompress(self.r1)
+                self.fastq2 = zstd.decompress(self.fastq2)
             if stagger:
                 parameters = ['vsearch',
                           '--fastq_mergepairs' , self.r1,
