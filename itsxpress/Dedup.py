@@ -179,6 +179,10 @@ class Dedup:
                 with zstd.open(self.fastq,'rt') as f:
                     with zstd.open(self.fastq2, 'rt') as g:
                         _create_gen(f,g)
+            elif self.fastq.endswith(".fq") and self.fastq2.endswith(".fq"):
+                with open(self.fastq, 'r') as f:
+                    with open(self.fastq2, 'r') as g:
+                        _create_gen(f, g)
             elif  (self.fastq2.endswith(".fastq") or self.fastq2.endswith(".fastq")):
                 with open(self.fastq, 'r') as f:
                     with open(self.fastq2, 'r') as g:
