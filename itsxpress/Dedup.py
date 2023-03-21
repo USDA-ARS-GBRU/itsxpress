@@ -268,8 +268,7 @@ class Dedup:
                 tempf = os.path.join('./','temp.fa')
                 with open(tempf, 'w') as g:
                     SeqIO.write(seqs, g, "fastq")
-                with open(tempf,'rb') as f_in:
-                    with gzip.open(outfile,'wb') as f_out:
+                with open(tempf,'rb') as f_in, gzip.open(outfile,'wb') as f_out:
                         f_out.writelines(f_in)
             elif zstd_file:
                 tempf = os.path.join('./','temp.fa')
@@ -282,7 +281,6 @@ class Dedup:
                 with open(outfile, 'w') as g:
                     SeqIO.write(seqs, g, "fastq")
                     
-
         if self.seq_file.endswith(".gz"):
             with gzip.open(self.seq_file, 'rt') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
