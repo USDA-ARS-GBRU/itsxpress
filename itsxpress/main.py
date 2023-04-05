@@ -197,6 +197,31 @@ def _check_fastqs(fastq, fastq2=None):
     if fastq2:
         core(fastq2)
 
+def _check_total_reads(file, file2 = None):
+    """Check the total number of reads in the input file(s).
+    """
+    #Count every fourth line in fastq file.
+    def core(file):
+        if file.endswith('.gz'):
+            f = gzip.open(file, 'rt')
+        elif file.endswith('.zst'):
+            f = zstd.open(file, 'rt')
+        else:
+            f = open(file, 'r')
+        n = 0
+
+        for i, line in enumerate(f):
+            if i % 4 == 0:
+                n += 1
+        f.close()
+        return n
+    
+    reads = core(file)
+    logging.info("Total number of reads in file {} is {}.".format(file, reads))
+    if file2:
+        reads = core(file2)
+        logging.info("Total number of reads in file {} is {}.".format(file2, reads))
+
 def main(args=None):
     """Run Complete ITS trimming workflow.
     """
@@ -205,7 +230,6 @@ def main(args=None):
     parser = myparser()
     if not args:
         args = parser.parse_args()
-
     _logger_setup(args.log)
     try:
         logging.info("Verifying the input sequences.")
@@ -235,8 +259,7 @@ def main(args=None):
         its_pos = ItsPosition(domtable=sobj.dom_file, region=args.region)
         # Create deduplication object
         dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file, fastq=sobj.r1, fastq2=sobj.fastq2)
-        # Create trimmed sequences
-        logging.info("Writing out sequences")
+        # Trim sequences
         if args.outfile2:
             if args.outfile.split('.')[-1] == 'gz' and args.outfile2.split('.')[-1] == 'gz':
                 dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True,zstd_file = False,  itspos=its_pos,wri_file=True)
@@ -260,6 +283,15 @@ def main(args=None):
             else:
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=True)
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=False)
+        # Count reads after trimming
+        logging.info("Counting reads after trimming.")
+        if args.outfile2:
+            _check_total_reads(args.fastq, args.fastq2)
+            _check_total_reads(args.outfile, args.outfile2)
+        else:
+            _check_total_reads(args.fastq)
+            _check_total_reads(args.outfile)
+        
         t1 = time.time()
         fmttime = time.strftime("%H:%M:%S", time.gmtime(t1-t0))
         logging.info("ITSxpress ran in {}".format(fmttime))
