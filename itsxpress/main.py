@@ -218,6 +218,7 @@ def _check_total_reads(file, file2 = None):
     
     reads = core(file)
     logging.info("Total number of reads in file {} is {}.".format(file, reads))
+    #Why is file2 False? 
     if file2:
         reads = core(file2)
         logging.info("Total number of reads in file {} is {}.".format(file2, reads))
@@ -286,10 +287,16 @@ def main(args=None):
         # Count reads after trimming
         logging.info("Counting reads after trimming.")
         if args.outfile2:
-            _check_total_reads(args.fastq, args.fastq2)
+            if args.fastq2:
+                _check_total_reads(args.fastq, args.fastq2)
+            else:
+                _check_total_reads(args.fastq)
             _check_total_reads(args.outfile, args.outfile2)
         else:
-            _check_total_reads(args.fastq)
+            if args.fastq2:
+                _check_total_reads(args.fastq, args.fastq2)
+            else:
+                _check_total_reads(args.fastq)
             _check_total_reads(args.outfile)
         
         t1 = time.time()
