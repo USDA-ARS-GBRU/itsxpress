@@ -165,12 +165,12 @@ Usage
 
 --threads		     	Number of processor threads to use. Default is 1.
 
---reversed_primers      Primers are in reverse orientation as in Taylor et al. 2016,
-                        DOI:10.1128/AEM.02576-16. If selected ITSxpress returns
-                        trimmed reads flipped to the forward orientation
+--reversed_primers      	Primers are in reverse orientation as in Taylor et al. 2016,
+                        		DOI:10.1128/AEM.02576-16. If selected ITSxpress returns
+                        		trimmed reads flipped to the forward orientation
 
---allow_staggered_reads Allow merging of staggered reads with --fastq_allowmergestagger \
-                        for Vsearch --fastq_mergepairs. See Vsearch documentation. (Optional) Default is true.
+--allow_staggered_reads 	Allow merging of staggered reads with --fastq_allowmergestagger
+                        		for Vsearch --fastq_mergepairs. See Vsearch documentation. (Optional) 					      Default is true.
 
 
 
