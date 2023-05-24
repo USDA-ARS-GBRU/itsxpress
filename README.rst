@@ -132,7 +132,7 @@ takes care of this for you so it is the preferred installation method.
 Usage
 ---------
 
--h, --help            	Show this help message and exit.
+-h, --help            		Show this help message and exit.
 
 --fastq 				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. Interleaved
                         	or not. Required.
@@ -158,8 +158,8 @@ Usage
 						Oomycota, Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,
 						Tracheophyta, Eustigmatophyceae, All}. Default Fungi.
 
---cluster_id            The percent identity for clustering reads range [0.99-1.0], set to 1
-                        for exact de-replication. Default 1.0.
+--cluster_id            	The percent identity for clustering reads range [0.99-1.0], set to 1
+                        	for exact de-replication. Default 1.0.
 
 --log		          	Log file. Default is ITSxpress.log.
 
