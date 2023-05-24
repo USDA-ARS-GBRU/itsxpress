@@ -9,8 +9,13 @@ ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) reg
    :target: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/python-package-conda.yml
    :alt: Build Status
 
-.. image:: https://api.codacy.com/project/badge/Grade/7e2a4c97cde74bccb3e84b706d7a2aa5
-  :target: https://www.codacy.com/app/GBRU/itsxpress?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=USDA-ARS-GBRU/itsxpress&amp;utm_campaign=Badge_Grade
+.. image:: https://anaconda.org/bioconda/itsxpress/badges/downloads.svg
+   :target: https://anaconda.org/bioconda/itsxpress
+   :alt: Anaconda-Server Badge
+   
+.. image:: https://img.shields.io/github/v/release/USDA-ARS-GBRU/itsxpress?style=social
+   :target: https://github.com/USDA-ARS-GBRU/itsxpress/releases/latest
+   :alt: GitHub release (latest by date)
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1304349.svg
   :target: https://doi.org/10.5281/zenodo.1304349
