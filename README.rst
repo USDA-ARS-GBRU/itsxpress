@@ -5,8 +5,8 @@ ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) reg
     :target: https://itsxpress.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://github.com/username/repo-name/actions/workflows/python-package-conda.yml/badge.svg
-   :target: https://github.com/username/repo-name/actions/workflows/python-package-conda.yml
+.. image:: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/python-package-conda.yml/badge.svg
+   :target: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/python-package-conda.yml
    :alt: Build Status
 
 .. image:: https://api.codacy.com/project/badge/Grade/7e2a4c97cde74bccb3e84b706d7a2aa5
