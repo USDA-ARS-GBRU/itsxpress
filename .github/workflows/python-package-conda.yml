@@ -1,4 +1,4 @@
-name: Python Package using Conda
+name: Weekly Build and Test
 
 on:
   push:
@@ -51,9 +51,7 @@ jobs:
         conda install biopython
         pip install pyzstd
         pip install pytest
-        conda list vsearch
-        conda list hmmer
-        pip install -e .
+        pip install .
     - name: Test with pytest
       run: |
         source activate testenv
