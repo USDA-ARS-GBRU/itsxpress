@@ -258,7 +258,7 @@ def test_create_paired_trimmed_seqs():
 	fastq = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R1.fastq")
 	fastq2 = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R2.fastq")
 	dedup = itsxpress.main.Dedup(uc_file=uc, rep_file=rep, seq_file=seq, fastq=fastq, fastq2=fastq2)
-	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR,"tests", "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	tf = tempfile.mkdtemp(".")
 	print(tf)
 	t1 = os.path.join(tf,'t2_r1.fq')
