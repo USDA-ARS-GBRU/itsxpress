@@ -1,4 +1,4 @@
-name: Python Package using Conda
+name: GitHub Actions Weekly Build
 
 on:
   push:
@@ -50,8 +50,6 @@ jobs:
         pip install pyzstd
         pip install pytest
         pip install -e .
-        conda list vsearch
-        conda list hmmer
     - name: Test with pytest
       run: |
         source activate testenv
