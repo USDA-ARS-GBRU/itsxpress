@@ -1,14 +1,13 @@
 ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) region of FASTQ files
 ==================================================================================================
-.. image:: https://travis-ci.org/USDA-ARS-GBRU/itsxpress.svg?branch=master
-    :target: https://travis-ci.org/USDA-ARS-GBRU/itsxpress
 
 .. image:: https://readthedocs.org/projects/itsxpress/badge/?version=latest
     :target: https://itsxpress.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://codecov.io/gh/USDA-ARS-GBRU/itsxpress/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/USDA-ARS-GBRU/itsxpress
+.. image:: https://github.com/username/repo-name/actions/workflows/python-package-conda.yml/badge.svg
+   :target: https://github.com/username/repo-name/actions/workflows/python-package-conda.yml
+   :alt: Build Status
 
 .. image:: https://api.codacy.com/project/badge/Grade/7e2a4c97cde74bccb3e84b706d7a2aa5
   :target: https://www.codacy.com/app/GBRU/itsxpress?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=USDA-ARS-GBRU/itsxpress&amp;utm_campaign=Badge_Grade
