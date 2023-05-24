@@ -1,17 +1,21 @@
 ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) region of FASTQ files
 ==================================================================================================
-.. image:: https://travis-ci.org/USDA-ARS-GBRU/itsxpress.svg?branch=master
-    :target: https://travis-ci.org/USDA-ARS-GBRU/itsxpress
 
 .. image:: https://readthedocs.org/projects/itsxpress/badge/?version=latest
     :target: https://itsxpress.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://codecov.io/gh/USDA-ARS-GBRU/itsxpress/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/USDA-ARS-GBRU/itsxpress
+.. image:: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/python-package-conda.yml/badge.svg
+   :target: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/python-package-conda.yml
+   :alt: Build Status
 
-.. image:: https://api.codacy.com/project/badge/Grade/7e2a4c97cde74bccb3e84b706d7a2aa5
-  :target: https://www.codacy.com/app/GBRU/itsxpress?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=USDA-ARS-GBRU/itsxpress&amp;utm_campaign=Badge_Grade
+.. image:: https://anaconda.org/bioconda/itsxpress/badges/downloads.svg
+   :target: https://anaconda.org/bioconda/itsxpress
+   :alt: Anaconda-Server Badge
+   
+.. image:: https://img.shields.io/github/v/release/USDA-ARS-GBRU/itsxpress?style=social
+   :target: https://github.com/USDA-ARS-GBRU/itsxpress/releases/latest
+   :alt: GitHub release (latest by date)
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1304349.svg
   :target: https://doi.org/10.5281/zenodo.1304349
@@ -33,7 +37,7 @@ analysis [version 1; referees: awaiting peer review]. F1000Research 2018, 7:1418
 
 #####
 
-**This is the end of life version 1 TSxpress.
+**This is the end of life version 1 ITSxpress.
 The new version 2 of ITSxpress, has the Qiime2 plugin built in with the command line version of ITSxpress. See 
 master branch of ITSxpress.**
 
@@ -161,9 +165,12 @@ Usage
 
 --threads		     	Number of processor threads to use. Default is 1.
 
---reversed_primers  Primers are in reverse orientation as in Taylor et al. 2016,
-                    DOI:10.1128/AEM.02576-16. If selected ITSxpress returns
-                    trimmed reads flipped to the forward orientation
+--reversed_primers      Primers are in reverse orientation as in Taylor et al. 2016,
+                        DOI:10.1128/AEM.02576-16. If selected ITSxpress returns
+                        trimmed reads flipped to the forward orientation
+
+--allow_staggered_reads Allow merging of staggered reads with --fastq_allowmergestagger \
+                        for Vsearch --fastq_mergepairs. See Vsearch documentation. (Optional) Default is true.
 
 
 
