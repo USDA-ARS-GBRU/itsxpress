@@ -20,17 +20,17 @@ hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict["Fungi"])
 
 
 def test_check_fastqs():
-	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
-	fastq2 = os.path.join(TEST_DIR, "test_data", "broken.fastq")
+	fastq = os.path.join(TEST_DIR,"tests", "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR,"tests", "test_data", "broken.fastq")
 	pytest.raises(ValueError, itsxpress.main._check_fastqs, fastq, fastq2)
 
 def test_check_fastq_gzs():
-	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq.gz")
-	fastq2 = os.path.join(TEST_DIR, "test_data", "broken.fastq.gz")
+	fastq = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R1.fastq.gz")
+	fastq2 = os.path.join(TEST_DIR,"tests",  "test_data", "broken.fastq.gz")
 	pytest.raises(ValueError, itsxpress.main._check_fastqs, fastq, fastq2)
 
 def test_its_position_init():
-	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	exp1 = {'tlen': 341, 'right': {'score': 59.1, 'to_pos': 326, 'from_pos': 282}, 'left': {'score': 52.2, 'to_pos': 128, 'from_pos': 84}}
 	print(itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"])
 	assert (exp1 == itspos.ddict["M02696:28:000000000-ATWK5:1:1101:19331:3209"])
@@ -40,9 +40,9 @@ def test_its_position_init():
 	assert (len(itspos.ddict) == 137)
 
 def test_dedup():
-	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
-	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
-	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
+	uc = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "rep.fa")
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq)
 	# Check length of records
 	assert len(dedup.matchdict) == 227
@@ -54,11 +54,11 @@ def test_dedup():
 def test_dedup_create_trimmed_seqs():
 	tf = tempfile.mkdtemp()
 	print(tf)
-	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
-	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
-	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
+	uc = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "rep.fa")
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq)
-	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	# Check non gzipped
 	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq"), gzipped=False, zstd_file=False, wri_file=True, itspos=itspos)
 	with open(os.path.join(tf,"testout.fastq"), 'r') as f:
@@ -76,11 +76,11 @@ def test_dedup_create_trimmed_seqs():
 def test_dedup_create_trimmed_seqs_gzipped():
 	tf = tempfile.mkdtemp()
 	print(tf)
-	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
-	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
-	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
+	uc = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "rep.fa")
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq)
-	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	# Check gzipped
 	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq.gz"), gzipped=True, zstd_file=False, wri_file=True, itspos=itspos)
 	with gzip.open(os.path.join(tf,"testout.fastq.gz"), 'rt') as f:
@@ -98,11 +98,11 @@ def test_dedup_create_trimmed_seqs_gzipped():
 def test_dedup_create_trimmed_seqs_zst():
 	tf = tempfile.mkdtemp()
 	print(tf)
-	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
-	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
-	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
+	uc = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "rep.fa")
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq)
-	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	# Check zstd compression
 	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq.zst"), gzipped=False, zstd_file=True, wri_file=True, itspos=itspos)
 	with zstd.open(os.path.join(tf,"testout.fastq.zst"), 'rt') as f:
@@ -129,22 +129,22 @@ def test_dedup_create_trimmed_seqs_zst():
 
 #Following test will fail if Vsearch version is less than 2.20 or hmmer is not installed
 def test_seq_sample_not_paired():
-	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_merged.fastq")
+	fastq = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_merged.fastq")
 	sobj = itsxpress.main.SeqSampleNotPaired(fastq=fastq, tempdir=".")
 	sobj.deduplicate(threads=1)
 	sobj._search(hmmfile=hmmfile, threads=1)
 	shutil.rmtree(sobj.tempdir)
 
 def test_seq_sample_not_paired_clustered():
-	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_merged.fastq")
+	fastq = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_merged.fastq")
 	sobj = itsxpress.main.SeqSampleNotPaired(fastq=fastq, tempdir=".")
 	sobj.cluster(threads=1, cluster_id=0.995)
 	sobj._search(hmmfile=hmmfile, threads=1)
 	shutil.rmtree(sobj.tempdir)
 
 def test_seq_sample_paired_not_interleaved():
-	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
-	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	fastq = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R2.fastq")
 	sobj = itsxpress.main.SeqSamplePairedNotInterleaved(fastq=fastq, tempdir=".", fastq2=fastq2)
 	sobj._merge_reads(stagger = True, threads=1)
 	sobj.deduplicate(threads=1)
@@ -186,10 +186,10 @@ def test_myparser():
 def test_main_paired():
 	parser = itsxpress.main.myparser()
 	tf = tempfile.mkdtemp()
-	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
-	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	fastq = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R2.fastq")
 	outfile = os.path.join(tf,'testout.fastq')
-	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
+	validation = os.path.join(TEST_DIR,"tests",  "test_data", "testout.fastq")
 	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
@@ -201,9 +201,9 @@ def test_main_paired():
 def test_main_merged():
 	parser = itsxpress.main.myparser()
 	tf = tempfile.mkdtemp()
-	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_merged.fastq")
+	fastq = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_merged.fastq")
 	outfile = os.path.join(tf,'testout.fastq')
-	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
+	validation = os.path.join(TEST_DIR,"tests",  "test_data", "testout.fastq")
 	args = parser.parse_args(['--fastq', fastq, '--single_end', '--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
@@ -215,10 +215,10 @@ def test_main_merged():
 def test_main_paired_no_cluster():
 	parser = itsxpress.main.myparser()
 	tf = tempfile.mkdtemp()
-	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
-	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	fastq = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R2.fastq")
 	outfile = os.path.join(tf,'testout.fastq')
-	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
+	validation = os.path.join(TEST_DIR,"tests",  "test_data", "testout.fastq")
 	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--cluster_id', '1', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
@@ -229,13 +229,13 @@ def test_main_paired_no_cluster():
 
 
 def test_get_paired_seq_generator():
-	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
-	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
-	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
-	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
-	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	uc = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "rep.fa")
+	fastq = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R2.fastq")
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq, fastq=fastq, fastq2=fastq2)
-	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
+	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	f = open(fastq, 'r')
 	g = open(fastq2, 'r')
 	seqgen1 = SeqIO.parse(f, 'fastq')
@@ -252,11 +252,11 @@ def test_get_paired_seq_generator():
 	assert (n2==226)
 
 def test_create_paired_trimmed_seqs():
-	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
-	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
-	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
-	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
-	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	uc = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR,"tests",  "test_data", "ex_tmpdir", "rep.fa")
+	fastq = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR,"tests",  "test_data", "4774-1-MSITS3_R2.fastq")
 	dedup = itsxpress.main.Dedup(uc_file=uc, rep_file=rep, seq_file=seq, fastq=fastq, fastq2=fastq2)
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	tf = tempfile.mkdtemp(".")
@@ -264,8 +264,8 @@ def test_create_paired_trimmed_seqs():
 	t1 = os.path.join(tf,'t2_r1.fq')
 	t2 = os.path.join(tf,'t2_r2.fq')
 	dedup.create_paired_trimmed_seqs(t1, t2, False,False, itspos,True)
-	assert (filecmp.cmp(t1, os.path.join(TEST_DIR, "test_data", "t2_r1.fq")))
-	assert (filecmp.cmp(t2, os.path.join(TEST_DIR, "test_data", "t2_r2.fq")))
+	assert (filecmp.cmp(t1, os.path.join(TEST_DIR,"tests",  "test_data", "t2_r1.fq")))
+	assert (filecmp.cmp(t2, os.path.join(TEST_DIR,"tests",  "test_data", "t2_r2.fq")))
 	shutil.rmtree(tf)
 
 try:
