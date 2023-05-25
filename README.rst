@@ -133,54 +133,54 @@ Usage
 ---------
 
 
-+----------------------+---------------------------------------------------------------+
-| Option               | Description                                                   |
-+======================+===============================================================+
-| -h, --help           | Show this help message and exit.                              |
-+----------------------+---------------------------------------------------------------+
-| --fastq              | A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file.      |
-|                      | Interleaved or not. Required.                                 |
-+----------------------+---------------------------------------------------------------+
-| --single_end         | A flag to specify that the fastq file is single-ended (not    |
-|                      | paired). Default is false.                                    |
-+----------------------+---------------------------------------------------------------+
-| --fastq2             | A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file       |
-|                      | representing read 2 if present, optional.                     |
-+----------------------+---------------------------------------------------------------+
-| --outfile            | The trimmed FASTQ file, if it ends in ``gz`` it will be       |
-|                      | gzipped.                                                      |
-+----------------------+---------------------------------------------------------------+
-| --outfile2           | The trimmed FASTQ read 2 file, if it ends in ``gz`` it will   |
-|                      | be gzipped. If used, reads will be retuned as unmerged pairs  |
-|                      | rather than than merged.                                      |
-+----------------------+---------------------------------------------------------------+
-| --tempdir            | Specify the temp file directory. Default is None.             |
-+----------------------+---------------------------------------------------------------+
-| --keeptemp           | Should intermediate files be kept? Default is false.          |
-+----------------------+---------------------------------------------------------------+
-| --region             | Options : {ITS2, ITS1, ALL}                                   |
-+----------------------+---------------------------------------------------------------+
-| --taxa               | Select the taxonomic group sequenced: {Alveolata, Bryophyta,  |
-|                      | Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,   |
-|                      | Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Oomycota, |
-|                      | Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,        |
-|                      | Tracheophyta, Eustigmatophyceae, All}. Default Fungi.         |
-+----------------------+---------------------------------------------------------------+
-| --cluster_id         | The percent identity for clustering reads range [0.99-1.0],   |
-|                      | set to 1 for exact de-replication. Default 1.0.               |
-+----------------------+---------------------------------------------------------------+
-| --log                | Log file. Default is ITSxpress.log.                           |
-+----------------------+---------------------------------------------------------------+
-| --threads            | Number of processor threads to use. Default is 1.             |
-+----------------------+---------------------------------------------------------------+
-| --reversed_primers   | Primers are in reverse orientation as in Taylor et al. 2016,  |
-|                      | DOI:10.1128/AEM.02576-16. If selected ITSxpress returns       |
-|                      | trimmed reads flipped to the forward orientation              |
-+----------------------+---------------------------------------------------------------+
-| --allow_staggered_   | Allow merging staggered reads with --fastq_allowmergestagge   |
-| reads                | for Vsearch --fastq_mergepairs. See Vsearch documentation.    |
-|                      | (Optional) Default is true.                                   |
-+----------------------+---------------------------------------------------------------+
++-------------------------+---------------------------------------------------------------+
+| Option                  | Description                                                   |
++=========================+===============================================================+
+| -h, --help              | Show this help message and exit.                              |
++-------------------------+---------------------------------------------------------------+
+| --fastq                 | A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file.      |
+|                         | Interleaved or not. Required.                                 |
++-------------------------+---------------------------------------------------------------+
+| --single_end            | A flag to specify that the fastq file is single-ended (not    |
+|                         | paired). Default is false.                                    |
++-------------------------+---------------------------------------------------------------+
+| --fastq2                | A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file       |
+|                         | representing read 2 if present, optional.                     |
++-------------------------+---------------------------------------------------------------+
+| --outfile               | The trimmed FASTQ file, if it ends in ``gz`` it will be       |
+|                         | gzipped.                                                      |
++-------------------------+---------------------------------------------------------------+
+| --outfile2              | The trimmed FASTQ read 2 file, if it ends in ``gz`` it will   |
+|                         | be gzipped. If used, reads will be retuned as unmerged pairs  |
+|                         | rather than than merged.                                      |
++-------------------------+---------------------------------------------------------------+
+| --tempdir               | Specify the temp file directory. Default is None.             |
++-------------------------+---------------------------------------------------------------+
+| --keeptemp              | Should intermediate files be kept? Default is false.          |
++-------------------------+---------------------------------------------------------------+
+| --region                | Options : {ITS2, ITS1, ALL}                                   |
++-------------------------+---------------------------------------------------------------+
+| --taxa                  | Select the taxonomic group sequenced: {Alveolata, Bryophyta,  |
+|                         | Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,   |
+|                         | Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Oomycota, |
+|                         | Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,        |
+|                         | Tracheophyta, Eustigmatophyceae, All}. Default Fungi.         |
++-------------------------+---------------------------------------------------------------+
+| --cluster_id            | The percent identity for clustering reads range [0.99-1.0],   |
+|                         | set to 1 for exact de-replication. Default 1.0.               |
++-------------------------+---------------------------------------------------------------+
+| --log                   | Log file. Default is ITSxpress.log.                           |
++-------------------------+---------------------------------------------------------------+
+| --threads               | Number of processor threads to use. Default is 1.             |
++-------------------------+---------------------------------------------------------------+
+| --reversed_primers      | Primers are in reverse orientation as in Taylor et al. 2016,  |
+|                         | DOI:10.1128/AEM.02576-16. If selected ITSxpress returns       |
+|                         | trimmed reads flipped to the forward orientation              |
++-------------------------+---------------------------------------------------------------+
+| --allow_staggered_reads | Allow merging staggered reads with --fastq_allowmergestagger  |
+|                         | for Vsearch --fastq_mergepairs. See Vsearch documentation.    |
+|                         | (Optional) Default is true.                                   |
++-------------------------+---------------------------------------------------------------+
 
 
 
