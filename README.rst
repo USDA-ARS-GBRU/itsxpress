@@ -54,9 +54,9 @@ et al. (2013)`_ published software the software package ITSx_ to do this.
 
 ITSxpress is designed to support the calling of exact sequence variants rather than OTUs_.
 This newer method of sequence error-correction requires quality score data from each
-sequence, so each input sequence must be trimmed. ITSXpress makes this possible by
+sequence, so each input sequence must be trimmed. ITSxpress makes this possible by
 taking FASTQ data, de-replicating the sequences then identifying the start and stop
-sites using HMMSearch.  Results are parsed and the trimmed files are returned. The ITS 1,
+sites using HMMSearch.  Results are parsed and the trimmed files are returned. The ITS1,
 ITS2 or the entire ITS region including the 5.8s rRNA gene can be selected. ITSxpress
 uses the hmm model from ITSx so results are comparable.
 
