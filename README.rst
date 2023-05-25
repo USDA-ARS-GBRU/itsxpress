@@ -132,6 +132,18 @@ takes care of this for you so it is the preferred installation method.
 Usage
 ---------
 
++----------------------+---------------------------------------------------------------+
+|Flag         		| Information                                                  |
++======================+===============================================================+
+| -h, --help           | Show this help message and exit.                                               |
++----------------------+---------------------------------------------------------------+
+| --allow_staggered_reads      | Primers are in reverse orientation as in Taylor et al. 2016,
+                        DOI:10.1128/AEM.02576-16. If selected ITSxpress returns
+                        trimmed reads flipped to the forward orientation                                              |
++----------------------+---------------------------------------------------------------+
+| Row 3, Column 1      | Row 3, Column 2                                               |
++----------------------+---------------------------------------------------------------+
+
 -h, --help            		Show this help message and exit.
 
 --fastq 				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. Interleaved
