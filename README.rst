@@ -30,7 +30,7 @@ Citation
 --------
 Rivers AR, Weber KC, Gardner TG et al. ITSxpress: Software to rapidly trim
 internally transcribed spacer sequences with quality scores for marker gene
-analysis [version 1; referees: awaiting peer review]. F1000Research 2018, 7:1418
+analysis [version 1]. F1000Research 2018, 7:1418
 (doi: `10.12688/f1000research.15704.1`_)
 
 .. _`10.12688/f1000research.15704.1`: https://doi.org/10.12688/f1000research.15704.1
