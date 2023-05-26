@@ -5,7 +5,7 @@ on:
     branches:
       - version2
   schedule:
-    - cron: "0 13 1 * *"
+    - cron: "0 0 */7 * *"
     
 jobs:
   build-linux:
@@ -18,7 +18,7 @@ jobs:
     - name: Set up Python 3.7
       uses: actions/setup-python@v3
       with:
-        python-version: '3.7'
+        python-version: latest
     - run:   |
          sudo apt update
          sudo apt install gcc-10 g++-10
@@ -30,7 +30,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       with:
         activate-environment: testenv
-        python-version: 3.7
+        python-version: latest
         channels: conda-forge,bioconda
         allow-softlinks: true
         channel-priority: flexible
@@ -39,7 +39,7 @@ jobs:
           
     - name: Set up environment
       run: |
-        conda create --name testenv python=3.7
+        conda create --name testenv python
         source activate testenv
     - name: Install Dependencies
       run: |
