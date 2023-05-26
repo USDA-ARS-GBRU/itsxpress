@@ -42,5 +42,5 @@ taxa_dict = {"Alveolata":"A.hmm","Bryophyta":"B.hmm", "Bacillariophyta":"C.hmm",
  "Tracheophyta":"T.hmm","Eustigmatophyceae":"U.hmm","All":"all.hmm"}
 
 
-maxmismatches = 40
+maxmismatches=40
 maxratio=0.3
