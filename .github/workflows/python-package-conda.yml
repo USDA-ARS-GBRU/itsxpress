@@ -40,16 +40,16 @@ jobs:
     - name: Set up environment
       run: |
         wget https://data.qiime2.org/distro/core/qiime2-2023.5-py38-linux-conda.yml
-        conda env create -n testenv --file qiime2-2023.5-py38-linux-conda.yml
-        source activate testenv
+        conda env create -n qiime --file qiime2-2023.5-py38-linux-conda.yml
+        source activate qiime
     - name: Install Dependencies
       run: |
-        source activate testenv
+        source activate qiime
         conda install biopython
         pip install pyzstd
         pip install pytest
         pip install .
     - name: Test with pytest
       run: |
-        source activate testenv
+        source activate qiime
         pytest
