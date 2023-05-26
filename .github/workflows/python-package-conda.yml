@@ -39,13 +39,12 @@ jobs:
           
     - name: Set up environment
       run: |
-        conda create --name testenv python
+        wget https://data.qiime2.org/distro/core/qiime2-2023.5-py38-linux-conda.yml
+        conda env create -n testenv --file qiime2-2023.5-py38-linux-conda.yml
         source activate testenv
     - name: Install Dependencies
       run: |
         source activate testenv
-        conda install -c bioconda vsearch
-        conda install -c bioconda hmmer
         conda install biopython
         pip install pyzstd
         pip install pytest
