@@ -15,10 +15,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.7
+    - name: Set up Python 3.11
       uses: actions/setup-python@v3
       with:
-        python-version: latest
+        python-version: 3.8.13
     - run:   |
          sudo apt update
          sudo apt install gcc-10 g++-10
@@ -30,7 +30,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       with:
         activate-environment: testenv
-        python-version: latest
+        python-version: 3.8.13
         channels: conda-forge,bioconda
         allow-softlinks: true
         channel-priority: flexible
