@@ -284,7 +284,7 @@ try:
 	import itsxpress.q2_itsxpress as q2_itsxpress
 	import itsxpress.plugin_setup
 	# The test data dir
-	TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__name__)))
+	TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__name__)),"tests")
 	# Test info 1
 	TEST_FILE = os.path.join(TEST_DIR,
 							"test_data",
