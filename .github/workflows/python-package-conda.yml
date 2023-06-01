@@ -1,4 +1,4 @@
-name: Weekly Build and Test
+name: Weekly Build and Test (1.8.1EOL)
 
 on:
   push:
