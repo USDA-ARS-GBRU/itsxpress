@@ -39,7 +39,7 @@ analysis [version 1]. F1000Research 2018, 7:1418
 
 **This is the end of life version 1 ITSxpress.
 The new version 2 of ITSxpress, has the Qiime2 plugin built in with the command line version of ITSxpress. See 
-master branch of ITSxpress.**
+main branch of ITSxpress.**
 
 #####
 
