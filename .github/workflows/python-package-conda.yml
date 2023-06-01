@@ -1,4 +1,4 @@
-name: GitHub Actions Weekly Build
+name: GitHub Actions Weekly Build (V2)
 
 on:
   push:
