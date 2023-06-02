@@ -1,18 +1,13 @@
-name: Publish docker image
-on: [push]
-jobs:
-publish-itsxpress-image:
-runs-on: ubuntu-latest
-steps:
-- uses: actions/checkout@v2
-- name: Login to GitHub Container Registry
-uses: docker/login-action@v1
-with:
-registry: ghcr.io
-username: ${{ github.actor }}
-password: ${{ secrets.GITHUB_TOKEN }}
-- name: Build the itsxpress Docker image
-run: |
-       docker build . --tag ghcr.io/usda-ars-gbru/itsxpress/itsxpress:latest
-       docker run ghcr.io/usda-ars-gbru/itsxpress/itsxpress:latest
-       docker push ghcr.io/usda-ars-gbru/itsxpress/itsxpress:latest
+build-and-publish-head:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/version2' # Running this job only for develop branch
+
+    steps:
+    - uses: actions/checkout@v2 # Checking out the repo
+
+    - name: Build and Publish head Docker image
+      uses: VaultVulp/gp-docker-action@1.0.1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }} # Provide GITHUB_TOKEN to login into the GitHub Packages
+        image-name: itsxpress # Provide Docker image name
+        image-tag: latest # Provide Docker image tag
