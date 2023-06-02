@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:latest
+FROM continuumio/miniconda3:4.10.3
 
 # Install system dependencies
 RUN apt-get update && \
