@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-"""ITSxpress: A python module to rapidly trim ITS amplicon sequences from FASTQ files.
+"""##### This is the end of life version 1 of q2_itsxpress and the command line version of ITSxpress.
+The new version 2 of ITSxpress, has the Qiime2 plugin built in with command line version of ITSxpress. #####
 
-Authors: Adam Rivers, Kyle weber, USDA Agricultural Research Service
+ITSxpress: A python module to rapidly trim ITS amplicon sequences from FASTQ files.
+
+Authors: Adam Rivers, Kyle weber, Sveinn Einarsson, USDA Agricultural Research Service
 
 The internally transcribed spacer region is a region between the highly conserved small
 subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. The eukaryotic ITS contains
@@ -124,7 +127,6 @@ class ItsPosition:
 
     def parse(self):
         """Parses dom table from HMMsearch.
-
         The dom table is parsed and the start and stop position from the top scoring
         hmm math is saved. The start and stop positions of reach sequence are added to the ddict attribute.
 
@@ -501,12 +503,11 @@ class SeqSample:
             self.uc_file=os.path.join(self.tempdir, 'uc.txt')
             self.rep_file=os.path.join(self.tempdir,'rep.fa')
             parameters = ["vsearch",
-                          "--derep_fulllength",
+                          "--fastx_uniques",
                           self.seq_file,
-                          "--output", self.rep_file,
+                          "--fastaout", self.rep_file,
                           "--uc", self.uc_file,
-                          "--strand", "both",
-                          "--threads", str(threads)]
+                          "--strand", "both"]
             p2 = subprocess.run(parameters, stderr=subprocess.PIPE)
             logging.info(p2.stderr.decode('utf-8'))
             p2.check_returncode()
@@ -748,6 +749,28 @@ def _check_fastqs(fastq, fastq2=None):
     if fastq2:
         core(fastq2)
 
+def _check_total_reads(file, file2 = None):
+    """Check the total number of reads in the input file(s).
+    """
+    #Count every fourth line in fastq file.
+    def core(file):
+        if file.endswith('.gz'):
+            f = gzip.open(file, 'rt')
+        else:
+            f = open(file, 'r')
+        n = 0
+        for i, line in enumerate(f):
+            if i % 4 == 0:
+                n += 1
+        f.close()
+        return n
+    
+    reads = core(file)
+    logging.info("Total number of reads in file {} is {}.".format(file, reads))
+    if file2:
+        reads = core(file2)
+        logging.info("Total number of reads in file {} is {}.".format(file2, reads))
+
 # workflow
 
 def main(args=None):
@@ -807,6 +830,16 @@ def main(args=None):
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True, itspos=its_pos)
             else:
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, itspos=its_pos)
+
+        # Count reads after trimming
+        logging.info("Counting reads after trimming.")
+        if args.outfile2:
+            _check_total_reads(args.fastq, args.fastq2)
+            _check_total_reads(args.outfile, args.outfile2)
+        else:
+            _check_total_reads(args.fastq)
+            _check_total_reads(args.outfile)
+
         t1 = time.time()
         fmttime = time.strftime("%H:%M:%S", time.gmtime(t1-t0))
         logging.info("ITSxpress ran in {}".format(fmttime))

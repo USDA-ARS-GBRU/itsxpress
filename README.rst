@@ -1,17 +1,21 @@
 ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) region of FASTQ files
 ==================================================================================================
-.. image:: https://travis-ci.org/USDA-ARS-GBRU/itsxpress.svg?branch=master
-    :target: https://travis-ci.org/USDA-ARS-GBRU/itsxpress
 
 .. image:: https://readthedocs.org/projects/itsxpress/badge/?version=latest
     :target: https://itsxpress.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://codecov.io/gh/USDA-ARS-GBRU/itsxpress/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/USDA-ARS-GBRU/itsxpress
+.. image:: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/python-package-conda.yml/badge.svg
+   :target: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/python-package-conda.yml
+   :alt: Build Status
 
-.. image:: https://api.codacy.com/project/badge/Grade/7e2a4c97cde74bccb3e84b706d7a2aa5
-  :target: https://www.codacy.com/app/GBRU/itsxpress?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=USDA-ARS-GBRU/itsxpress&amp;utm_campaign=Badge_Grade
+.. image:: https://anaconda.org/bioconda/itsxpress/badges/downloads.svg
+   :target: https://anaconda.org/bioconda/itsxpress
+   :alt: Anaconda-Server Badge
+   
+.. image:: https://img.shields.io/github/v/release/USDA-ARS-GBRU/itsxpress?style=social
+   :target: https://github.com/USDA-ARS-GBRU/itsxpress/releases/latest
+   :alt: GitHub release (latest by date)
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1304349.svg
   :target: https://doi.org/10.5281/zenodo.1304349
@@ -19,16 +23,25 @@ ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) reg
 Author
 -------
 * Adam R. Rivers, US Department of Agriculture, Agricultural Research Service
+* Sveinn V. Einarsson, US Department of Agriculture, Agricultural Research Service
 
 
 Citation
 --------
 Rivers AR, Weber KC, Gardner TG et al. ITSxpress: Software to rapidly trim
 internally transcribed spacer sequences with quality scores for marker gene
-analysis [version 1; referees: awaiting peer review]. F1000Research 2018, 7:1418
+analysis [version 1]. F1000Research 2018, 7:1418
 (doi: `10.12688/f1000research.15704.1`_)
 
 .. _`10.12688/f1000research.15704.1`: https://doi.org/10.12688/f1000research.15704.1
+
+#####
+
+**This is the end of life version 1 ITSxpress.
+The new version 2 of ITSxpress, has the Qiime2 plugin built in with the command line version of ITSxpress. See 
+main branch of ITSxpress.**
+
+#####
 
 Introduction
 -------------
@@ -41,9 +54,9 @@ et al. (2013)`_ published software the software package ITSx_ to do this.
 
 ITSxpress is designed to support the calling of exact sequence variants rather than OTUs_.
 This newer method of sequence error-correction requires quality score data from each
-sequence, so each input sequence must be trimmed. ITSXpress makes this possible by
+sequence, so each input sequence must be trimmed. ITSxpress makes this possible by
 taking FASTQ data, de-replicating the sequences then identifying the start and stop
-sites using HMMSearch.  Results are parsed and the trimmed files are returned. The ITS 1,
+sites using HMMSearch.  Results are parsed and the trimmed files are returned. The ITS1,
 ITS2 or the entire ITS region including the 5.8s rRNA gene can be selected. ITSxpress
 uses the hmm model from ITSx so results are comparable.
 
@@ -53,77 +66,121 @@ ITSxpress is also available as a `QIIME2 Plugin`_
 .. _ITSx: http://microbiology.se/software/itsx/
 .. _OTUs: https://doi.org/10.1038/ismej.2017.119
 .. _`QIIME2 Plugin`: https://github.com/USDA-ARS-GBRU/q2_itsxpress
+.. _`mamba installation guide`: https://mamba.readthedocs.io/en/latest/installation.html
 
 
 Installation
 -------------
-ITSxpress can be installed from:
 
-1. Bioconda: (preferred method because it handles dependencies):
+This is the installation of the final iteration of ITSxpress version 1: (BBmap is no longer used in ITSxpress version 2):
+
+	- This version should primarily be used for reproducability with other datasets, which used ITSxpress =<1.8.1
+	- The new version 2 is compatible with the newer versions of Qiime2
+	- **If you want to install this iteration of ITSxpress with Qiime2, then you you need to follow the install instructions here:** `QIIME2 Plugin`_ 
+
+Since this version is no longer supported, you **must** create a new conda environment in order for the depenendencies to be compatible.
+
+
+Example on how to install and create new conda environment for this version of ITSxpress. We are using mamba because it resolves packages better and faster, but conda can be substituted.
+
+	- Information on installing mamba or micromamba (either highly recommended) can be found here: `mamba installation guide`_
+
+.. code-block:: bash
+  
+  mamba create -n ITSxpress_V1EOL python=3.8.13
+  mamba activate ITSxpress_V1EOL
+  #or
+  conda create -n ITSxpress_V1EOL python=3.8.13
+  conda activate ITSxpress_V1EOL
+
+
+
+ITSxpress can be installed in 3 ways:
+--------------------------------------
+
+
+1. **Bioconda:** (preferred method because it handles dependencies):
 
 .. code-block:: bash
 
-    conda install itsxpress
+    mamba install -y -c bioconda itsxpress==1.8.1
 
-2. Pip: https://pypi.org/project/itsxpress/:
+2. **Pip:** https://pypi.org/project/itsxpress/:
+    - If using Pip, you will need to specify the versions of the dependencies listed below before installing itsxpress
 
 .. code-block:: bash
 
+    mamba install -y -c bioconda hmmer==3.1b2
+    mamba install -y -c bioconda bbmap==38.69
+    mamba install -y -c bioconda vsearch==2.21.1
     pip install itsxpress
 
 
-3. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
+3. **The Github repository:** https://github.com/USDA-ARS-GBRU/itsxpress
 
 .. code-block:: bash
 
-    git clone https://github.com/USDA-ARS-GBRU/itsxpress.git
+    git clone -branch 1.8.1-EOL https://github.com/USDA-ARS-GBRU/itsxpress.git
 
 
 Dependencies
 -------------
-The software requires Vsearch, BBtools, Hmmer >= 3.1b and Biopython. Bioconda
+This software requires Vsearch=2.21.1, BBtools=38.69, Hmmer=3.1b2 and Biopython>=1.79. Bioconda
 takes care of this for you so it is the preferred installation method.
 
 
 Usage
 ---------
 
--h, --help            	Show this help message and exit.
 
---fastq 				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file. Interleaved
-                        	or not. Required.
-
---single_end 			A flag to specify that the fastq file is single-ended (not paired).
-                        	single-ended (not paired). Default is false.
-
---fastq2 				A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file representing read 2 if present, optional.
-
---outfile				The trimmed FASTQ file, if it ends in ``gz`` it will be gzipped.
-
---outfile2			The trimmed FASTQ read 2 file, if it ends in ``gz`` it will be gzipped. If used, reads will be retuned as unmerged pairs rather than than merged.
-
---tempdir				Specify the temp file directory. Default is None.
-
---keeptemp				Should intermediate files be kept? Default is false.
-
---region 				Options : {ITS2, ITS1, ALL}
-
---taxa					Select the taxonomic group sequenced: {Alveolata, Bryophyta,
-						Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,
-						Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa,
-						Oomycota, Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,
-						Tracheophyta, Eustigmatophyceae, All}. Default Fungi.
-
---cluster_id            The percent identity for clustering reads range [0.99-1.0], set to 1
-                        for exact de-replication. Default 1.0.
-
---log		          	Log file. Default is ITSxpress.log.
-
---threads		     	Number of processor threads to use. Default is 1.
-
---reversed_primers  Primers are in reverse orientation as in Taylor et al. 2016,
-                    DOI:10.1128/AEM.02576-16. If selected ITSxpress returns
-                    trimmed reads flipped to the forward orientation
++-------------------------+---------------------------------------------------------------+
+| Option                  | Description                                                   |
++=========================+===============================================================+
+| -h, --help              | Show this help message and exit.                              |
++-------------------------+---------------------------------------------------------------+
+| --fastq                 | A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file.      |
+|                         | Interleaved or not. Required.                                 |
++-------------------------+---------------------------------------------------------------+
+| --single_end            | A flag to specify that the fastq file is single-ended (not    |
+|                         | paired). Default is false.                                    |
++-------------------------+---------------------------------------------------------------+
+| --fastq2                | A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file       |
+|                         | representing read 2 if present, optional.                     |
++-------------------------+---------------------------------------------------------------+
+| --outfile               | The trimmed FASTQ file, if it ends in ``gz`` it will be       |
+|                         | gzipped.                                                      |
++-------------------------+---------------------------------------------------------------+
+| --outfile2              | The trimmed FASTQ read 2 file, if it ends in ``gz`` it will   |
+|                         | be gzipped. If used, reads will be retuned as unmerged pairs  |
+|                         | rather than than merged.                                      |
++-------------------------+---------------------------------------------------------------+
+| --tempdir               | Specify the temp file directory. Default is None.             |
++-------------------------+---------------------------------------------------------------+
+| --keeptemp              | Should intermediate files be kept? Default is false.          |
++-------------------------+---------------------------------------------------------------+
+| --region                | Options : {ITS2, ITS1, ALL}                                   |
++-------------------------+---------------------------------------------------------------+
+| --taxa                  | Select the taxonomic group sequenced: {Alveolata, Bryophyta,  |
+|                         | Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,   |
+|                         | Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Oomycota, |
+|                         | Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,        |
+|                         | Tracheophyta, Eustigmatophyceae, All}. Default Fungi.         |
++-------------------------+---------------------------------------------------------------+
+| --cluster_id            | The percent identity for clustering reads range [0.99-1.0],   |
+|                         | set to 1 for exact de-replication. Default 1.0.               |
++-------------------------+---------------------------------------------------------------+
+| --log                   | Log file. Default is ITSxpress.log.                           |
++-------------------------+---------------------------------------------------------------+
+| --threads               | Number of processor threads to use. Default is 1.             |
++-------------------------+---------------------------------------------------------------+
+| --reversed_primers      | Primers are in reverse orientation as in Taylor et al. 2016,  |
+|                         | DOI:10.1128/AEM.02576-16. If selected ITSxpress returns       |
+|                         | trimmed reads flipped to the forward orientation              |
++-------------------------+---------------------------------------------------------------+
+| --allow_staggered_reads | Allow merging staggered reads with --fastq_allowmergestagger  |
+|                         | for Vsearch --fastq_mergepairs. See Vsearch documentation.    |
+|                         | (Optional) Default is true.                                   |
++-------------------------+---------------------------------------------------------------+
 
 
 
