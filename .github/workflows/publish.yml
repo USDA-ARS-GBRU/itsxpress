@@ -1,13 +1,16 @@
-build-and-publish-head:
+name: Build and publish 
+
+on: push
+
+jobs:
+  build-with-multiple-tags:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/version2' # Running this job only for develop branch
 
     steps:
-    - uses: actions/checkout@v2 # Checking out the repo
-
-    - name: Build and Publish head Docker image
-      uses: VaultVulp/gp-docker-action@1.0.1
+    - uses: actions/checkout@v2.5.0 # Checking out the repo
+ 
+    - name: Build and publish Docker image with multiple tags
+      uses: VaultVulp/gp-docker-action@1.6.0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }} # Provide GITHUB_TOKEN to login into the GitHub Packages
         image-name: itsxpress # Provide Docker image name
-        image-tag: latest # Provide Docker image tag
