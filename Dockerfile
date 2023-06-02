@@ -6,6 +6,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+LABEL org.opencontainers.image.source="https://github.com/usda-ars-gbru/itsxpress"
 # Install conda dependencies
 RUN conda install -c bioconda vsearch hmmer
 
