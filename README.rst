@@ -1,8 +1,8 @@
 ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) region of FASTQ files
 ==================================================================================================
 
-.. image:: https://readthedocs.org/projects/itsxpress/badge/?version=latest
-    :target: https://itsxpress.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/itsxpress-package/badge/?version=latest
+    :target: https://itsxpress-package.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
 .. image:: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/python-package-conda.yml/badge.svg
