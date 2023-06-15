@@ -259,7 +259,7 @@ def main(args=None):
         logging.info("Parsing HMM results.")
         its_pos = ItsPosition(domtable=sobj.dom_file, region=args.region)
         # Create deduplication object
-        dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file, fastq=sobj.r1, fastq2=sobj.fastq2, tempdir=sobj.tempdir)
+        dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file, fastq=sobj.r1, fastq2=sobj.fastq2)
         # Trim sequences
         if args.outfile2:
             if args.outfile.split('.')[-1] == 'gz' and args.outfile2.split('.')[-1] == 'gz':

@@ -41,14 +41,13 @@ class Dedup:
         except Exception as e:
             logging.exception("Could not parse the Vsearch '.uc' file.")
             raise e
-    def __init__(self, uc_file, rep_file, seq_file, fastq=None, fastq2=None, tempdir=self.tempdir):
+    def __init__(self, uc_file, rep_file, seq_file, fastq=None, fastq2=None):
         self.matchdict = None
         self.uc_file = uc_file
         self.rep_file = rep_file
         self.seq_file = seq_file
         self.fastq = fastq
         self.fastq2 = fastq2
-        self.tempdir = tempdir
         self.parse()
 
 
