@@ -252,7 +252,7 @@ class Dedup:
         return map(map_func, filt)
 
 
-    def create_trimmed_seqs(self, outfile, gzipped,zstd_file, itspos,wri_file):
+    def create_trimmed_seqs(self, outfile, gzipped,zstd_file, itspos,wri_file, tempdir):
         """Creates a FASTQ file, optionally gzipped, with the reads trimmed to the
             selected region.
         Args:
@@ -264,13 +264,13 @@ class Dedup:
         """
         def _write_seqs():
             if gzipped:
-                tempf = os.path.join(self.tempdir,'temp.fa')
+                tempf = os.path.join(tempdir,'temp.fa')
                 with open(tempf, 'w') as g:
                     SeqIO.write(seqs, g, "fastq")
                 with open(tempf,'rb') as f_in, gzip.open(outfile,'wb') as f_out:
                         f_out.writelines(f_in)
             elif zstd_file:
-                tempf = os.path.join(self.tempdir,'temp.fa')
+                tempf = os.path.join(tempdir,'temp.fa')
                 with open(tempf, 'w') as g:
                     SeqIO.write(seqs, g, "fastq")
                 with open(tempf,'rb') as f_in:
