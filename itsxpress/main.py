@@ -259,7 +259,7 @@ def main(args=None):
         logging.info("Parsing HMM results.")
         its_pos = ItsPosition(domtable=sobj.dom_file, region=args.region)
         # Create deduplication object
-        dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file, fastq=sobj.r1, fastq2=sobj.fastq2)
+        dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file, fastq=sobj.r1, fastq2=sobj.fastq2, tempdir=sobj.tempdir)
         # Trim sequences
         if args.outfile2:
             if args.outfile.split('.')[-1] == 'gz' and args.outfile2.split('.')[-1] == 'gz':
@@ -275,15 +275,15 @@ def main(args=None):
         else:
             if args.outfile.split('.')[-1] == 'gz':
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=True)
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=False)
+                #dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=False)
                 #add function with above create_trimmed_seqs
                 #use said function to check for 0 length seqs
             elif args.outfile.split('.')[-1] == 'zst':
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=True)
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=False)
+                #dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=False)
             else:
                 dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=True)
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=False)
+                #dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=False)
         # Count reads after trimming
         logging.info("Counting reads after trimming.")
         if args.outfile2:
