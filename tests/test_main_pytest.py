@@ -60,7 +60,7 @@ def test_dedup_create_trimmed_seqs():
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq)
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR,"test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	# Check non gzipped
-	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq"), gzipped=False, zstd_file=False, wri_file=True, itspos=itspos)
+	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq"), gzipped=False, zstd_file=False, wri_file=True, itspos=itspos,tempdir=tf)
 	with open(os.path.join(tf,"testout.fastq"), 'r') as f:
 		recs = SeqIO.parse(f, "fastq")
 		n = 0
@@ -82,7 +82,7 @@ def test_dedup_create_trimmed_seqs_gzipped():
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq)
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	# Check gzipped
-	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq.gz"), gzipped=True, zstd_file=False, wri_file=True, itspos=itspos)
+	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq.gz"), gzipped=True, zstd_file=False, wri_file=True, itspos=itspos,tempdir=tf)
 	with gzip.open(os.path.join(tf,"testout.fastq.gz"), 'rt') as f:
 		recs = SeqIO.parse(f, "fastq")
 		n = 0
@@ -104,7 +104,7 @@ def test_dedup_create_trimmed_seqs_zst():
 	dedup = itsxpress.main.Dedup( uc_file=uc, rep_file=rep, seq_file=seq)
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR,"test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
 	# Check zstd compression
-	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq.zst"), gzipped=False, zstd_file=True, wri_file=True, itspos=itspos)
+	dedup.create_trimmed_seqs(os.path.join(tf,"testout.fastq.zst"), gzipped=False, zstd_file=True, wri_file=True, itspos=itspos,tempdir=tf)
 	with zstd.open(os.path.join(tf,"testout.fastq.zst"), 'rt') as f:
 		recs = SeqIO.parse(f, "fastq")
 		n = 0
