@@ -225,7 +225,8 @@ def main(per_sample_sequences,
                                     rep_file=sobj.rep_file,
                                     seq_file=sobj.seq_file,
                                     fastq=sobj.r1,
-                                    fastq2=sobj.fastq2)
+                                    fastq2=sobj.fastq2
+                                    tempdir=sobj.tempdir)
 
         # Copy the original filename, that way we preserve all filename fields.
         out_path_fwd = os.path.join(str(results),
@@ -247,7 +248,8 @@ def main(per_sample_sequences,
                                       gzipped=True,
                                       zstd_file=False,
                                       itspos=its_pos,
-                                      wri_file=True)
+                                      wri_file=True,
+                                      tempdir=sobj.tempdir)
         # Deleting the temp files.
         shutil.rmtree(sobj.tempdir)
     # Writing out the results.
