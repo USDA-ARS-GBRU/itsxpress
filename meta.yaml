@@ -1,0 +1,50 @@
+﻿package:
+  name: '{{ "itsxpress"|lower }}'
+  version: '{{ "2.0.0" }}'
+
+# source
+source:
+  git_url: https://github.com/USDA-ARS-GBRU/itsxpress.git
+  git_tag: version2
+
+build:
+  noarch: python
+  number: 0
+  entry_points:
+    - itsxpress=itsxpress.main:main
+  script: python -m pip install --no-deps --ignore-installed .
+
+requirements:
+  host:
+    - pip
+    - python =3.8.16
+  run:
+    - pip
+    - python =3.8.16
+    - biopython >=1.79
+    - bioconda::hmmer =3.1b2
+    - bioconda::vsearch =2.22.1
+    - pyzstd
+
+test:
+  imports:
+    - itsxpress
+  commands:
+    - itsxpress --help
+
+about:
+  home: http://github.com/usda-ars-gbru/itsxpress
+  license: 'CC0 1.0'
+  license_family: 'PUBLIC-DOMAIN'
+  # license_file: ''
+  summary: 'ITSxpress: Software to rapidly trim the Internally Transcribed Spacer (ITS) region from FASTQ files'
+
+
+extra:
+  recipe-maintainers:
+    - arivers
+    - sveinn.einarsson
+  identifiers:
+    - biotools:ITSxpress
+    - doi:10.5281/zenodo.1304349
+    - doi:10.12688/f1000research.15704.1
