@@ -8,7 +8,7 @@ RUN apt-get update && \
 
 LABEL org.opencontainers.image.source="https://github.com/usda-ars-gbru/itsxpress"
 # Install conda dependencies
-RUN conda install -c bioconda vsearch hmmer
+RUN conda install -c bioconda vsearch=2.22.1 hmmer=3.1b2
 
 # Copy the itsxpress package files and install dependencies
 COPY . /app
