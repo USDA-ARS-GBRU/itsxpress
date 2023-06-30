@@ -25,23 +25,14 @@ Author
 * Adam R. Rivers, US Department of Agriculture, Agricultural Research Service
 * Sveinn V. Einarsson, US Department of Agriculture, Agricultural Research Service
 
-
 Citation
 --------
 Rivers AR, Weber KC, Gardner TG et al. ITSxpress: Software to rapidly trim
 internally transcribed spacer sequences with quality scores for marker gene
-analysis [version 1]. F1000Research 2018, 7:1418
+analysis [version 1; referees: awaiting peer review]. F1000Research 2018, 7:1418
 (doi: `10.12688/f1000research.15704.1`_)
 
 .. _`10.12688/f1000research.15704.1`: https://doi.org/10.12688/f1000research.15704.1
-
-#####
-
-**This is the end of life version 1 ITSxpress.
-The new version 2 of ITSxpress, has the Qiime2 plugin built in with the command line version of ITSxpress. See 
-main branch of ITSxpress.**
-
-#####
 
 Introduction
 -------------
@@ -54,78 +45,65 @@ et al. (2013)`_ published software the software package ITSx_ to do this.
 
 ITSxpress is designed to support the calling of exact sequence variants rather than OTUs_.
 This newer method of sequence error-correction requires quality score data from each
-sequence, so each input sequence must be trimmed. ITSxpress makes this possible by
+sequence, so each input sequence must be trimmed. ITSXpress makes this possible by
 taking FASTQ data, de-replicating the sequences then identifying the start and stop
-sites using HMMSearch.  Results are parsed and the trimmed files are returned. The ITS1,
+sites using HMMSearch.  Results are parsed and the trimmed files are returned. The ITS 1,
 ITS2 or the entire ITS region including the 5.8s rRNA gene can be selected. ITSxpress
 uses the hmm model from ITSx so results are comparable.
 
-ITSxpress is also available as a `QIIME2 Plugin`_
+ITSxpress is also a QIIME2 plugin. Starting from version 2.0.0 of ITSxpress, the QIIME2 plugin is included with
+the command line version of ITSxpress. The installation method will be slightly different depending on whether 
+QIIME2 is being used.
 
 .. _`Bengtsson-Palme et al. (2013)`: https://doi.org/10.1111/2041-210X.12073
 .. _ITSx: http://microbiology.se/software/itsx/
 .. _OTUs: https://doi.org/10.1038/ismej.2017.119
 .. _`QIIME2 Plugin`: https://github.com/USDA-ARS-GBRU/q2_itsxpress
-.. _`mamba installation guide`: https://mamba.readthedocs.io/en/latest/installation.html
 
+
+Environment with or without QIIME2
+-----------------------------------
+Create a new conda environment before installing ITSxpress.
+
+If using QIIME2, follow the installation instructions on their wiki: https://docs.qiime2.org/2022.11/install/native/
+
+As of now ITSxpress is compatible with version 2022.8 and 2022.11 of QIIME2
+
+Example:
+
+.. code-block:: bash
+
+    wget https://data.qiime2.org/distro/core/qiime2-2022.11-py38-osx-conda.yml
+    mamba env create -n qiime2-2022.11 --file qiime2-2022.11-py38-osx-conda.yml
+    mamba activate qiime2-2022.11
+
+If you are only installing the command line version of ITSxpress and not QIIME2:
+
+.. code-block:: bash
+
+    mamba env create -n ITSxpress
+    mamba activate ITSxpress
 
 Installation
 -------------
+Within either conda environment, described above, ITSxpress can be installed from:
 
-This is the installation of the final iteration of ITSxpress version 1: (BBmap is no longer used in ITSxpress version 2):
-
-	- This version should primarily be used for reproducability with other datasets, which used ITSxpress =<1.8.1
-	- The new version 2 is compatible with the newer versions of Qiime2
-	- **If you want to install this iteration of ITSxpress with Qiime2, then you you need to follow the install instructions here:** `QIIME2 Plugin`_ 
-
-Since this version is no longer supported, you **must** create a new conda environment in order for the depenendencies to be compatible.
-
-
-Example on how to install and create new conda environment for this version of ITSxpress. We are using mamba because it resolves packages better and faster, but conda can be substituted.
-
-	- Information on installing mamba or micromamba (either highly recommended) can be found here: `mamba installation guide`_
-
-.. code-block:: bash
-  
-  mamba create -n ITSxpress_V1EOL python=3.8.13
-  mamba activate ITSxpress_V1EOL
-  #or
-  conda create -n ITSxpress_V1EOL python=3.8.13
-  conda activate ITSxpress_V1EOL
-
-
-
-ITSxpress can be installed in 3 ways:
---------------------------------------
-
-
-1. **Bioconda:** (preferred method because it handles dependencies):
+1. Bioconda: (preferred method because it handles dependencies, **Pip is no longer maintained for ITSxpress>=2.0.0**):
 
 .. code-block:: bash
 
-    mamba install -y -c bioconda itsxpress==1.8.1
+    mamba install -c bioconda itsxpress
 
-2. **Pip:** https://pypi.org/project/itsxpress/:
-    - If using Pip, you will need to specify the versions of the dependencies listed below before installing itsxpress
-
-.. code-block:: bash
-
-    mamba install -y -c bioconda hmmer==3.1b2
-    mamba install -y -c bioconda bbmap==38.69
-    mamba install -y -c bioconda vsearch==2.21.1
-    pip install itsxpress
-
-
-3. **The Github repository:** https://github.com/USDA-ARS-GBRU/itsxpress
+2. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
 
 .. code-block:: bash
 
-    git clone -branch 1.8.1-EOL https://github.com/USDA-ARS-GBRU/itsxpress.git
+    git clone https://github.com/USDA-ARS-GBRU/itsxpress.git
 
 
 Dependencies
 -------------
-This software requires Vsearch=2.21.1, BBtools=38.69, Hmmer=3.1b2 and Biopython>=1.79. Bioconda
+The software requires Vsearch, Hmmer and Biopython. Bioconda
 takes care of this for you so it is the preferred installation method.
 
 
@@ -195,8 +173,8 @@ forward and reverse gzipped FASTQ files using two cpu threads. Return a single m
     itsxpress --fastq r1.fastq.gz --fastq2 r2.fastq.gz --region ITS2 \
     --taxa Fungi --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
 
-ITSxpress can take gzipped or un-gzipped FASTQ files and it can write gzipped or
-un-gzipped FASTQ files. It expects FASTQ files to end in: .fq, .fastq, .fq.gz or fastq.gz.
+ITSxpress can take uncompressed, gzipped or zstd compressed FASTQ files and it can write uncompressed, gzipped or
+zstd compressed FASTQ files. It expects FASTQ files to end in: .fq, .fastq, .fq.gz, fastq.gz, .fq.zst or fastq.zst.
 
 Use case 2: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
 forward and reverse gzipped FASTQ files using two cpu threads. Return a forward
@@ -207,20 +185,11 @@ and reverse read files  for use in Dada2.
     itsxpress --fastq r1.fastq.gz --fastq2 r2.fastq.gz --region ITS2 \
     --taxa Fungi --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
 
-ITSxpress can take gzipped or un-gzipped FASTQ files and it can write gzipped or
-un-gzipped FASTQ files. It expects FASTQ files to end in: .fq, .fastq, .fq.gz or fastq.gz.
+ITSxpress can take uncompressed, gzipped or zstd compressed FASTQ files and it can write uncompressed, gzipped or
+zstd compressed FASTQ files. It expects FASTQ files to end in: .fq, .fastq, .fq.gz, fastq.gz, .fq.zst or fastq.zst.
 
 
 Use case 3: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
-an interleaved gzipped FASTQ files using two cpu threads. Return a single merged file for use in Deblur.
-
-.. code-block:: bash
-
-    itsxpress --fastq interleaved.fastq.gz  --region ITS2 --taxa Fungi \
-    --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
-
-
-Use case 4: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
 an single-ended gzipped FASTQ files using two cpu threads.
 
 .. code-block:: bash
@@ -231,17 +200,9 @@ an single-ended gzipped FASTQ files using two cpu threads.
 Single ended data is less common and may come from a dataset where the reads have already
 been merged.
 
-Use case 5: Trimming the ITS1 region from a Alveolata amplicon sequencing dataset with
-an interleaved gzipped FASTQ files using 8 cpu threads.
-
-.. code-block:: bash
-
-    itsxpress --fastq interleaved.fastq.gz --region ITS1 --taxa Alveolata \
-    --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 8
-
-
 License information
 --------------------
 This software is a work of the United States Department of Agriculture,
 Agricultural Research Service and is released under a Creative Commons CC0
 public domain attribution.
+=======

@@ -1,4 +1,8 @@
 include itsxpress/ITSx_db/HMMs/*
 include tests/test_data/*
 include tests/test_data/ex_tmpdir/*
+include tests/test_main_pytest.py
 include LICENSE.txt
+include itsxpress/citations.bib
+include changelog.md 
+include Dockerfile

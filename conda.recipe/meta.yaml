@@ -9,7 +9,7 @@ source:
 
 build:
   noarch: python
-  number: 0
+  number: 2
   entry_points:
     - itsxpress=itsxpress.main:main
   script: python -m pip install --no-deps --ignore-installed .
@@ -17,13 +17,13 @@ build:
 requirements:
   host:
     - pip
-    - python =3.8.16
+    - python ==3.8.13
   run:
     - pip
-    - python =3.8.16
+    - python ==3.8.13
     - biopython >=1.79
-    - bioconda::hmmer =3.1b2
-    - bioconda::vsearch =2.22.1
+    - hmmer ==3.1b2
+    - vsearch ==2.21.1
     - pyzstd
 
 test:

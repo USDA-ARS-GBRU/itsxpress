@@ -1,0 +1,3 @@
+sample-id,filename,direction
+4774-1-MSITS3,4774-1-MSITS3_0_L001_R1_001.fastq.gz,forward
+4774-1-MSITS3,4774-1-MSITS3_1_L001_R2_001.fastq.gz,reverse

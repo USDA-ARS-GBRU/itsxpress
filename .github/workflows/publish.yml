@@ -1,0 +1,32 @@
+name: publish
+
+
+on: [push]
+
+
+jobs:
+
+  publish-itsxpress-image:
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+
+    - name: Build the itsxpress Docker image
+
+      run: |
+
+        echo $CR_PAT | docker login ghcr.io -u seina001 --password-stdin
+
+      env:
+
+        CR_PAT: ${{ secrets.CR_PAT }}
+
+    - name: Publish image
+      run: |
+            docker build . --tag ghcr.io/usda-ars-gbru/itsxpress:latest
+            docker push ghcr.io/usda-ars-gbru/itsxpress:latest
