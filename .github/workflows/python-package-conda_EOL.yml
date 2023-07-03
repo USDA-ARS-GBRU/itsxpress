@@ -3,7 +3,7 @@ name: Weekly Build and Test (1.8.1EOL)
 on:
   push:
     branches:
-      - 1.8.1-EOL
+      - main
   schedule:
     - cron: "0 1 * * 1"
     
@@ -51,6 +51,7 @@ jobs:
         conda install biopython
         pip install pyzstd
         pip install pytest
+
         git clone -b 1.8.1-EOL git@github.com:USDA-ARS-GBRU/itsxpress.git --single-branch
         cd itsxpress
         pip install .
