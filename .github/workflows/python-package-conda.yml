@@ -3,7 +3,7 @@ name: GitHub Actions Weekly Build (V2)
 on:
   push:
     branches:
-      - version2
+      - main
   schedule:
     - cron: "0 0 */7 * *"
     
