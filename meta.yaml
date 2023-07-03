@@ -5,7 +5,6 @@
 # source
 source:
   git_url: https://github.com/USDA-ARS-GBRU/itsxpress.git
-  git_tag: version2
 
 build:
   noarch: python
