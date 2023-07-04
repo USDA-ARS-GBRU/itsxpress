@@ -1,10 +1,16 @@
-﻿package:
-  name: '{{ "itsxpress"|lower }}'
-  version: '{{ "2.0.0" }}'
+﻿{% set name = "itsxpress" %}
+{% set version = "2.0.0" %}
+{% set file_ext = "tar.gz" %}
+{% set hash_type = "sha256" %}
+{% set hash_value = "3306cb809e4b8c69b93a795f0289dbf4b9d8b7ba653f34d94472a62b38f41f6e" %}
 
-# source
+package:
+  name: '{{ name|lower }}'
+  version: '{{ version }}'
+
 source:
-  git_url: https://github.com/USDA-ARS-GBRU/itsxpress.git
+  url: "https://github.com/USDA-ARS-GBRU/{{ name }}/archive/v{{ version }}.tar.gz"
+  '{{ hash_type }}': '{{ hash_value }}'
 
 build:
   noarch: python
