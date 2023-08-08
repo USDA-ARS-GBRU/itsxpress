@@ -15,10 +15,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.7
+    - name: Set up Python 3.8
       uses: actions/setup-python@v3
       with:
-        python-version: '3.8.13'
+        python-version: '3.8.16'
     - run:   |
         sudo apt update
         sudo apt install gcc-10 g++-10
@@ -30,7 +30,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       with:
         activate-environment: testenv
-        python-version: 3.8.13
+        python-version: 3.8.16
         channels: conda-forge,bioconda
         allow-softlinks: true
         channel-priority: flexible
@@ -39,11 +39,11 @@ jobs:
 
     - name: Set up environment
       run: |
-        wget https://data.qiime2.org/distro/core/qiime2-2022.8-py38-linux-conda.yml
-        conda env create -n qiime2-2022.8 --file qiime2-2022.8-py38-linux-conda.yml
+        wget https://data.qiime2.org/distro/core/qiime2-2023.5-py38-linux-conda.yml
+        conda env create -n qiime2-2023.5 --file qiime2-2023.5-py38-linux-conda.yml
     - name: Install Dependencies
       run: |
-        source activate qiime2-2022.8
+        source activate qiime2-2023.5
         conda install biopython
         pip install pyzstd
         pip install pytest
@@ -51,5 +51,5 @@ jobs:
 
     - name: Test with pytest
       run: |
-        source activate qiime2-2022.8
+        source activate qiime2-2023.5
         pytest
