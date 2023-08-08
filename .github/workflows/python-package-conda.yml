@@ -41,7 +41,7 @@ jobs:
       run: |
         wget https://data.qiime2.org/distro/core/qiime2-2023.5-py38-linux-conda.yml
         source activate testenv
-        conda update --file qiime2-2023.5-py38-linux-conda.yml
+        conda env update --file qiime2-2023.5-py38-linux-conda.yml
     - name: Install Dependencies
       run: |
         source activate testenv
