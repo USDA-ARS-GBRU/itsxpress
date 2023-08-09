@@ -51,8 +51,6 @@ jobs:
     - name: Install Dependencies
       run: |
         echo $CONDA_PREFIX
-        $CONDA/bin/conda activate testenv
-        echo $CONDA_PREFIX
         $CONDA/bin/conda install biopython
         pip install pyzstd
         pip install pytest
@@ -64,5 +62,4 @@ jobs:
 
     - name: Test with pytest
       run: |
-        $CONDA/bin/conda activate testenv
         pytest
