@@ -63,4 +63,5 @@ jobs:
 
     - name: Test with pytest
       run: |
+        source activate testenv
         pytest
