@@ -32,6 +32,7 @@ jobs:
         $CONDA/bin/conda list
         $CONDA/bin/conda info --base
         conda create --name testenv python=3.8
+        CONDA_PREFIX=/usr/share/miniconda/envs/testenv
         $CONDA/bin/conda info
         $CONDA/bin/conda list
         
@@ -40,22 +41,26 @@ jobs:
       with:
         channels: conda-forge,bioconda,default
 
-#     - name: Set up environment
-#       run: |
-#         wget https://data.qiime2.org/distro/core/qiime2-2023.5-py38-linux-conda.yml
-#         $CONDA/bin/conda env update --file qiime2-2023.5-py38-linux-conda.yml --name base
-#     - name: Install Dependencies
-#       run: |
-#         echo $CONDA_PREFIX
-#         $CONDA/bin/conda install biopython
-#         pip install pyzstd
-#         pip install pytest
-#         pip install .
-#         qiime
-#         itsxpress
-#         qiime itsxpress
-#         ls
+    - name: Set up environment
+      run: |
+        wget https://data.qiime2.org/distro/core/qiime2-2023.5-py38-linux-conda.yml
+        $CONDA/bin/conda activate testenv
+        $CONDA/bin/conda env update --file qiime2-2023.5-py38-linux-conda.yml --name testenv
+    - name: Install Dependencies
+      run: |
+        echo $CONDA_PREFIX
+        $CONDA/bin/conda activate testenv
+        echo $CONDA_PREFIX
+        $CONDA/bin/conda install biopython
+        pip install pyzstd
+        pip install pytest
+        pip install .
+        qiime
+        itsxpress
+        qiime itsxpress
+        ls
 
-#     - name: Test with pytest
-#       run: |
-#         pytest
+    - name: Test with pytest
+      run: |
+        $CONDA/bin/conda activate testenv
+        pytest
