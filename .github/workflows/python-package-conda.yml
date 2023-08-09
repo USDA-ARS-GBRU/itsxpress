@@ -43,6 +43,10 @@ jobs:
         pip install pyzstd
         pip install pytest
         pip install .
+        qiime
+        itsxpress
+        qiime itsxpress
+        ls
 
     - name: Test with pytest
       run: |
