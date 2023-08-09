@@ -29,7 +29,9 @@ jobs:
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
         echo $CONDA_PREFIX
-        $CONDA/bin/conda env list
+        $CONDA/bin/conda list
+        $CONDA/bin/conda info --base
+        
 #     - name: Initiate conda channels
 #       uses: conda-incubator/setup-miniconda@v2
 #       with:
