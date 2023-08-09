@@ -51,6 +51,7 @@ jobs:
     - name: Install Dependencies
       run: |
         echo $CONDA_PREFIX
+        source activate testenv
         $CONDA/bin/conda install biopython
         pip install pyzstd
         pip install pytest
