@@ -31,6 +31,8 @@ jobs:
         echo $CONDA_PREFIX
         $CONDA/bin/conda list
         $CONDA/bin/conda info --base
+        $CONDA_PREFIX=/usr/share/miniconda
+        echo $CONDA_PREFIX
         
 #     - name: Initiate conda channels
 #       uses: conda-incubator/setup-miniconda@v2
