@@ -31,11 +31,8 @@ jobs:
     - name: Initiate conda channels
       uses: conda-incubator/setup-miniconda@v2
       with:
-        channels: conda-forge,bioconda,free
-        allow-softlinks: true
-        channel-priority: flexible
-        show-channel-urls: true
-        use-only-tar-bz2: true
+        channels: conda-forge,bioconda,default
+        channel-priority: strict
 
     - name: Set up environment
       run: |
