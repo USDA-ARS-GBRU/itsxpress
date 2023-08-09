@@ -31,7 +31,7 @@ jobs:
         echo $CONDA_PREFIX
         $CONDA/bin/conda list
         $CONDA/bin/conda info --base
-        CONDA_PREFIX=/usr/share/miniconda
+        CONDA_PREFIX=/usr/share/miniconda/envs/
         echo $CONDA_PREFIX
         ls $CONDA_PREFIX
         
