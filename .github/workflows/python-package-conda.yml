@@ -32,12 +32,11 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       with:
         channels: conda-forge,bioconda,default
-        channel-priority: strict
 
     - name: Set up environment
       run: |
         wget https://data.qiime2.org/distro/core/qiime2-2023.5-py38-linux-conda.yml
-        $CONDA/bin/conda env update --file qiime2-2023.5-py38-linux-conda.yml --name base
+        $CONDA/bin/conda env update --file qiime2-2023.5-py38-linux-conda.yml
     - name: Install Dependencies
       run: |
         $CONDA/bin/conda install biopython
