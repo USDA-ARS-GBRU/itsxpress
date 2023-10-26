@@ -117,7 +117,7 @@ Usage
 | -h, --help              | Show this help message and exit.                              |
 +-------------------------+---------------------------------------------------------------+
 | --fastq                 | A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file.      |
-|                         | Interleaved or not. Required.                                 |
+|                         |  Required.                                                    |
 +-------------------------+---------------------------------------------------------------+
 | --single_end            | A flag to specify that the fastq file is single-ended (not    |
 |                         | paired). Default is false.                                    |
