@@ -157,7 +157,7 @@ def test_is_paired():
 	assert paired_end == True
 
 	paired_end= itsxpress.main._is_paired("fastq1.fq", None, single_end=False)
-	assert paired_end == True
+	assert paired_end == False
 
 	paired_end= itsxpress.main._is_paired("fastq1.fq", None, single_end=True)
 	assert paired_end == False
