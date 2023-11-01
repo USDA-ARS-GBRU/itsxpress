@@ -89,13 +89,24 @@ def myparser():
 def _is_paired(fastq, fastq2, single_end):
     """Determines the workflow based on file inputs.
     Args:
+    fastq (str): The path to a fastq or fastq.gz file
+    fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
+    single_end (bool): A flag to specify that the FASTQ file is single-ended (not paired). Default is false.
     """
+    paired_end = None
     if fastq and fastq2:
         paired_end = True
     elif single_end:
         paired_end = False
+    elif fastq and not fastq2:
+        paired_end = False
+        logging.info("Only one fastq file provided. Assuming single-end.")
     else:
-        paired_end = True
+        try:
+            assert paired_end != None
+        except AssertionError as a:
+            logging.error("ITSxpress requires either a single-end file or two paired-end files. If this is a single-end file, please use the --single_end flag.")
+            raise a
     return paired_end
 
 def _logger_setup(logfile):
@@ -124,13 +135,14 @@ def _logger_setup(logfile):
         raise e
 
 def _check_fastqs(fastq, fastq2=None):
-    """Verifies the input files are valid fastq or fastq.gz files.
-    Add interleaved explanation
+    """Verifies the input files are valid fastq or fastq.gz files. Also checks for interleaved files which are no longer supported.
     Args:
         fastq (str): The path to a fastq or fastq.gz file
         fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
+
     Raises:
         ValueError: If Biopython detected invalid FASTQ files
+        AssertionError: If interleaved files are detected
     """
     def check_interleaved(file):
         try:
@@ -141,13 +153,13 @@ def _check_fastqs(fastq, fastq2=None):
             else:
                 f = open(file, 'r')
             lines = f.readlines()
-            L1 = lines[0:96:8]
-            L2 = lines[3:96:8]
+            L1 = lines[0:24:8]
+            L2 = lines[4:24:8]
             L1_old = [i.strip().split('/', 1)[0] for i in L1]
             L2_old = [i.strip().split('/', 1)[0] for i in L2]
             L1_new = [i.strip().split(' ', 1)[0] for i in L1]
             L2_new = [i.strip().split(' ', 1)[0] for i in L2]
-            assert L1_old != L2_old or L1_new != L2_new
+            assert L1_old != L2_old and L1_new != L2_new
 
         except AssertionError as a:
             logging.error("'File may be interleaved. ITSxpress will run with errors. Check BBmap reformat.sh to split interleaved files before using ITSxpress.")
