@@ -1,3 +1,9 @@
+2.0.1 (2023-11-07)
+------------------
+Fix single-end logic bug, which looked for a reverse read file even if single-end reads were provided because the single_end flag wasn't indicated by user.
+
+Fix unit test bug, which was failing because the test data was interleaved and the test was expecting single-end reads. This was due to the logic bug mentioned above being fixed.
+
 2.0.0 (2023-06-28)
 ------------------
 Release Highlights
