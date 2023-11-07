@@ -9,7 +9,7 @@ RUN apt-get update && \
 LABEL org.opencontainers.image.source="https://github.com/usda-ars-gbru/itsxpress"
 # Install conda dependencies
 RUN conda update mamba -c conda-forge
-RUN mamba install -c conda-forge python=3.8.16
+RUN mamba install -c conda-forge python>3.8
 RUN mamba install -c bioconda vsearch=2.22.1 hmmer=3.1b2
 
 # Copy the itsxpress package files and install dependencies
