@@ -15,7 +15,7 @@ RUN mamba install -c bioconda vsearch=2.22.1 hmmer=3.1b2
 # Copy the itsxpress package files and install dependencies
 COPY . /app
 WORKDIR /app
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir ./app/
 
 # Set the default command to run itsxpress
 CMD ["itsxpress"]
