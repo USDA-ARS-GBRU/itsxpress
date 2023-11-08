@@ -67,7 +67,7 @@ Create a new conda environment before installing ITSxpress.
 
 If using QIIME2, follow the installation instructions on their wiki: https://docs.qiime2.org/2022.11/install/native/
 
-As of now ITSxpress is compatible with version 2022.8 and 2022.11 of QIIME2
+As of now ITSxpress is compatible with newest versions of QIIME2. The following instructions are for QIIME2 2022.11.
 
 Example:
 
@@ -117,7 +117,7 @@ Usage
 | -h, --help              | Show this help message and exit.                              |
 +-------------------------+---------------------------------------------------------------+
 | --fastq                 | A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file.      |
-|                         |  Required.                                                    |
+|                         | Required.                                                     |
 +-------------------------+---------------------------------------------------------------+
 | --single_end            | A flag to specify that the fastq file is single-ended (not    |
 |                         | paired). Default is false.                                    |
@@ -205,4 +205,4 @@ License information
 This software is a work of the United States Department of Agriculture,
 Agricultural Research Service and is released under a Creative Commons CC0
 public domain attribution.
-=======
+

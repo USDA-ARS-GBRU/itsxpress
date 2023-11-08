@@ -10,8 +10,6 @@ ITSxpress is a high-speed implementation of the methods in ITSx than also allows
 files to be processed. Processing FASTQ files Which is essential for analyzing
 sequences using the newer exact Sequence Variant methods in Qiime2, Dada2, Deblur
 and Unoise that are replacing OTU clustering.
-ITSxpress is also available as a QIIME Plugin. See
-https://github.com/USDA-ARS-GBRU/q2_itsxpress for details.
 Process:
     * Merges and error corrects reads using Vsearch if reads are paired-end
     * Deduplicates reads using Vsearch to eliminate redundant hmm searches
