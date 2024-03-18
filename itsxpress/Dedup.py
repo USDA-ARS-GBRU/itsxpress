@@ -97,7 +97,9 @@ class Dedup:
             repseq = self.matchdict[record1.id]
             start, stop, tlen = itspos.get_position(repseq)
             r2start = tlen - stop
-            return record1[start:], record2[r2start:]
+            r2end = tlen - start #calculate end of R2
+            return record1[start:stop], record2[r2start:r2end] #trim both R1 and R2 three-prime ends based on stop sites
+
 
         def _split_gen(gen):
             gen_a, gen_b = tee(gen, 2)
