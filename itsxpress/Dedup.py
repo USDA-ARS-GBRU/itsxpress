@@ -98,8 +98,23 @@ class Dedup:
             start, stop, tlen = itspos.get_position(repseq)
             r2start = tlen - stop
             r2end = tlen - start #calculate end of R2
-            return record1[start:stop], record2[r2start:r2end] #trim both R1 and R2 three-prime ends based on stop sites
-
+            try:
+                if stop > tlen:
+                    record1_return = record1[start:]
+                elif stop <= tlen:
+                    record1_return = record1[start:stop]
+                else: 
+                    raise ValueError("An error occurred when trimming the forward read of {}".format(record1.id))
+                if r2end > tlen:
+                    record2_return = record2[r2start:]
+                elif r2end <= tlen:
+                    record2_return = record2[r2start:r2end]
+                else:
+                    raise ValueError("An error occurred when trimming the reverse read of {}".format(record2.id))
+            except ValueError as e:
+                logging.exception(e)
+                raise e
+            return record1_return, record2_return
 
         def _split_gen(gen):
             gen_a, gen_b = tee(gen, 2)
