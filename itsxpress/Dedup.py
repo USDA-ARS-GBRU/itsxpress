@@ -1,4 +1,5 @@
 import logging
+logger = logging.getLogger(__name__)
 import gzip
 import pyzstd as zstd
 import os
@@ -98,6 +99,8 @@ class Dedup:
             start, stop, tlen = itspos.get_position(repseq)
             r2start = tlen - stop
             r2end = tlen - start #calculate end of R2
+            #Log start, stop, and tlen, r2start, r2end with names and sequence ids
+            logging.info("Start: {} Stop: {} Tlen: {} R2start: {} R2end: {} for sequence ID: {}".format(start, stop, tlen, r2start, r2end, record1.id))
             try:
                 if stop > tlen:
                     record1_return = record1[start:]
