@@ -264,9 +264,6 @@ def test_create_paired_trimmed_seqs():
 	t1 = os.path.join(tf,'t2_r1.fq')
 	t2 = os.path.join(tf,'t2_r2.fq')
 	dedup.create_paired_trimmed_seqs(t1, t2, False,False, itspos,True)
-	#Save t1 and t2 to /test_data/ for comparison
-	shutil.copy(t1, os.path.join(TEST_DIR, "test_data", "t2_r1_new.fq"))
-	shutil.copy(t2, os.path.join(TEST_DIR, "test_data", "t2_r2_new.fq"))
 	assert (filecmp.cmp(t1, os.path.join(TEST_DIR, "test_data", "t2_r1.fq")))
 	assert (filecmp.cmp(t2, os.path.join(TEST_DIR, "test_data", "t2_r2.fq")))
 	shutil.rmtree(tf)
