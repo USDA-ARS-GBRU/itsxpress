@@ -1,4 +1,5 @@
 import logging
+logger = logging.getLogger(__name__)
 
 class ItsPosition:
     """Class for ITS positional information derived from hmmserach domtable files.

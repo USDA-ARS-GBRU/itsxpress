@@ -4,6 +4,7 @@ from itsxpress.SeqSample import SeqSample
 
 import subprocess
 import logging
+logger = logging.getLogger(__name__)
 import os
 import pyzstd as zstd
 

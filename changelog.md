@@ -1,3 +1,11 @@
+2.0.2 (2024-3-20)
+------------------
+- Fixed a bug where the 3' end of the ITS region was not being trimmed from both forward and reverse reads if the read extended past the ITS region. This was due to the trimming being done at the start of both forward and reverse reads and not the end of each read. Thus if the read overlaped the opposite end of the ITS read, part of the conserved region would still be found on the ends of the forward and reverse read. This was fixed by trimming to just the ITS region for both forward and reverse reads. This bug did not affect the results of ASV calling with Dada2 becasue Dada2 ignored sequecne beyond the ITS region.  This fix will make the output more consistent with expectation.
+
+- Fixed a bug for submodule logging, where submodules were not logging to the main log file. This was fixed by passing the log file to the submodules and having them write to the same log file. This issue was introduced in version 2.0.0.
+
+- Added unit test to confirm that the 3' end of the ITS region is being trimmed from both forward and reverse reads.
+
 2.0.1 (2023-11-07)
 ------------------
 Fix single-end logic bug, which looked for a reverse read file even if single-end reads were provided because the single_end flag wasn't indicated by user.
