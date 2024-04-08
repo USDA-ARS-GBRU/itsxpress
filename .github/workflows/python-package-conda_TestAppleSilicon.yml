@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - main
-    
 jobs:
-  build-linux:
-    runs-on: macos-14
+  example-13:
+    name: Ex13 (os=${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 5
+      fail-fast: false
+      matrix:
+        os: ["macos-14"]
     steps:
       - uses: actions/checkout@v4
       - uses: ./
@@ -21,48 +23,4 @@ jobs:
         shell: bash -el {0}
         run: |
           conda install -y python
-          python -c "import platform; assert platform.machine() == 'arm64', platform.machine()"
-      - run:   |
-        #sudo apt update
-        #sudo apt install gcc-10 g++-10
-      - name: Add conda to system path
-        run: |
-          # $CONDA is an environment variable pointing to the root of the miniconda directory
-          echo $CONDA/bin >> $GITHUB_PATH
-          echo $CONDA_PREFIX
-          $CONDA/bin/conda list
-          $CONDA/bin/conda info --base
-          CONDA_SUBDIR=osx-64 conda create --name testenv python
-          #CONDA_PREFIX=/usr/share/miniconda/envs/testenv
-          conda config --env --set subdir
-          $CONDA/bin/conda info
-          $CONDA/bin/conda list
-        
-      - name: Initiate conda channels
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          channels: conda-forge,bioconda,default
-          activate-environment: testenv
-          auto-activate-base: false
-  
-  
-      - name: Set up environment
-        run: |
-          wget https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2023.9-py38-linux-conda.yml
-          $CONDA/bin/conda env update --file qiime2-amplicon-2023.9-py38-linux-conda.yml --name testenv
-      - name: Install Dependencies
-        run: |
-          echo $CONDA_PREFIX
-          source activate testenv
-          $CONDA/bin/conda install biopython
-          pip install pyzstd
-          pip install pytest
-          pip install .
-          qiime
-          #itsxpress
-          #qiime itsxpress
-          #ls
-      - name: Test with pytest
-        run: |
-          source activate testenv
-          pytest
+          python -c "import platform; assert platform.machine() == 'arm64', platform.machine()"    
