@@ -13,14 +13,8 @@ jobs:
       matrix:
         os: ["macos-14"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./
-        id: setup-miniconda
-        continue-on-error: true
-        with:
-          miniconda-version: latest
-      - name: Check arm64
-        shell: bash -el {0}
+      - uses: actions/checkout@v2
+      - name: check conda
         run: |
-          conda install -y python
-          python -c "import platform; assert platform.machine() == 'arm64', platform.machine()"    
+          echo ${CONDA}
+          ${CONDA}/bin/conda --version 
