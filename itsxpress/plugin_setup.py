@@ -37,7 +37,7 @@ plugin = Plugin(
     citations=Citations.load('citations.bib', package='itsxpress')
 )
 
-taxaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'ALL', 'O', 'P', 'Q', 'R', 'S', 'T', 'U']
+taxaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'ALL', 'O', 'P', 'Q', 'R', 'S', 'T', 'U','Y']
 
 plugin.methods.register_function(
     function=trim_single,
@@ -82,6 +82,7 @@ plugin.methods.register_function(
                 '\nS = Synurophyceae\n'
                 '\nT = Tracheophyta (higher plants)\n'
                 '\nU = Eustigmatophyceae\n'
+                '\nY = Parabasalia\n'
                 '\nALL = All'
 )
 
@@ -132,6 +133,7 @@ plugin.methods.register_function(
                 '\nS = Synurophyceae\n'
                 '\nT = Tracheophyta (higher plants)\n'
                 '\nU = Eustigmatophyceae\n'
+                '\nY = Parabasalia\n'
                 '\nALL = All'
 
 )
@@ -183,6 +185,7 @@ plugin.methods.register_function(
                 '\nS = Synurophyceae\n'
                 '\nT = Tracheophyta (higher plants)\n'
                 '\nU = Eustigmatophyceae\n'
+                '\nY = Parabasalia\n'
                 '\nALL = All'
 
 )

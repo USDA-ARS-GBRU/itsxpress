@@ -95,7 +95,7 @@ def _taxa_prefix_to_taxa(taxa_prefix: str) -> str:
     taxa_dic = {"A": "Alveolata", "B": "Bryophyta", "C": "Bacillariophyta", "D": "Amoebozoa", "E": "Euglenozoa",
                 "F": "Fungi", "G": "Chlorophyta", "H": "Rhodophyta", "I": "Phaeophyceae", "L": "Marchantiophyta",
                 "M": "Metazoa", "O": "Oomycota", "P": "Haptophyceae", "Q": "Raphidophyceae", "R": "Rhizaria",
-                "S": "Synurophyceae", "T": "Tracheophyta", "U": "Eustigmatophyceae", "ALL": "All"}
+                "S": "Synurophyceae", "T": "Tracheophyta", "U": "Eustigmatophyceae","Y": "Parabasalia", "ALL": "All"}
     taxa_choice = taxa_dic[taxa_prefix]
     return taxa_choice
 

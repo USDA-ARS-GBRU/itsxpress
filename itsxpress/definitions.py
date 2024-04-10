@@ -27,19 +27,19 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 # T = Tracheophyta (higher plants)
 # U = Eustigmatophyceae
 # X = Apusozoa (No longer present in ITSx files)
-# Y = Parabasalia (No longer present in ITSx files)
+# Y = Parabasalia
 
 taxa_choices = ["Alveolata", "Bryophyta", "Bacillariophyta","Amoebozoa", "Euglenozoa", "Fungi",
  "Chlorophyta","Rhodophyta","Phaeophyceae","Marchantiophyta","Metazoa",
  "Oomycota","Haptophyceae", "Raphidophyceae"," Rhizaria","Synurophyceae",
- "Tracheophyta","Eustigmatophyceae", "All"]
+ "Tracheophyta","Eustigmatophyceae","Parabasalia", "All"]
 
 taxa_dict = {"Alveolata":"A.hmm","Bryophyta":"B.hmm", "Bacillariophyta":"C.hmm",
  "Amoebozoa":"D.hmm", "Euglenozoa":"E.hmm", "Fungi":"F.hmm","Chlorophyta":"G.hmm",
  "Rhodophyta":"H.hmm","Phaeophyceae":"I.hmm","Marchantiophyta":"L.hmm","Metazoa":"M.hmm",
  "Oomycota":"O.hmm","Haptophyceae":"P.hmm",
  "Raphidophyceae":"Q.hmm"," Rhizaria":"R.hmm","Synurophyceae":"S.hmm",
- "Tracheophyta":"T.hmm","Eustigmatophyceae":"U.hmm","All":"all.hmm"}
+ "Tracheophyta":"T.hmm","Eustigmatophyceae":"U.hmm","Parabasalia":"Y.hmm","All":"all.hmm"}
 
 
 maxmismatches=40
