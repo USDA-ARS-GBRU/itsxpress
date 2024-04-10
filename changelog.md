@@ -1,3 +1,15 @@
+2.1.0 (2024-4-10)
+------------------
+- HMMs are updated to version 2 of the HMM database curated by Henrik Nilson at the University of Gothenburg.  
+    -Version 2 (see https://github.com/USDA-ARS-GBRU/ITS_HMMs)
+    -5 April 2024
+
+    New Updates to models A, D, E, F, O, P, R to impove support for oomycetes and fungal taxa with deviant ribosomal genes, notably Wickerhamiella, Calocera, and Mucoromycotina fine root endophytes
+
+    Addition of Y.hmm to support Parabasalia
+- Added option of Y.hmm to ITSxpress standalone and Qiime2 plugin
+- Added documentation for Apple Silicon chip support.
+ 
 2.0.2 (2024-3-20)
 ------------------
 - Fixed a bug where the 3' end of the ITS region was not being trimmed from both forward and reverse reads if the read extended past the ITS region. This was due to the trimming being done at the start of both forward and reverse reads and not the end of each read. Thus if the read overlaped the opposite end of the ITS read, part of the conserved region would still be found on the ends of the forward and reverse read. This was fixed by trimming to just the ITS region for both forward and reverse reads. This bug did not affect the results of ASV calling with Dada2 becasue Dada2 ignored sequecne beyond the ITS region.  This fix will make the output more consistent with expectation.

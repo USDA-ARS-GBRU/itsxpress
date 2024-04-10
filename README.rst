@@ -69,7 +69,7 @@ If using QIIME2, follow the installation instructions on their wiki: https://doc
 
 As of now ITSxpress is compatible with newest versions of QIIME2. The following instructions are for QIIME2 2022.11.
 
-Example:
+Example for OSX installation, please see Qiime documentation for other operating systems:
 
 .. code-block:: bash
 
@@ -93,6 +93,15 @@ Within either conda environment, described above, ITSxpress can be installed fro
 .. code-block:: bash
 
     mamba install -c bioconda itsxpress
+
+
+1.1 Bioconda installation for Apple Silicon (M1, M2, M3, etc.) installation example:
+
+.. code-block:: bash
+
+    CONDA_SUBDIR=osx-64 mamba create -n itsxpressenv -c bioconda -c conda-forge itsxpress
+    mamba activate itsxpressenv
+    conda  config --env --set subdir osx-64
 
 2. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
 
@@ -142,7 +151,8 @@ Usage
 |                         | Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,   |
 |                         | Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Oomycota, |
 |                         | Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,        |
-|                         | Tracheophyta, Eustigmatophyceae, All}. Default Fungi.         |
+|                         | Tracheophyta, Eustigmatophyceae, Parabasalia, All}.           |
+|                         | Default Fungi.                                                |
 +-------------------------+---------------------------------------------------------------+
 | --cluster_id            | The percent identity for clustering reads range [0.99-1.0],   |
 |                         | set to 1 for exact de-replication. Default 1.0.               |
