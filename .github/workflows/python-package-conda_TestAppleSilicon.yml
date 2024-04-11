@@ -18,9 +18,4 @@ jobs:
         source activate itsxpressenv
         conda  config --env --set subdir osx-64
         conda install biopython
-        pip install pyzstd
-        pip install pytest
-        git clone https://github.com/USDA-ARS-GBRU/itsxpress.git
-        cd itsxpress
-        pip install .
-        pytest
+
