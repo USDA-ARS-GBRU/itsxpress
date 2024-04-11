@@ -12,6 +12,8 @@ jobs:
         curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
         bash Miniconda3-latest-MacOSX-x86_64.sh -b -p $HOME/miniconda
         export PATH="$HOME/miniconda/bin:$PATH"
+    - name: Install Dependencies
+      run: |
         conda init bash
         CONDA_SUBDIR=osx-64 conda create -n itsxpressenv -c bioconda -c conda-forge itsxpress
         conda init
@@ -21,8 +23,7 @@ jobs:
         pip install pyzstd
         pip install pytest
         pip install .
-        #qiime
-        #itsxpress
-        #qiime itsxpress
-        #ls
+    - name: Test with pytest
+      run: |
+        source activate itsxpressenv
         pytest
