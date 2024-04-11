@@ -22,6 +22,8 @@ jobs:
         conda install biopython
         pip install pyzstd
         pip install pytest
+        git clone https://github.com/USDA-ARS-GBRU/itsxpress.git
+        cd itsxpress
         pip install .
     - name: Test with pytest
       run: |
