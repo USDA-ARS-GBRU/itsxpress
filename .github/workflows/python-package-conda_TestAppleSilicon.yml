@@ -17,4 +17,20 @@ jobs:
         conda init
         source activate itsxpressenv
         conda  config --env --set subdir osx-64
-        itsxpress
+    - name: Install Dependencies
+      run: |
+        source activate itsxpressenv
+        conda  config --env --set subdir osx-64
+        conda install biopython
+        pip install pyzstd
+        pip install pytest
+        pip install .
+        #qiime
+        #itsxpress
+        #qiime itsxpress
+        #ls
+
+    - name: Test with pytest
+      run: |
+        source activate testenv
+        pytest
