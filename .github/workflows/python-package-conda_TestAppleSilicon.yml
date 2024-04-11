@@ -1,38 +1,27 @@
 name: GitHub Action Apple Silicon Test
 
-on:
-  push:
-    branches:
-      - main
+#A workflow (github action) that tests installation of itsxpress on Apple Silicon (arm64) using conda
+on: [push, pull_request]
+
 jobs:
-  example-13:
-    name: Ex13 (os=${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+  build:
+    runs-on: macos-latest
     strategy:
-      fail-fast: false
       matrix:
-        os: ["macos-14"]
+        python-version: [3.8, 3.9, 3.10]
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.13
-      - name: Install dependencies
-        run: |
-          # $CONDA is an environment variable pointing to the root of the miniconda directory
-      - run:   |
-          #sudo apt update
-          #sudo apt install gcc-10 g++-10
-      - name: Add conda to system path
-        run: |
-          # $CONDA is an environment variable pointing to the root of the miniconda directory
-          echo $CONDA/bin >> $GITHUB_PATH
-          echo $CONDA_PREFIX
-          $CONDA/bin/conda list
-          $CONDA/bin/conda info --base
-          CONDA_SUBDIR=osx-64 conda create --name testenv python=3.10
-          #CONDA_PREFIX=/usr/share/miniconda/envs/testenv
-          $CONDA/bin/conda info
-          $CONDA/bin/conda list
-          
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install conda
+      run: |
+        curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+        bash Miniconda3-latest-MacOSX-x86_64.sh -b -p $HOME/miniconda
+        export PATH="$HOME/miniconda/bin:$PATH"
+        conda init bash
+        conda create -n test-itsxpress python=${{ matrix.python-version }}
+        conda activate test-itsxpress
+        conda install -c conda-forge biopython hmmer vsearch pyzstd
+
