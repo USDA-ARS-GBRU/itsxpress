@@ -5,16 +5,8 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.9, 3.10]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    runs-on: macos-14
+    steps:     
     - name: Install conda
       run: |
         curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
@@ -24,4 +16,3 @@ jobs:
         conda create -n test-itsxpress python=${{ matrix.python-version }}
         conda activate test-itsxpress
         conda install -c conda-forge biopython hmmer vsearch pyzstd
-
