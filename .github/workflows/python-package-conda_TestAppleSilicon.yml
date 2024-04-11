@@ -15,6 +15,6 @@ jobs:
         conda init bash
         CONDA_SUBDIR=osx-64 conda create -n itsxpressenv -c bioconda -c conda-forge itsxpress
         conda init
-        conda activate itsxpressenv
+        source activate itsxpressenv
         conda  config --env --set subdir osx-64
         itsxpress
