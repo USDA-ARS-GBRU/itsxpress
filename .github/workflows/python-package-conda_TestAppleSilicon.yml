@@ -13,6 +13,8 @@ jobs:
         bash Miniconda3-latest-MacOSX-x86_64.sh -b -p $HOME/miniconda
         export PATH="$HOME/miniconda/bin:$PATH"
         conda init bash
-        conda create -n test-itsxpress python=${{ matrix.python-version }}
-        conda activate test-itsxpress
-        conda install -c conda-forge biopython hmmer vsearch pyzstd
+        CONDA_SUBDIR=osx-64 conda create -n itsxpressenv -c bioconda -c conda-forge itsxpress
+        conda init
+        conda activate itsxpressenv
+        conda  config --env --set subdir osx-64
+        itsxpress
