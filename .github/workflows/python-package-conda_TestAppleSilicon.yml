@@ -14,10 +14,10 @@ jobs:
         os: ["macos-14"]
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.8
+      - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.10
       - name: Install dependencies
         run: |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
@@ -31,7 +31,7 @@ jobs:
           echo $CONDA_PREFIX
           $CONDA/bin/conda list
           $CONDA/bin/conda info --base
-          CONDA_SUBDIR=osx-64 conda create --name testenv python=3.8.16
+          CONDA_SUBDIR=osx-64 conda create --name testenv python=3.10
           #CONDA_PREFIX=/usr/share/miniconda/envs/testenv
           $CONDA/bin/conda info
           $CONDA/bin/conda list
