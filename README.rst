@@ -61,41 +61,58 @@ QIIME2 is being used.
 .. _`QIIME2 Plugin`: https://github.com/USDA-ARS-GBRU/q2_itsxpress
 
 
-Environment with or without QIIME2
------------------------------------
-Create a new conda environment before installing ITSxpress.
+Installing ITSxpress for use as a QIIME2 Plugin
+----------------------------------------------------
 
-If using QIIME2, follow the installation instructions on their wiki: https://docs.qiime2.org/2022.11/install/native/
+To install ITSxpress as a plugin for QIIME 2 first install QIIME 2 as a separate Conda/Mamba environemnt using thier instructions 
+https://docs.qiime2.org/2024.2/install/ then add ITSxress to the QIIME 2 Conda environment. The examples below are for QIIME2 2 
+version 2024.2 an so please update the commands if you want a newer release.
+ 
 
-As of now ITSxpress is compatible with newest versions of QIIME2. The following instructions are for QIIME2 2022.11.
-
-Example for OSX installation, please see Qiime documentation for other operating systems:
-
-.. code-block:: bash
-
-    wget https://data.qiime2.org/distro/core/qiime2-2022.11-py38-osx-conda.yml
-    mamba env create -n qiime2-2022.11 --file qiime2-2022.11-py38-osx-conda.yml
-    mamba activate qiime2-2022.11
-
-If you are only installing the command line version of ITSxpress and not QIIME2:
+For Linux:
 
 .. code-block:: bash
 
-    mamba env create -n ITSxpress
-    mamba activate ITSxpress
+    wget https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.2-py38-linux-conda.yml
+    mamba create -n qiime2-amplicon-2024.2 --file qiime2-amplicon-2024.2-py38-linux-conda.yml
+    mamba activate qiime2-amplicon-2024.2
+    mamba install ITSxpress
+    qiime dev refresh-cache
 
-Installation
--------------
-Within either conda environment, described above, ITSxpress can be installed from:
-
-1. Bioconda: (preferred method because it handles dependencies, **Pip is no longer maintained for ITSxpress>=2.0.0**):
+For maxOS (Intel) and OS X:
 
 .. code-block:: bash
 
-    mamba install -c bioconda itsxpress
+    wget https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.2-py38-osx-conda.yml
+    mamba create -n qiime2-amplicon-2024.2 --file qiime2-amplicon-2024.2-py38-osx-conda.yml
+    mamba activate qiime2-amplicon-2024.2
+    mamba install ITSxpress
+    qiime dev refresh-cache
+
+For macOS (Arm / Apple Silicon):
+
+.. code-block:: bash
+
+    wget https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.2-py38-osx-conda.yml
+    CONDA_SUBDIR=osx-64 mamba create -n qiime2-amplicon-2024.2 --file qiime2-amplicon-2024.2-py38-osx-conda.yml
+    mamba activate qiime2-amplicon-2024.2
+    mamba config --env --set subdir osx-64
+    mamba install ITSxpress
+    qiime dev refresh-cache
 
 
-1.1 Bioconda installation for Apple Silicon (M1, M2, M3, etc.) installation example:
+Installing ITSxpress for standalone use
+-------------------------------------------
+
+For Linux, maxOS (Intel), and OS X:
+
+.. code-block:: bash
+
+    mamba create -n itsxpressenv -c bioconda -c conda-forge itsxpress
+    mamba activate itsxpressenv 
+
+
+For macOS (Arm/Apple Silicon):
 
 .. code-block:: bash
 
@@ -103,11 +120,14 @@ Within either conda environment, described above, ITSxpress can be installed fro
     mamba activate itsxpressenv
     conda  config --env --set subdir osx-64
 
-2. The Github repository: https://github.com/USDA-ARS-GBRU/itsxpress
+
+Running ITSxpress as a Docker container
+-------------------------------------------
 
 .. code-block:: bash
-
-    git clone https://github.com/USDA-ARS-GBRU/itsxpress.git
+    
+    docker pull ghcr.io/usda-ars-gbru/itsxpress
+    docker run [Options...] itsxpress
 
 
 Dependencies
