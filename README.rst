@@ -72,6 +72,7 @@ version 2024.2 an so please update the commands if you want a newer release.
 For Linux:
 
 .. code-block:: bash
+
     wget https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.2-py38-linux-conda.yml
     mamba create -n qiime2-amplicon-2024.2 --file qiime2-amplicon-2024.2-py38-linux-conda.yml
     mamba activate qiime2-amplicon-2024.2
@@ -124,6 +125,7 @@ Running ITSxpress as a Docker container
 -------------------------------------------
 
 .. code-block:: bash
+    
     docker pull ghcr.io/usda-ars-gbru/itsxpress
     docker run [Options...] itsxpress
 
