@@ -1,4 +1,4 @@
-ITSxpress: Software to rapidly trim  the Internally transcribed spacer (ITS) region of FASTQ files
+ITSxpress: Software to rapidly trim  the internal transcribed spacer (ITS) region of FASTQ files
 ==================================================================================================
 
 .. image:: https://readthedocs.org/projects/itsxpress-package/badge/?version=latest
