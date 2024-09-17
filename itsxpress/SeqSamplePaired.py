@@ -1,16 +1,12 @@
-from itsxpress.SeqSample import SeqSample
-
-
 
 import subprocess
 import logging
-logger = logging.getLogger(__name__)
 import os
-import pyzstd as zstd
 
-from Bio import SeqIO
-
+from itsxpress.SeqSample import SeqSample
 from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio, vsearch_fastq_qmax
+
+logger = logging.getLogger(__name__)
 
 class SeqSamplePairedNotInterleaved(SeqSample):
     """SeqSample class extended to paired, two FASTQ file format.
@@ -43,23 +39,23 @@ class SeqSamplePairedNotInterleaved(SeqSample):
 
             if stagger:
                 parameters = ['vsearch',
-                          '--fastq_mergepairs' , self.r1,
-                          '--reverse' , self.fastq2,
-                          '--fastqout' ,seq_file,
-                          '--fastq_maxdiffs' , str(maxmismatches),
-                          '--fastq_maxee' , str(2),
-                          '--threads'  ,str(threads),
-                          '--fastq_allowmergestagger'
-                          '--fastq_qmax' ,str(vsearch_fastq_qmax)]
+                          '--fastq_mergepairs', self.r1,
+                          '--reverse', self.fastq2,
+                          '--fastqout', seq_file,
+                          '--fastq_maxdiffs', str(maxmismatches),
+                          '--fastq_maxee', str(2),
+                          '--threads', str(threads),
+                          '--fastq_allowmergestagger',
+                          '--fastq_qmax', str(vsearch_fastq_qmax)]
             else:
                 parameters = ['vsearch',
-                          '--fastq_mergepairs' , self.r1,
-                          '--reverse' , self.fastq2,
-                          '--fastqout' ,seq_file,
-                          '--fastq_maxdiffs' , str(maxmismatches),
-                          '--fastq_maxee' , str(2),
-                          '--threads'  ,str(threads),
-                          '--fastq_qmax' ,str(vsearch_fastq_qmax)]
+                          '--fastq_mergepairs', self.r1,
+                          '--reverse', self.fastq2,
+                          '--fastqout', seq_file,
+                          '--fastq_maxdiffs', str(maxmismatches),
+                          '--fastq_maxee', str(2),
+                          '--threads', str(threads),
+                          '--fastq_qmax', str(vsearch_fastq_qmax)]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             self.seq_file = seq_file
             p1.check_returncode()

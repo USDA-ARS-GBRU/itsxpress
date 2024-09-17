@@ -1,10 +1,9 @@
 import os
 import logging
-logger = logging.getLogger(__name__)
 import tempfile
 import subprocess
 
-
+logger = logging.getLogger(__name__)
 
 class SeqSample:
     """The class for processing sequence data into trimmed sequences.

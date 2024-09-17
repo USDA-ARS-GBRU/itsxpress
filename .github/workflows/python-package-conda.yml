@@ -14,10 +14,10 @@ jobs:
       max-parallel: 5
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python 398
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Install dependencies
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
@@ -31,7 +31,7 @@ jobs:
         echo $CONDA_PREFIX
         $CONDA/bin/conda list
         $CONDA/bin/conda info --base
-        conda create --name testenv python=3.8.16
+        conda create --name testenv python=3.9.19
         #CONDA_PREFIX=/usr/share/miniconda/envs/testenv
         $CONDA/bin/conda info
         $CONDA/bin/conda list
@@ -46,8 +46,7 @@ jobs:
 
     - name: Set up environment
       run: |
-        wget https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2023.9-py38-linux-conda.yml
-        $CONDA/bin/conda env update --file qiime2-amplicon-2023.9-py38-linux-conda.yml --name testenv
+        $CONDA/bin/conda env create -n testenv --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-linux-conda.yml
     - name: Install Dependencies
       run: |
         echo $CONDA_PREFIX

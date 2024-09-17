@@ -29,9 +29,7 @@ Reference:
 
 import gzip
 import pyzstd as zstd
-import tempfile
 import argparse
-import subprocess
 import logging
 import time
 import os

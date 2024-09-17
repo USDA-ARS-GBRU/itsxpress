@@ -24,14 +24,14 @@ build:
 requirements:
   host:
     - pip
-    - python >=3.8
+    - python =3.9.19
   run:
     - pip
-    - python >=3.8
-    - biopython >=1.79
+    - python =3.9.19
+    - biopython =1.84
     - hmmer =3.1b2
     - vsearch =2.22.1
-    - pyzstd
+    - pyzstd >=0.15.3
 
 test:
   imports:

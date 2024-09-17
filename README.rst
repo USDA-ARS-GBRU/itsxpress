@@ -65,7 +65,7 @@ Installing ITSxpress for use as a QIIME2 Plugin
 ----------------------------------------------------
 
 To install ITSxpress as a plugin for QIIME 2 first install QIIME 2 as a separate Conda/Mamba environemnt using thier instructions 
-https://docs.qiime2.org/2024.2/install/ then add ITSxress to the QIIME 2 Conda environment. The examples below are for QIIME2 2 
+https://docs.qiime2.org/2024.5/install/ then add ITSxress to the QIIME 2 Conda environment. The examples below are for QIIME2 2 
 version 2024.2 an so please update the commands if you want a newer release.
  
 
@@ -73,31 +73,27 @@ For Linux:
 
 .. code-block:: bash
 
-    wget https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.2-py38-linux-conda.yml
-    mamba create -n qiime2-amplicon-2024.2 --file qiime2-amplicon-2024.2-py38-linux-conda.yml
-    mamba activate qiime2-amplicon-2024.2
-    mamba install ITSxpress
+    conda env create -n qiime2-amplicon-2024.5 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-linux-conda.yml
+    conda activate qiime2-amplicon-2024.5
+    conda install -c bioconda -c conda-forge ITSxpress
     qiime dev refresh-cache
 
 For maxOS (Intel) and OS X:
 
 .. code-block:: bash
 
-    wget https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.2-py38-osx-conda.yml
-    mamba create -n qiime2-amplicon-2024.2 --file qiime2-amplicon-2024.2-py38-osx-conda.yml
-    mamba activate qiime2-amplicon-2024.2
-    mamba install ITSxpress
+    conda env create -n qiime2-amplicon-2024.5 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-osx-conda.yml
+     conda activate qiime2-amplicon-2024.5
+    conda install -c bioconda -c conda-forge ITSxpress
     qiime dev refresh-cache
 
 For macOS (Arm / Apple Silicon):
 
 .. code-block:: bash
-
-    wget https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.2-py38-osx-conda.yml
-    CONDA_SUBDIR=osx-64 mamba create -n qiime2-amplicon-2024.2 --file qiime2-amplicon-2024.2-py38-osx-conda.yml
-    mamba activate qiime2-amplicon-2024.2
-    mamba config --env --set subdir osx-64
-    mamba install ITSxpress
+    CONDA_SUBDIR=osx-64 conda env create -n qiime2-amplicon-2024.5 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-osx-conda.yml
+    conda activate qiime2-amplicon-2024.5
+    conda config --env --set subdir osx-64
+    CONDA_SUBDIR=osx-64 conda install -c bioconda -c conda-forge ITSxpress
     qiime dev refresh-cache
 
 

@@ -1,14 +1,13 @@
 import logging
-logger = logging.getLogger(__name__)
 import gzip
-import pyzstd as zstd
 import os
 import tempfile
-
 from itertools import tee
 
+import pyzstd as zstd
 from Bio import SeqIO
 
+logger = logging.getLogger(__name__)
 class Dedup:
     """A class to handle deduplicated sequence data.
     To speed processing Vmatch is used to remove duplicate amplicons so that the
