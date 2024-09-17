@@ -2,8 +2,7 @@ name: GitHub Actions Weekly Build (V2)
 
 on:
   push:
-    branches:
-      - main
+  pull_request:
   schedule:
     - cron: "0 0 */7 * *"
     
@@ -14,7 +13,7 @@ jobs:
       max-parallel: 5
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 398
+    - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
@@ -31,7 +30,7 @@ jobs:
         echo $CONDA_PREFIX
         $CONDA/bin/conda list
         $CONDA/bin/conda info --base
-        conda create --name testenv python=3.9.19
+        conda create --name testenv python=3.9
         #CONDA_PREFIX=/usr/share/miniconda/envs/testenv
         $CONDA/bin/conda info
         $CONDA/bin/conda list
