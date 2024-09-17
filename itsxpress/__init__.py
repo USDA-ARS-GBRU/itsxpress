@@ -15,3 +15,6 @@ except ModuleNotFoundError as e:
     pass
 
 __all__ = ["main", "definitions"]
+
+from . import _version
+__version__ = _version.get_versions()['version']
