@@ -42,5 +42,6 @@ taxa_dict = {"Alveolata":"A.hmm","Bryophyta":"B.hmm", "Bacillariophyta":"C.hmm",
  "Tracheophyta":"T.hmm","Eustigmatophyceae":"U.hmm","Parabasalia":"Y.hmm","All":"all.hmm"}
 
 
-maxmismatches=40
-maxratio=0.3
+maxmismatches = 40
+maxratio = 0.3
+vsearch_fastq_qmax = 101
