@@ -39,7 +39,7 @@ jobs:
         pip install .
     - name: Test with pytest
       run: |
-        cd /home/runner/work/itsxpress
+        cd /home/runner/work/itsxpress/tests
         pytest
     - name: Test qiime install
       run: |
