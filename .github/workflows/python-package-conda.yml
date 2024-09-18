@@ -26,6 +26,7 @@ jobs:
     - name: Initialize conda
       run: |
         conda init
+        source ~/.bashrc
     - name: Set up QIIME Conda environment
       run: |
         conda env create -n testenv --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-linux-conda.yml
