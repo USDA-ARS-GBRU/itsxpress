@@ -31,7 +31,6 @@ jobs:
         conda install --name test --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-linux-conda.yml
     - name: Install Dependencies
       run: |
-        conda activate testenv
         conda install biopython=1.84
         pip install pyzstd
         pip install pytest
