@@ -14,9 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Check out Repo
-  #    uses: actions/setup-python@v5
-  #    with:
-  #      python-version: 3.9
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.9.19
   #  - name: Install dependencies
   #    run: |
   #      # $CONDA is an environment variable pointing to the root of the miniconda directory
@@ -32,16 +32,13 @@ jobs:
   #      $CONDA/bin/conda info --base
   #      $CONDA/bin/conda info --envs
   #      #CONDA_PREFIX=/usr/share/miniconda/envs/testenv
-     
     - name: Initiate conda channels
       uses: conda-incubator/setup-miniconda@v3
       with:
         channels: conda-forge,bioconda,default
    #     activate-environment: testenv
         auto-activate-base: true
-
-
-    - name: Set up environment
+    - name: Set up QIIME Conda environment
       run: |
         ls 
         pwd
@@ -55,7 +52,6 @@ jobs:
         pip install pyzstd
         pip install pytest
         pip install .
-
     - name: Test with pytest
       run: |
         conda activate activate testenv
