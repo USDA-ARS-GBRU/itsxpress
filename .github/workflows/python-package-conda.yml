@@ -30,10 +30,8 @@ jobs:
         echo $CONDA_PREFIX
         $CONDA/bin/conda list
         $CONDA/bin/conda info --base
-        conda create --name testenv python=3.9
         #CONDA_PREFIX=/usr/share/miniconda/envs/testenv
-        $CONDA/bin/conda info
-        $CONDA/bin/conda list
+
         
     - name: Initiate conda channels
       uses: conda-incubator/setup-miniconda@v2
