@@ -41,11 +41,11 @@ jobs:
     - name: Test with pytest
       run: |
         pwd
-        ls
-        # cd /home/runner/work/itsxpress/tests
-        # pytest
+        which itsxpress
+        pytest tests/test_main_pytest.py
     - name: Test qiime install
       run: |
+        which qiime
         qiime dev refresch-cache
         qiime itsxpress --help
 
