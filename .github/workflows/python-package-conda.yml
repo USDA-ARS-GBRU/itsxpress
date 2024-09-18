@@ -21,15 +21,14 @@ jobs:
       uses: conda-incubator/setup-miniconda@v3
       with:
         channels: conda-forge,bioconda,default
-   #     activate-environment: testenv
-        auto-activate-base: true
-    - name: Initialize conda
-      run: |
-        conda init
-        source ~/.bashrc
+        auto-activate-base: false
+ #   - name: Initialize conda
+  #    run: |
+  #      conda init
+   #     source ~/.bashrc
     - name: Set up QIIME Conda environment
       run: |
-        conda env create -n testenv --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-linux-conda.yml
+        conda install --name test --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-linux-conda.yml
     - name: Install Dependencies
       run: |
         conda activate testenv
