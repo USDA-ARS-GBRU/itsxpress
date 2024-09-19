@@ -42,7 +42,8 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
         echo $CONDA_PREFIX
         echo $CONDA_PKGS_DIR
-        ECHO $GITHUB_PATH
+        ls $CONDA_PKGS_DIR
+        echo $GITHUB_PATH
         $CONDA_PKGS_DIR/pytest 
     - name: Test qiime install
       run: |
