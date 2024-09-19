@@ -41,7 +41,7 @@ jobs:
     - name: Test with pytest
       run: |
         # echo "begin: PATH=$PATH;"
-        #conda activate testenv
+        conda activate testenv
         # echo "after conda activate testenv: PATH=$PATH;"
         #conda info
         #ls $CONDA/bin
