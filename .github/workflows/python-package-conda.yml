@@ -39,13 +39,14 @@ jobs:
         pip install .
     - name: Test with pytest
       run: |
-        echo $CONDA/bin >> $GITHUB_PATH
-        echo $CONDA_PREFIX
-        echo $GITHUB_PATH
+        conda activate testenv
+        conda info
         ls $CONDA/bin
         $CONDA/bin/pytest 
     - name: Test qiime install
       run: |
-        qiime dev refresch-cache
-        qiime itsxpress --help
+        conda activate testenv
+        conda info
+        $CONDA/bin/qiime dev refresch-cache
+        $CONDA/bin/qiime itsxpress --help
 
