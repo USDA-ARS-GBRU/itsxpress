@@ -9,14 +9,13 @@ on:
 jobs:
   build-linux:
     strategy:
+      max-parallel: 4
       matrix:
         os: [macos-latest, ubuntu-latest]
     runs-on: ${{matrix.os}}
     defaults:
       run:
         shell: bash -el {0}
-
-      max-parallel: 5
     steps:
     - uses: actions/checkout@v4
     - name: Check out Repo
