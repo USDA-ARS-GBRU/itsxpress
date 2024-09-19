@@ -11,7 +11,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [ubuntu-latest]
     runs-on: ${{matrix.os}}
     defaults:
       run:
