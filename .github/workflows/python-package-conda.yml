@@ -24,7 +24,6 @@ jobs:
       uses: conda-incubator/setup-miniconda@v3
       with:
         channels: conda-forge,bioconda,default
-        auto-activate-base: false
     - name: Initialize conda
       run: |
         conda info
@@ -40,12 +39,11 @@ jobs:
         pip install .
     - name: Test with pytest
       run: |
-        pwd
-        which itsxpress
-        pytest tests/test_main_pytest.py
+        echo $CONDA/bin >> $GITHUB_PATH
+        echo $CONDA_PREFIX
+        pytest 
     - name: Test qiime install
       run: |
-        which qiime
         qiime dev refresch-cache
         qiime itsxpress --help
 
