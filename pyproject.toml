@@ -1,12 +1,12 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "itsxpress"
-version = "2.0.2"
+dynamic = ["version"]
 
-description = "Rapidly trim sequences down to their Internally Transcribed Spacer ITS regions"
+description = "Rapidly trim sequences down to their Internal Transcribed Spacer (ITS) regions"
 authors = [
     {name = "Adam R. Rivers", email =  "adam.rivers@usda.gov"},
     {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}]
@@ -32,6 +32,9 @@ repository = "http://github.com/usda-ars-gbru/itsxpress"
 tests = [
 "pytest"
 ]
+
+[tool.setuptools_scm]
+version_file = "itsxpress/_version.py"
 
 [tool.setuptools.package-data]
 itsxpress = ["*.bib"]

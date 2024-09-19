@@ -194,8 +194,25 @@ def test_main_paired():
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = sum(1 for _ in seqs)
-	#assert (n == 227)
 	assert (n==235)
+	shutil.rmtree(tf)
+
+def test_main_paired_high_qual():
+	""" Test Qual scores over 41
+	"""
+	parser = itsxpress.main.myparser()
+	tf = tempfile.mkdtemp()
+	fastq = os.path.join(TEST_DIR,"test_data", "high_qual_scores_R1.fastq.gz")
+	fastq2 = os.path.join(TEST_DIR,"test_data", "high_qual_scores_R2.fastq.gz")
+	outfile = os.path.join(tf,'testout.fastq')
+	validation = os.path.join(TEST_DIR,"test_data", "testout.fastq")
+	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--threads', '1'])
+	itsxpress.main.main(args=args)
+	seqs = SeqIO.parse(outfile, 'fastq')
+	n = sum(1 for _ in seqs)
+	print(n)
+	#assert (n == 227)
+	#assert (n==235)
 	shutil.rmtree(tf)
 
 def test_main_merged():

@@ -1,3 +1,14 @@
+2.1.1 (2024-9-19)
+------------------
+- Changed settings to allow FASTQ quality scores up to 93. This prevents an error in processing some reads from PacBio, Nanopore and Element Biosciences AVITI sequencers with quality scores over 41.
+- Updated from manual software versioning to automated versioning based on git tag metadata and `setuptools-scm`.
+- Updated Github action workflow for QIIME 2024.5 and Python 3.9.19
+- Improved and updated installation instructions in the README file
+- Updated tests for FASTQs with high qual scores
+- Added citation information for forthcoming ITSXpress version 2 publication
+- Cleaned up some PEP formatting 
+
+
 2.1.0 (2024-4-10)
 ------------------
 - HMMs are updated to version 2 of the HMM database curated by Henrik Nilson at the University of Gothenburg.  

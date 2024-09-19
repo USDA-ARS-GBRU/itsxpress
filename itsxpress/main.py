@@ -29,9 +29,7 @@ Reference:
 
 import gzip
 import pyzstd as zstd
-import tempfile
 import argparse
-import subprocess
 import logging
 import time
 import os
@@ -48,6 +46,7 @@ from itsxpress.Dedup import Dedup
 from itsxpress.ITSposition import ItsPosition
 from itsxpress.SeqSamplePaired import SeqSamplePairedNotInterleaved
 from itsxpress.SeqSampleNotPaired import SeqSampleNotPaired
+from ._version import __version__
 
 def restricted_float(x):
     x = float(x)
@@ -79,6 +78,7 @@ def myparser():
     parser.add_argument('--reversed_primers', '-rp',  help="Primers are in reverse orientation as in Taylor et al. 2016, DOI:10.1128/AEM.02576-16. If selected ITSxpress returns trimmed reads flipped to the forward orientation", action='store_true')
     parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
     parser.add_argument('--threads' ,help="Number of processor threads to use.", type=int, default=1)
+    parser.add_argument('--version', '-v' , help="display version",  action="version", version="ITSxpress version: " + __version__)
     return parser
 
 
@@ -243,6 +243,7 @@ def main(args=None):
         args = parser.parse_args()
     _logger_setup(args.log)
     try:
+        logging.info("Starting ITSxpress version  {}".format(__version__))
         logging.info("Verifying the input sequences.")
         _check_fastqs(args.fastq, args.fastq2)
         # Parse input types

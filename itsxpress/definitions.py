@@ -42,5 +42,7 @@ taxa_dict = {"Alveolata":"A.hmm","Bryophyta":"B.hmm", "Bacillariophyta":"C.hmm",
  "Tracheophyta":"T.hmm","Eustigmatophyceae":"U.hmm","Parabasalia":"Y.hmm","All":"all.hmm"}
 
 
-maxmismatches=40
-maxratio=0.3
+maxmismatches = 40
+maxratio = 0.3
+# vsearch sets the max fasq_qmax value as 126 - the fastq_ascii value (normally this is 33 but on very old fastqs this can be 64)
+vsearch_fastq_qmax = 93

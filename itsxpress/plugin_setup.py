@@ -15,10 +15,10 @@ from itsxpress.q2_itsxpress import (trim_single,
                                      trim_pair,
                                      trim_pair_output_unmerged,
                                      default_cluster_id)
-
+from ._version import __version__
 plugin = Plugin(
     name='itsxpress',
-    version='2.0.2',
+    version=__version__,
     package='itsxpress',
     website='https://github.com/USDA-ARS-GBRU/q2_itsxpress             '
             'ITSxpress: https://github.com/USDA-ARS-GBRU/itsxpress',

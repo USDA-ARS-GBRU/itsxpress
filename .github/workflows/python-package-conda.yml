@@ -2,66 +2,51 @@ name: GitHub Actions Weekly Build (V2)
 
 on:
   push:
-    branches:
-      - main
+  pull_request:
   schedule:
     - cron: "0 0 */7 * *"
     
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
     strategy:
-      max-parallel: 5
+      max-parallel: 4
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{matrix.os}}
+    defaults:
+      run:
+        shell: bash -el {0}
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v4
+    - name: Check out Repo
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-    - run:   |
-        #sudo apt update
-        #sudo apt install gcc-10 g++-10
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-        echo $CONDA_PREFIX
-        $CONDA/bin/conda list
-        $CONDA/bin/conda info --base
-        conda create --name testenv python=3.8.16
-        #CONDA_PREFIX=/usr/share/miniconda/envs/testenv
-        $CONDA/bin/conda info
-        $CONDA/bin/conda list
-        
+        python-version: 3.9.19
     - name: Initiate conda channels
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         channels: conda-forge,bioconda,default
-        activate-environment: testenv
-        auto-activate-base: false
-
-
-    - name: Set up environment
+        auto-activate-base: true
+    - name: Initialize conda
       run: |
-        wget https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2023.9-py38-linux-conda.yml
-        $CONDA/bin/conda env update --file qiime2-amplicon-2023.9-py38-linux-conda.yml --name testenv
+        conda info
+    - name: Set up QIIME Conda environment
+      run: |
+        conda env create -n testenv --file=https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-linux-conda.yml
     - name: Install Dependencies
       run: |
-        echo $CONDA_PREFIX
-        source activate testenv
-        $CONDA/bin/conda install biopython
+        conda activate testenv 
+        conda install biopython=1.84
         pip install pyzstd
         pip install pytest
         pip install .
-        qiime
-        #itsxpress
-        #qiime itsxpress
-        #ls
-
     - name: Test with pytest
       run: |
-        source activate testenv
-        pytest
+        conda activate testenv
+        pytest 
+    - name: Test qiime install
+      run: |
+        conda activate testenv
+        #qiime dev refresch-cache
+        qiime itsxpress --help
+
