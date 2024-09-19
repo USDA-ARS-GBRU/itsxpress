@@ -8,11 +8,14 @@ on:
     
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{matrix.os}}
     defaults:
       run:
         shell: bash -el {0}
-    strategy:
+
       max-parallel: 5
     steps:
     - uses: actions/checkout@v4
