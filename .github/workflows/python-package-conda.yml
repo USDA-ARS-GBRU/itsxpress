@@ -40,12 +40,13 @@ jobs:
         pip install .
     - name: Test with pytest
       run: |
-        echo "begin: PATH=$PATH;"
-        conda activate testenv
-        echo "after conda activate testenv: PATH=$PATH;"
-        conda info
-        ls $CONDA/bin
-        pytest -h
+        # echo "begin: PATH=$PATH;"
+        #conda activate testenv
+        # echo "after conda activate testenv: PATH=$PATH;"
+        #conda info
+        #ls $CONDA/bin
+        pwd
+        pytest 
     - name: Test qiime install
       run: |
         ls
