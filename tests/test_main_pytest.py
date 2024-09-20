@@ -117,39 +117,32 @@ def test_dedup_create_trimmed_seqs_zst():
 	assert length == 42637
 	shutil.rmtree(tf)
 
-#Following test is removed in ITSxpress version 2.0.0, as interleaved files are no longer supported.
-
-# def test_seq_sample_paired_interleaved():
-# 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_interleaved.fastq")
-# 	sobj = itsxpress.main.SeqSamplePairedInterleaved(fastq=fastq, tempdir=".")
-# 	sobj._merge_reads(threads=1)
-# 	sobj.deduplicate(threads=1)
-# 	sobj._search(hmmfile=hmmfile, threads=1)
-# 	shutil.rmtree(sobj.tempdir)
-
 #Following test will fail if Vsearch version is less than 2.20 or hmmer is not installed
 def test_seq_sample_not_paired():
+	tf = tempfile.mkdtemp()
 	fastq = os.path.join(TEST_DIR,"test_data", "4774-1-MSITS3_merged.fastq")
-	sobj = itsxpress.main.SeqSampleNotPaired(fastq=fastq, tempdir=".")
+	sobj = itsxpress.main.SeqSampleNotPaired(fastq=fastq, tempdir=tf)
 	sobj.deduplicate(threads=1)
 	sobj._search(hmmfile=hmmfile, threads=1)
-	shutil.rmtree(sobj.tempdir)
+	shutil.rmtree(tf)
 
 def test_seq_sample_not_paired_clustered():
+	tf = tempfile.mkdtemp()
 	fastq = os.path.join(TEST_DIR,"test_data", "4774-1-MSITS3_merged.fastq")
-	sobj = itsxpress.main.SeqSampleNotPaired(fastq=fastq, tempdir=".")
+	sobj = itsxpress.main.SeqSampleNotPaired(fastq=fastq, tempdir=tf)
 	sobj.cluster(threads=1, cluster_id=0.995)
 	sobj._search(hmmfile=hmmfile, threads=1)
-	shutil.rmtree(sobj.tempdir)
+	shutil.rmtree(tf)
 
 def test_seq_sample_paired_not_interleaved():
+	tf = tempfile.mkdtemp()
 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
 	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
-	sobj = itsxpress.main.SeqSamplePairedNotInterleaved(fastq=fastq, tempdir=".", fastq2=fastq2)
+	sobj = itsxpress.main.SeqSamplePairedNotInterleaved(fastq=fastq, tempdir=tf, fastq2=fastq2)
 	sobj._merge_reads(stagger = True, threads=1)
 	sobj.deduplicate(threads=1)
 	sobj._search(hmmfile=hmmfile, threads=1)
-	shutil.rmtree(sobj.tempdir)
+	shutil.rmtree(tf)
 
 
 def test_is_paired():
@@ -168,28 +161,14 @@ def test_myparser():
 	args = parser.parse_args(['--fastq', 'test.fastq','--outfile', 'test.out','--tempdir', 'dirt','--region','ITS1','--taxa', 'Fungi'])
 	assert (args.fastq == 'test.fastq')
 
-#Following test is removed as interleaved files aren't supported in version 2 of itsxpress
-# def test_main_interleaved():
-# 	parser = itsxpress.main.myparser()
-# 	tf = tempfile.mkdtemp()
-# 	print(tf)
-# 	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_interleaved.fastq")
-# 	outfile = os.path.join(tf,'testout.fastq')
-# 	args = parser.parse_args(['--fastq', fastq,'--outfile', outfile, '--region','ITS2', '--taxa', 'Fungi', '--keeptemp'])
-# 	itsxpress.main.main(args=args)
-# 	seqs = SeqIO.parse(outfile, 'fastq')
-# 	n = sum(1 for _ in seqs)
-# 	print(n)
-# 	assert (n == 227)
-# 	shutil.rmtree(tf)
 
 def test_main_paired():
 	parser = itsxpress.main.myparser()
 	tf = tempfile.mkdtemp()
-	fastq = os.path.join(TEST_DIR,"test_data", "4774-1-MSITS3_R1.fastq")
-	fastq2 = os.path.join(TEST_DIR,"test_data", "4774-1-MSITS3_R2.fastq")
-	outfile = os.path.join(tf,'testout.fastq')
-	validation = os.path.join(TEST_DIR,"test_data", "testout.fastq")
+	fastq = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R1.fastq")
+	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
+	outfile = os.path.join(tf, 'testout.fastq')
+	validation = os.path.join(TEST_DIR, "test_data", "testout.fastq")
 	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
@@ -202,16 +181,15 @@ def test_main_paired_high_qual():
 	"""
 	parser = itsxpress.main.myparser()
 	tf = tempfile.mkdtemp()
-	fastq = os.path.join(TEST_DIR,"test_data", "high_qual_scores_R1.fastq.gz")
-	fastq2 = os.path.join(TEST_DIR,"test_data", "high_qual_scores_R2.fastq.gz")
-	outfile = os.path.join(tf,'testout.fastq')
+	fastq = os.path.join(TEST_DIR, "test_data", "high_qual_scores_R1.fastq.gz")
+	fastq2 = os.path.join(TEST_DIR, "test_data", "high_qual_scores_R2.fastq.gz")
+	outfile = os.path.join(tf, 'testout.fastq')
 	validation = os.path.join(TEST_DIR,"test_data", "testout.fastq")
 	args = parser.parse_args(['--fastq', fastq, '--fastq2', fastq2, '--outfile', outfile, '--region','ITS2', '--taxa',  'Fungi', '--threads', '1'])
 	itsxpress.main.main(args=args)
 	seqs = SeqIO.parse(outfile, 'fastq')
 	n = sum(1 for _ in seqs)
 	print(n)
-	#assert (n == 227)
 	#assert (n==235)
 	shutil.rmtree(tf)
 
@@ -276,7 +254,7 @@ def test_create_paired_trimmed_seqs():
 	fastq2 = os.path.join(TEST_DIR, "test_data", "4774-1-MSITS3_R2.fastq")
 	dedup = itsxpress.main.Dedup(uc_file=uc, rep_file=rep, seq_file=seq, fastq=fastq, fastq2=fastq2)
 	itspos = itsxpress.main.ItsPosition(os.path.join(TEST_DIR,"test_data", "ex_tmpdir", "domtbl.txt"), "ITS2")
-	tf = tempfile.mkdtemp(".")
+	tf = tempfile.mkdtemp()
 	print(tf)
 	t1 = os.path.join(tf,'t2_r1.fq')
 	t2 = os.path.join(tf,'t2_r2.fq')
@@ -381,25 +359,6 @@ try:
 													threads=1)
 				self.assertTrue("4774-1-MSITS3" in obs.fastq)
 
-		#This test seems to test bbmap? It doesn't fail in V2
-				# def test_trim_pair_no_bb(self):
-				# 	samples = TEST_DATA.manifest.view(pd.DataFrame)
-				# 	for sample in samples.itertuples():
-				# 		with pytest.raises(ValueError):
-				# 			q2_itsxpress._set_fastqs_and_check(fastq=sample.forward,
-				# 																	fastq2=sample.reverse,
-				# 																	sample_id=sample.Index,
-				# 																	single_end=False,
-				# 																	reversed_primers=False,
-				# 																	threads=1)
-				# 		with pytest.raises(ValueError): 
-				# 			q2_itsxpress._set_fastqs_and_check(fastq=sample.forward,
-				# 																	fastq2=sample.reverse,
-				# 																	sample_id=sample.Index,
-				# 																	single_end=True,
-				# 																	reversed_primers=False,
-				# 																	threads=1)
-
 			def test_trim_single_no_cluster():
 				threads = 1
 				taxa = "F"
@@ -415,25 +374,6 @@ try:
 														 cluster=False)
 
 
-
-#This test seems to test bbmap? It doesn't fail in V2
-		# def test_trim_pair_no_bb(self):
-		# 	samples = TEST_DATA.manifest.view(pd.DataFrame)
-		# 	for sample in samples.itertuples():
-		# 		with pytest.raises(ValueError):
-		# 			q2_itsxpress._set_fastqs_and_check(fastq=sample.forward,
-		# 																	fastq2=sample.reverse,
-		# 																	sample_id=sample.Index,
-		# 																	single_end=False,
-		# 																	reversed_primers=False,
-		# 																	threads=1)
-		# 		with pytest.raises(ValueError): 
-		# 			q2_itsxpress._set_fastqs_and_check(fastq=sample.forward,
-		# 																	fastq2=sample.reverse,
-		# 																	sample_id=sample.Index,
-		# 																	single_end=True,
-		# 																	reversed_primers=False,
-		# 																	threads=1)
 
 	def test_trim_single_no_cluster():
 		threads = 1
