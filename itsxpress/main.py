@@ -35,6 +35,7 @@ import time
 import os
 import shutil
 import math
+import tempfile
 from itertools import tee
 
 from numpy import empty
@@ -233,6 +234,46 @@ def _check_total_reads(file, file2 = None):
         reads = core(file2)
         logging.info("Total number of reads in file {} is {}.".format(file2, reads))
 
+def create_temp_directory(tempdir_arg=None):
+    """
+    Creates a temporary directory at a user-defined location or at the default location.
+    The directory name is prefixed with 'itsxpress_'.
+    
+    Ensures no file with the same name exists before creating the directory.
+    
+    Parameters:
+    - tempdir_arg (str): Path to a directory provided by the user. If None, 
+      a new temporary directory is created at the default location.
+    
+    Returns:
+    - str: Path to the temporary directory, or None if there was an error.
+    """
+    try:
+        if tempdir_arg:
+            if not os.path.exists(tempdir_arg):
+                os.makedirs(tempdir_arg)
+                logging.info(f"Directory '{tempdir_arg}' has been created.")
+            else:
+                if os.path.isfile(tempdir_arg):
+                    logging.error(f"A file with the same name '{tempdir_arg}' already exists. Cannot create directory.")
+                    return None
+                logging.info(f"Directory '{tempdir_arg}' already exists.")
+            
+            # Try creating a unique temporary directory inside user-specified directory
+            temp_dir =  tempfile.mkdtemp(prefix="itsxpress_", dir=tempdir_arg)
+            logging.info(f"Temporary directory '{temp_dir}' has been created at the user-defined location.")
+        else:
+            # Create a temporary directory at default location
+            temp_dir = tempfile.mkdtemp(prefix="itsxpress_")
+            logging.info(f"Temporary directory '{temp_dir}' has been created at the default location.")
+        
+        return temp_dir
+    
+    except Exception as e:
+        logging.error(f"Failed to create temporary directory: {e}")
+        return None
+
+
 def main(args=None):
     """Run Complete ITS trimming workflow.
     """
@@ -248,14 +289,14 @@ def main(args=None):
         _check_fastqs(args.fastq, args.fastq2)
         # Parse input types
         paired_end = _is_paired(args.fastq, args.fastq2, args.single_end)
+        session_tempdir = create_temp_directory(tempdir_arg=args.tempdir)
         if paired_end:
             logging.info("Sequences are paired-end in two files. They will be merged using Vsearch.")
-            sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=args.tempdir, reversed_primers=args.reversed_primers)
+            sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=session_tempdir, reversed_primers=args.reversed_primers)
             sobj._merge_reads(threads=str(args.threads), stagger=args.allow_staggered_reads)
         elif not paired_end:
             logging.info("Sequences are assumed to be single-end.")
-            sobj = SeqSampleNotPaired(fastq=args.fastq, tempdir=args.tempdir)
-        logging.info("Temporary directory is: {}".format(sobj.tempdir))
+            sobj = SeqSampleNotPaired(fastq=args.fastq, tempdir=session_tempdir)
         # Deduplicate
         logging.info("Unique sequences are being written to a temporary FASTA file with Vsearch.")
         if math.isclose(args.cluster_id, 1, rel_tol=1e-05):
@@ -320,12 +361,11 @@ def main(args=None):
     finally:
         try:
             if not args.keeptemp:
-                shutil.rmtree(sobj.tempdir)
+                shutil.rmtree(session_tempdir)
         except UnboundLocalError:
             pass
         except AttributeError:
             pass
-
 
 if __name__ == '__main__':
     main()

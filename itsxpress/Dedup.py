@@ -1,7 +1,6 @@
 import logging
 import gzip
 import os
-import tempfile
 from itertools import tee
 
 import pyzstd as zstd
@@ -271,7 +270,7 @@ class Dedup:
         return map(map_func, filt)
 
 
-    def create_trimmed_seqs(self, outfile, gzipped,zstd_file, itspos,wri_file, tempdir=None):
+    def create_trimmed_seqs(self, outfile, gzipped,zstd_file, itspos,wri_file, tempdir):
         """Creates a FASTQ file, optionally gzipped, with the reads trimmed to the
             selected region.
         Args:
@@ -281,14 +280,6 @@ class Dedup:
             itspos (object): an ItsPosition object
             wri_file (bool): Should file be written or checked for empty sequences?
         """
-        if tempdir:
-            if not os.path.exists(tempdir):
-                logging.warning("Specified location for tempfile ({}) does not exist, using default location.".format(tempdir))
-                self.tempdir = tempfile.mkdtemp(prefix='itsxpress_')
-            else:
-                self.tempdir = tempfile.mkdtemp(prefix='itsxpress_', dir=tempdir)
-        else:
-            self.tempdir = tempfile.mkdtemp(prefix='itsxpress_')
 
         def _write_seqs():
             if gzipped:
