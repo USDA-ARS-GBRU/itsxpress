@@ -1,3 +1,10 @@
+# 2.1.2 (2024-9-23)
+
+- Fixed bug [Issue 54](https://github.com/USDA-ARS-GBRU/itsxpress/issues/54) that casued `--tempdir` input to be ignored in the ITSxpress CLI and updated q2_itsxpress.py and test code for this change.
+- updates to Dockerfile
+- updates to changelog formatting and readme
+
+
 # 2.1.1 (2024-9-19)
 
 - Changed settings to allow FASTQ quality scores up to 93. This prevents an error in processing some reads from PacBio, Nanopore and Element Biosciences AVITI sequencers with quality scores over 41.
