@@ -19,6 +19,7 @@ import os
 import pathlib
 import shutil
 import math
+import tempfile
 
 import pandas as pd
 from q2_types.per_sample_sequences import (SingleLanePerSamplePairedEndFastqDirFmt,
@@ -28,11 +29,13 @@ from itsxpress import main as itsxpress
 from itsxpress.definitions import (taxa_dict,
                    ROOT_DIR)
 
-default_cluster_id=0.995
+#default_cluster_id=0.995
+default_cluster_id=1.0
 
 
 def _set_fastqs_and_check(fastq: str,
                           fastq2: str,
+                          tempdir: str,
                           sample_id: str,
                           single_end: bool,
                           reversed_primers: bool,
@@ -67,18 +70,18 @@ def _set_fastqs_and_check(fastq: str,
         raise ValueError("There is a problem with the fastq file(s) you selected")
         # Create SeqSample objects and merge if needed.
 
-
+    
     if paired_end:
         sobj = itsxpress.SeqSamplePairedNotInterleaved(fastq=fastq,
                                                        fastq2=fastq2,
-                                                       tempdir=None,
+                                                       tempdir=tempdir,
                                                        reversed_primers=reversed_primers)
         sobj._merge_reads(threads=threads,stagger=allow_staggered_reads)
         return sobj
 
     elif not paired_end:
         sobj = itsxpress.SeqSampleNotPaired(fastq=fastq,
-                                            tempdir=None)
+                                            tempdir=tempdir)
         return sobj
 
 
@@ -189,6 +192,11 @@ def main(per_sample_sequences,
     # Setting the taxa
     taxa = _taxa_prefix_to_taxa(taxa)
     samples = per_sample_sequences.manifest.view(pd.DataFrame)
+    try:
+        tempdir = tempfile.mkdtemp(prefix='itsxpress_')
+        # print("tempdir location {}".format(tempdir))
+    except Exception as e:
+        raise ValueError("Could not create temporary directory")
     # Creating result dir
     results = CasavaOneEightSingleLanePerSampleDirFmt()
     # Running the for loop for each sample
@@ -197,6 +205,7 @@ def main(per_sample_sequences,
         sobj = _set_fastqs_and_check(
             fastq=sample.forward,
             fastq2=sample.reverse if paired_in else None,
+            tempdir=tempdir,
             sample_id=sample.Index,
             single_end=False if paired_in else True,
             reversed_primers=reversed_primers,
@@ -250,6 +259,6 @@ def main(per_sample_sequences,
                                       wri_file=True,
                                       tempdir=sobj.tempdir)
         # Deleting the temp files.
-        shutil.rmtree(sobj.tempdir)
+        shutil.rmtree(tempdir)
     # Writing out the results.
     return results

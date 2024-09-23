@@ -1,6 +1,5 @@
 import os
 import logging
-import tempfile
 import subprocess
 
 logger = logging.getLogger(__name__)
@@ -16,15 +15,8 @@ class SeqSample:
     """
 
 
-    def __init__(self, fastq, tempdir=None):
-        if tempdir:
-            if not os.path.exists(tempdir):
-                logging.warning("Specified location for tempfile ({}) does not exist, using default location.".format(tempdir))
-                self.tempdir = tempfile.mkdtemp(prefix='itsxpress_')
-            else:
-                self.tempdir = tempfile.mkdtemp(prefix='itsxpress_', dir=tempdir)
-        else:
-            self.tempdir = tempfile.mkdtemp(prefix='itsxpress_')
+    def __init__(self, fastq, tempdir):
+        self.tempdir = tempdir
         self.fastq = fastq
         self.uc_file = None
         self.rep_file = None

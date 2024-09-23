@@ -2,7 +2,7 @@ FROM condaforge/mambaforge:24.7.1-0
 
 # # Install system dependencies
 RUN apt-get update && \
-    apt-get install -y build-essential && \
+    apt-get install -y --no-install-recommends build-essential && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -14,8 +14,7 @@ RUN mamba install -c bioconda vsearch=2.22.1 hmmer=3.1b2
 
 # Copy the itsxpress package files and install dependencies
 COPY .. /app
-WORKDIR /app
-RUN git clone https://github.com/USDA-ARS-GBRU/itsxpress.git && cd itsxpress && pip install .
+RUN cd /app && git clone https://github.com/USDA-ARS-GBRU/itsxpress.git && cd itsxpress && pip install .
 
 # Set the default command to run itsxpress
 CMD ["itsxpress"]
