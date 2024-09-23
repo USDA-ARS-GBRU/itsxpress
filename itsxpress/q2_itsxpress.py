@@ -31,15 +31,11 @@ from itsxpress.definitions import (taxa_dict,
 
 #default_cluster_id=0.995
 default_cluster_id=1.0
-try:
-    tempdir = tempfile.mkdtemp(prefix='itsxpress_')
-    print("tempdir location {}".format(tempdir))
 
-except Exception as e:
-    raise ValueError("Could not create temporary directory")
 
 def _set_fastqs_and_check(fastq: str,
                           fastq2: str,
+                          tempdir: str,
                           sample_id: str,
                           single_end: bool,
                           reversed_primers: bool,
@@ -196,6 +192,11 @@ def main(per_sample_sequences,
     # Setting the taxa
     taxa = _taxa_prefix_to_taxa(taxa)
     samples = per_sample_sequences.manifest.view(pd.DataFrame)
+    try:
+        tempdir = tempfile.mkdtemp(prefix='itsxpress_')
+        # print("tempdir location {}".format(tempdir))
+    except Exception as e:
+        raise ValueError("Could not create temporary directory")
     # Creating result dir
     results = CasavaOneEightSingleLanePerSampleDirFmt()
     # Running the for loop for each sample
@@ -204,6 +205,7 @@ def main(per_sample_sequences,
         sobj = _set_fastqs_and_check(
             fastq=sample.forward,
             fastq2=sample.reverse if paired_in else None,
+            tempdir=tempdir,
             sample_id=sample.Index,
             single_end=False if paired_in else True,
             reversed_primers=reversed_primers,

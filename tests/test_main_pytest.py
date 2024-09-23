@@ -278,6 +278,8 @@ try:
 	import pandas as pd
 	import itsxpress.q2_itsxpress as q2_itsxpress
 	import itsxpress.plugin_setup
+
+	tempdir = tempfile.mkdtemp()
 	# The test data dir
 	TEST_DIR = os.path.join(os.path.dirname(os.path.abspath(__name__)),"tests")
 	# Test info 1
@@ -341,6 +343,7 @@ try:
 			for sample in samples.itertuples():
 				obs = q2_itsxpress._set_fastqs_and_check(fastq=sample.forward,
 													fastq2=None,
+													tempdir=tempdir,
 													sample_id=sample.Index,
 													single_end=True,
 													reversed_primers=False,
@@ -352,6 +355,7 @@ try:
 			for sample in samples.itertuples():
 				obs = q2_itsxpress._set_fastqs_and_check(fastq=sample.forward,
 													fastq2=sample.reverse,
+													tempdir=tempdir,
 													sample_id=sample.Index,
 													single_end=True,
 													reversed_primers=False,
@@ -366,6 +370,7 @@ try:
 				# Fix for missing argument
 				obs = q2_itsxpress._set_fastqs_and_check(fastq=sample.forward,
 														 fastq2=None,
+														 tempdir=tempdir,
 														 sample_id=sample.Index,
 														 single_end=True,
 														 reversed_primers=False,
