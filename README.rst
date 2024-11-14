@@ -28,12 +28,15 @@ Author
 Citations
 ---------
 
-Einarsson, SV and Rivers, AR. ITSxpress Version 2: Software to rapidly trim internal 
-transcribed spacer sequences with quality scores for amplicon sequencing. Microbiology Spectrum. In press, 2024.
+Einarsson SV, Rivers AR. 2024. ITSxpress version 2: software to rapidly trim internal transcribed 
+spacer sequences with quality scores for amplicon sequencing. Microbiol Spectr 0:e00601-24.
+(doi: `10.1128/spectrum.00601-24`_)
+
+.. _`10.1128/spectrum.00601-24`: https://doi.org/10.1128/spectrum.00601-24
 
 Rivers AR, Weber KC, Gardner TG, Liu, S, Armstrong, SD. ITSxpress: Software to rapidly trim
 internally transcribed spacer sequences with quality scores for marker gene
-analysis [version 1; referees: awaiting peer review]. F1000Research 2018, 7:1418
+analysis [version 1]. F1000Research 2018, 7:1418
 (doi: `10.12688/f1000research.15704.1`_)
 
 .. _`10.12688/f1000research.15704.1`: https://doi.org/10.12688/f1000research.15704.1
