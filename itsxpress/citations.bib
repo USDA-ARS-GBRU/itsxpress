@@ -1,10 +1,18 @@
-@article{ Einarsson2024,
-    AUTHOR  = {Einarsson, SV and Rivers, AR},
-    TITLE = {ITSxpress Version 2: Software to rapidly trim internal transcribed spacer sequences with quality scores for amplicon sequencing},
-    YEAR    = "in press 2024",
-    JOURNAL = "Microbiology Spectrum",
-    publisher={American Society for Microbiology 1752 N St., NW, Washington, DC}
-    }
+
+@article{Einarsson2024,
+	abstract = {The nuclear ribosomal RNA (rRNA) internal transcribed spacer (ITS) regions are commonly used to identify fungi and other eukaryotic taxa in amplicon sequencing. The highly conserved rRNA regions flanking the ITS are often trimmed before being used for taxonomic assignment. The Python software package ITSxpress rapidly trims single-end or paired-end sequences in FASTQ format for use in amplicon sequence variant clustering methods like DADA2. This new major release of ITSxpress improves the paired-end merging method, simplifies installation of the QIIME 2 ITSxpress plugin, removes major dependencies, adds use cases, and is compatible with newer compression formats. This article discusses the modifications to ITSxpress that improve the output and user experience, leading to a major version increase.IMPORTANCE ITSxpress is a sequence trimming method applied to internal transcribed spacer (ITS) amplicon sequences before calling amplicon sequence variants (ASVs). The ITS region is used to understand the composition of eukaryotic microbial communities. ITS sequences provide good taxonomic resolution due to their hypervariability, but are flanked by conserved regions that allow their primers to be more universal. Amplicons generated with such primers contain regions with different evolutionary rates, and trimming these conserved regions results in better taxonomic classification and a more valid set of ASVs. This package can be used for most amplicon sequencing methods including for newer long-read sequencing formats, such as PacBio. ITSxpress can be installed from Bioconda, used as a Docker image, or installed from source code. The package works well with high-performance computing clusters or laptops due to its low-resource requirements. },
+	author = {Sveinn V. Einarsson and Adam R. Rivers},
+	doi = {10.1128/spectrum.00601-24},
+	eprint = {https://journals.asm.org/doi/pdf/10.1128/spectrum.00601-24},
+	journal = {Microbiology Spectrum},
+	number = {0},
+	pages = {e00601-24},
+	title = {ITSxpress version 2: software to rapidly trim internal transcribed spacer sequences with quality scores for amplicon sequencing},
+	url = {https://journals.asm.org/doi/abs/10.1128/spectrum.00601-24},
+	volume = {0},
+	bdsk-url-1 = {https://journals.asm.org/doi/abs/10.1128/spectrum.00601-24},
+	bdsk-url-2 = {https://doi.org/10.1128/spectrum.00601-24}}
+
 @Article{ Rivers2018,
     AUTHOR = { Rivers, AR and Weber, KC and Gardner, TG and Liu, S and Armstrong, SD},
     TITLE = {ITSxpress: Software to rapidly trim internally transcribed spacer sequences with quality scores for marker gene analysis},

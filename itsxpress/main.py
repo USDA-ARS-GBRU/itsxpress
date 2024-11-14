@@ -36,7 +36,8 @@ import os
 import shutil
 import math
 import tempfile
-from itertools import tee
+from itertools import tee, islice
+import contextlib
 
 from numpy import empty
 
@@ -133,7 +134,37 @@ def _logger_setup(logfile):
         print("An error occurred setting up logging")
         raise e
 
-def _check_fastqs(fastq, fastq2=None):
+@contextlib.contextmanager
+def read_file(filename: str, mode: str ='r') -> contextlib.contextmanager:
+    """ A context manager for opening gzipped, stdz compressed or uncompressed files.
+
+        Args:
+            filename: the filename to open
+            mode: 'r' for read 'w' for write. 't' will be adeed automacially for compressed files.
+        
+        Returns a context manager so the file can be opened using 'with'
+    """
+    try:
+        if filename.endswith('.gz'):
+            file = gzip.open(filename, mode +'t')
+            yield file
+        elif filename.endswith('.zst'):
+            file = zstd.open(filename, mode + 't')
+            yield file
+        else:
+            file = open(filename, mode)
+            yield file
+    except FileNotFoundError as f:
+        logging.error("The input file {} could not be found.".format(filename))
+        raise f
+    except Exception as g:
+        logging.error("There appears to be an issue reading the input file {}.".format(filename))
+        raise g
+    finally:
+        if 'file' in locals():
+            file.close()
+    
+def _check_fastqs(fastq: str, fastq2: str=None) -> None:
     """Verifies the input files are valid fastq or fastq.gz files. Also checks for interleaved files which are no longer supported.
     Args:
         fastq (str): The path to a fastq or fastq.gz file
@@ -141,91 +172,63 @@ def _check_fastqs(fastq, fastq2=None):
 
     Raises:
         ValueError: If Biopython detected invalid FASTQ files
-        AssertionError: If interleaved files are detected
     """
-    def check_interleaved(file):
-        try:
-            if file.endswith('.gz'):
-                f = gzip.open(file, 'rt')
-            elif file.endswith('.zst'):
-                f = zstd.open(file, 'rt')
-            else:
-                f = open(file, 'r')
-            lines = f.readlines()
-            L1 = lines[0:24:8]
-            L2 = lines[4:24:8]
-            L1_old = [i.strip().split('/', 1)[0] for i in L1]
-            L2_old = [i.strip().split('/', 1)[0] for i in L2]
-            L1_new = [i.strip().split(' ', 1)[0] for i in L1]
-            L2_new = [i.strip().split(' ', 1)[0] for i in L2]
-            assert L1_old != L2_old and L1_new != L2_new
-
-        except AssertionError as a:
-            logging.error("'File may be interleaved. ITSxpress will run with errors. Check BBmap reformat.sh to split interleaved files before using ITSxpress.")
-            raise a 
-        except IOError as f:
-            logging.error("File may be wrong format for interleaved file check.")
-            raise f
+    # Validation method from BBtools (Thanks Brian!)
+    def test_pair_names_str(id1, id2):
+        len1 = len(id1)
+        len2 = len(id2)
+        if len1 != len2:
+            return False  # Can happen in PacBio names, but never Illumina
+        idx_slash1 = id1.rfind('/')
+        idx_slash2 = id2.rfind('/')
+        idx_space1 = id1.find(' ')
+        idx_space2 = id2.find(' ')
         
-  
-    def core(file):   
-        try:
-            if file.endswith('.gz'):
-                f = gzip.open(file, 'rt')
-            elif file.endswith('.zst'):
-                f = zstd.open(file, 'rt')
-            else:
-                f = open(file, 'r')
-            n = 0
-            for record in SeqIO.parse(f, 'fastq'):
-                while n < 100:
-                    n += 1
-            check_interleaved(file)
-            f.close()
-            if fastq2:
-                if fastq2.endswith('.gz'):
-                    f = gzip.open(fastq2, 'rt')
-                elif file.endswith('.zst'):
-                    f = zstd.open(file, 'rt')
-                else:
-                    f = open(fastq2, 'r')
-                n = 0
-                for record in SeqIO.parse(f, 'fastq'):
-                    while n < 100:
-                        n += 1
-            f.close()
-        except ValueError as e:
-            logging.error("There appears to be an issue with the format of input file {}.".format(file))
-            raise e
-        except FileNotFoundError as f:
-            logging.error("The input file {} could not be found.".format(file))
-            raise f
-        except Exception as g:
-            logging.error("There appears to be an issue reading the input file {}.".format(file))
-            raise g
-
-    core(fastq)
+        if idx_space1 == idx_space2 and idx_space1 > 0 and len1 >= idx_space1 + 3 and len2 >= idx_space2 + 3:
+            if id1[idx_space1 + 1] == '1' and id1[idx_space1 + 2] == ':' and id2[idx_space2 + 1] == '2' and id2[idx_space2 + 2] == ':':
+                for i in range(idx_space1):
+                    if id1[i] != id2[i]:
+                        return False
+                return True
+        
+        if idx_slash1 == idx_slash2 and idx_slash1 > 0 and len1 >= idx_slash1 + 2 and len2 >= idx_slash2 + 2:
+            if id1[idx_slash1 + 1] == '1' and id2[idx_slash2 + 1] == '2':
+                for i in range(idx_slash1):
+                    if id1[i] != id2[i]:
+                        return False
+                for i in range(idx_slash1 + 2, len1):
+                    if id1[i] != id2[i]:
+                        return False
+                return True
+        
+        return id1 == id2
+    
+    def core(filename):
+        with read_file(filename) as handle:
+            records = SeqIO.parse(handle, 'fastq')
+            reclist = list(islice(records, 2))
+            return test_pair_names_str(reclist[0].id, reclist[1].id)
+        
+    def warn_mess(filename):
+        return logging.warning( "The file {} may be interleaved, which is not supported. Please verify your input file manually.")
+    
+    if core(fastq):
+        warn_mess(fastq)
     if fastq2:
-        core(fastq2)
+        if core(fastq2):
+            warn_mess(fastq2)
 
 def _check_total_reads(file, file2 = None):
     """Check the total number of reads in the input file(s).
     """
     #Count every fourth line in fastq file.
     def core(file):
-        if file.endswith('.gz'):
-            f = gzip.open(file, 'rt')
-        elif file.endswith('.zst'):
-            f = zstd.open(file, 'rt')
-        else:
-            f = open(file, 'r')
-        n = 0
-
-        for i, line in enumerate(f):
-            if i % 4 == 0:
-                n += 1
-        f.close()
-        return n
+        with read_file(file) as handle:
+            n = 0
+            for i, _ in enumerate(handle):
+                if i % 4 == 0:
+                    n += 1
+            return n
     
     reads = core(file)
     logging.info("Total number of reads in file {} is {}.".format(file, reads))
