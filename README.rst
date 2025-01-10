@@ -211,12 +211,12 @@ zstd compressed FASTQ files. It expects FASTQ files to end in: .fq, .fastq, .fq.
 
 Use case 2: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
 forward and reverse gzipped FASTQ files using two cpu threads. Return a forward
-and reverse read files  for use in Dada2.
+and reverse read files for use in Dada2.
 
 .. code-block:: bash
 
     itsxpress --fastq r1.fastq.gz --fastq2 r2.fastq.gz --region ITS2 \
-    --taxa Fungi --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
+    --taxa Fungi --log logfile.txt --outfile trimmed_reads_r1.fastq.gz --outfile2 trimmed_reads_r2.fastq.gz --threads 2
 
 ITSxpress can take uncompressed, gzipped or zstd compressed FASTQ files and it can write uncompressed, gzipped or
 zstd compressed FASTQ files. It expects FASTQ files to end in: .fq, .fastq, .fq.gz, fastq.gz, .fq.zst or fastq.zst.
@@ -230,8 +230,8 @@ an single-ended gzipped FASTQ files using two cpu threads.
     itsxpress --fastq single-end.fastq.gz --single_end --region ITS2 --taxa Fungi \
     --log logfile.txt --outfile trimmed_reads.fastq.gz --threads 2
 
-Single ended data is less common and may come from a dataset where the reads have already
-been merged.
+Single ended data is less common and may come from a platform like Oxford Nanopore or PacBio with long single-end reads. 
+Pre-merging paired-end reads is not recommended because the next step for most people is DADA2 which prefers paired-end reads.
 
 License information
 --------------------
