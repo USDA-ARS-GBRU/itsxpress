@@ -62,8 +62,8 @@ def _set_fastqs_and_check(fastq: str,
         itsxpress._check_fastqs(fastq=fastq, fastq2=fastq2)
         # Parse input types
         paired_end = itsxpress._is_paired(fastq=fastq,
-                                                       fastq2=fastq2,
-                                                       single_end=single_end)
+                                          fastq2=fastq2,
+                                          single_end=single_end)
     except (NotADirectoryError,
             FileNotFoundError):
 
@@ -259,6 +259,6 @@ def main(per_sample_sequences,
                                       wri_file=True,
                                       tempdir=sobj.tempdir)
         # Deleting the temp files.
-        shutil.rmtree(tempdir)
+    shutil.rmtree(tempdir)
     # Writing out the results.
     return results
