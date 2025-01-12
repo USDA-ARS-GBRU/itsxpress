@@ -23,6 +23,9 @@ class SeqSamplePairedNotInterleaved(SeqSample):
     def _merge_reads(self, threads,stagger):
         try:
             seq_file = os.path.join(self.tempdir, 'seq.fq')
+            if not os.path.exists(self.tempdir):
+                logging.info(f"Expected {self.tempdir} to exist, but it does not. Creating it now.")
+                os.makedirs(self.tempdir)
             if self.r1.split('.')[-1] == 'zst' and self.fastq2.split('.')[-1] == 'zst':
                 r1_temp = os.path.join(self.tempdir, 'r1_temp.fq')
                 r2_temp = os.path.join(self.tempdir, 'r2_temp.fq')
