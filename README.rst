@@ -71,17 +71,17 @@ QIIME2 is being used.
 Installing ITSxpress for use as a QIIME2 Plugin
 ----------------------------------------------------
 
-To install ITSxpress as a plugin for QIIME 2 first install QIIME 2 as a separate Conda/Mamba environemnt using thier instructions 
-https://docs.qiime2.org/2024.5/install/ then add ITSxress to the QIIME 2 Conda environment. The examples below are for QIIME2 2 
-version 2024.2 an so please update the commands if you want a newer release.
+To install ITSxpress as a plugin for QIIME 2, first install QIIME 2 Amplicon Distribution as a separate Conda/Mamba environemnt using their instructions 
+https://docs.qiime2.org/2024.10/install/native then add ITSxpress to the QIIME 2 Conda environment. The examples below are for QIIME2 
+version 2024.10 an so please update the commands if you want a newer release.
  
 
 For Linux:
 
 .. code-block:: bash
 
-    conda env create -n qiime2-amplicon-2024.5 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-linux-conda.yml
-    conda activate qiime2-amplicon-2024.5
+    conda env create -n qiime2-amplicon-2024.10 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.10-py310-linux-conda.yml
+    conda activate qiime2-amplicon-2024.10
     conda install -c bioconda -c conda-forge ITSxpress
     qiime dev refresh-cache
 
@@ -89,16 +89,16 @@ For maxOS (Intel) and OS X:
 
 .. code-block:: bash
 
-    conda env create -n qiime2-amplicon-2024.5 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-osx-conda.yml
-     conda activate qiime2-amplicon-2024.5
+    conda env create -n qiime2-amplicon-2024.10 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.10-py310-osx-conda.yml
+    conda activate qiime2-amplicon-2024.10
     conda install -c bioconda -c conda-forge ITSxpress
     qiime dev refresh-cache
 
 For macOS (Arm / Apple Silicon):
 
 .. code-block:: bash
-    CONDA_SUBDIR=osx-64 conda env create -n qiime2-amplicon-2024.5 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.5-py39-osx-conda.yml
-    conda activate qiime2-amplicon-2024.5
+    CONDA_SUBDIR=osx-64 conda env create -n qiime2-amplicon-2024.10 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.10-py310-osx-conda.yml
+    conda activate qiime2-amplicon-2024.10
     conda config --env --set subdir osx-64
     CONDA_SUBDIR=osx-64 conda install -c bioconda -c conda-forge ITSxpress
     qiime dev refresh-cache
@@ -111,16 +111,16 @@ For Linux, maxOS (Intel), and OS X:
 
 .. code-block:: bash
 
-    mamba create -n itsxpressenv -c bioconda -c conda-forge itsxpress
-    mamba activate itsxpressenv 
+    conda create -n itsxpressenv -c bioconda -c conda-forge itsxpress
+    conda activate itsxpressenv 
 
 
 For macOS (Arm/Apple Silicon):
 
 .. code-block:: bash
 
-    CONDA_SUBDIR=osx-64 mamba create -n itsxpressenv -c bioconda -c conda-forge itsxpress
-    mamba activate itsxpressenv
+    CONDA_SUBDIR=osx-64 conda create -n itsxpressenv -c bioconda -c conda-forge itsxpress
+    conda activate itsxpressenv
     conda  config --env --set subdir osx-64
 
 
@@ -210,7 +210,7 @@ ITSxpress can take uncompressed, gzipped or zstd compressed FASTQ files and it c
 zstd compressed FASTQ files. It expects FASTQ files to end in: .fq, .fastq, .fq.gz, fastq.gz, .fq.zst or fastq.zst.
 
 Use case 2: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
-forward and reverse gzipped FASTQ files using two cpu threads. Return a forward
+forward and reverse gzipped FASTQ files using two cpu threads. Return forward
 and reverse read files for use in Dada2.
 
 .. code-block:: bash
