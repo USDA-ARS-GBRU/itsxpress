@@ -140,7 +140,7 @@ def read_file(filename: str, mode: str ='r') -> contextlib.contextmanager:
 
         Args:
             filename: the filename to open
-            mode: 'r' for read 'w' for write. 't' will be adeed automacially for compressed files.
+            mode: 'r' for read 'w' for write. 't' will be added automatically for compressed files.
         
         Returns a context manager so the file can be opened using 'with'
     """
