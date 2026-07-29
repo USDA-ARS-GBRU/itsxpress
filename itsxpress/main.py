@@ -207,6 +207,12 @@ def _check_fastqs(fastq: str, fastq2: str=None) -> None:
         with read_file(filename) as handle:
             records = SeqIO.parse(handle, 'fastq')
             reclist = list(islice(records, 2))
+            if not reclist:
+                # If file is empty, test_pair_names_str isn't applicable, return False
+                return False
+            if len(reclist) < 2:
+                # Single read file, cannot check paired name structure
+                return False
             return test_pair_names_str(reclist[0].id, reclist[1].id)
         
     def warn_mess(filename):

@@ -13,7 +13,7 @@ import pytest
 
 import itsxpress
 
-TEST_DIR = os.path.dirname(os.path.abspath(__name__))
+TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 from itsxpress.definitions import ROOT_DIR, taxa_dict
 hmmfile = os.path.join(ROOT_DIR,"ITSx_db","HMMs", taxa_dict["Fungi"])
 
@@ -472,3 +472,68 @@ except ModuleNotFoundError as e:
 	#logging
 	print("{}.Could not initialize the Qiime plugin portion of ITSxpress. Command line ITSxpress will still work normally. If you wish to use the Qiime2 ITSxpress plugin, you need to install Qiime2 first into your environment.\n".format(e))
 	pass
+
+
+# --- Additional Unit Tests to improve coverage and verify fixed logical bugs ---
+
+def test_check_fastqs_empty(tmp_path):
+	"""Verifies that check_fastqs handles empty files gracefully or returns correct False check on empty streams."""
+	empty_file = tmp_path / "empty.fastq"
+	empty_file.write_text("")
+	# Since it is empty, records list is empty and should return False inside core()
+	# Let's ensure calling _check_fastqs does not raise IndexError
+	itsxpress.main._check_fastqs(str(empty_file))
+
+def test_coordinate_zero_not_falsy():
+	"""Verifies that coordinate 0 (zero-index) is treated as a valid non-None value."""
+	from Bio.Seq import Seq
+	from Bio.SeqRecord import SeqRecord
+
+	class MockItsPosition:
+		def get_position(self, seq_id):
+			# Coordinate zero must be recognized!
+			return (0, 10, 100)
+
+	itspos = MockItsPosition()
+
+	# Create a dummy Dedup object
+	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
+	dedup = itsxpress.main.Dedup(uc_file=uc, rep_file=rep, seq_file=seq)
+	dedup.matchdict = {"seq1": "seq1"}
+
+	# Verify start=0 does not trigger falsy skip in generator filter logic
+	seqgen = [SeqRecord(Seq("ATCG" * 50), id="seq1", description="")]
+	res_gen = list(dedup._get_trimmed_seq_generator(iter(seqgen), itspos, wri_file=True))
+
+	# Since start=0 is evaluated correctly as a valid position, sequence must be successfully trimmed and returned.
+	assert len(res_gen) == 1
+	assert str(res_gen[0].seq) == "ATCGATCGAT"
+
+def test_generator_exhaustion_wri_file_false():
+	"""Verifies that calling _get_trimmed_seq_generator with wri_file=False does not exhaust the returned generator."""
+	from Bio.Seq import Seq
+	from Bio.SeqRecord import SeqRecord
+
+	class MockItsPosition:
+		def get_position(self, seq_id):
+			return (5, 15, 100)
+
+	itspos = MockItsPosition()
+
+	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
+	dedup = itsxpress.main.Dedup(uc_file=uc, rep_file=rep, seq_file=seq)
+	dedup.matchdict = {"seq1": "seq1"}
+
+	seqgen = [SeqRecord(Seq("ATCG" * 50), id="seq1", description="")]
+	# Get generator with wri_file=False
+	res_gen = dedup._get_trimmed_seq_generator(iter(seqgen), itspos, wri_file=False)
+
+	# Convert generator to list. Under the old buggy code, this would have been empty [].
+	# Under the new robust code, it remains unexhausted and fully functional!
+	res_list = list(res_gen)
+	assert len(res_list) == 1
+	assert len(res_list[0].seq) == 10
