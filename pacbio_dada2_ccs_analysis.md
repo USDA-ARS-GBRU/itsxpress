@@ -135,6 +135,52 @@ plugin.methods.register_function(
 )
 ```
 
+### E. Step 5: Consensus Flanking Anchors for DADA2 Compatibility
+To satisfy DADA2 `denoise-ccs`'s mandatory requirement for primer sequences without re-introducing non-biological artifacts, `ITSxpress` will utilize a fixed-length trimming window rather than an absolute boundary slice.
+
+1. **Junction Anchor Slicing:** 
+   Instead of cutting exactly at the coordinates identified by the HMMER search, the trimming function will expand the coordinate boundaries outward to include exactly **15 base pairs** of the conserved flanking structural genes.
+   - **5' Edge (Forward Anchor):** Retain the last 15 bp of the upstream gene (e.g., 18S for ITS1, or 5.8S for ITS2).
+   - **3' Edge (Reverse Anchor):** Retain the first 15 bp of the downstream gene (e.g., 5.8S for ITS1, or 28S for ITS2).
+
+2. **Consensus Calculation:**
+   Because `ITSxpress` pre-orients 100% of the reads to the forward strand in Step 1, these 15 bp flanking regions will be highly conserved and predictable based on the user's selected `--taxa` and `--region`. The plugin will internally compute these two 15 bp strings.
+
+3. **User Output Logging:**
+   At the successful completion of the pipeline, the CLI and QIIME 2 visualizer will print the exact 15 bp consensus sequences to the terminal log. This tells the user exactly what to type into their downstream DADA2 command, removing all user guesswork.
+
+```text
+Success: ITSxpress completed. Reads are 100% forward-oriented.
+To run 'qiime dada2 denoise-ccs' next, use these exact parameters for your taxon:
+
+   --p-front    [15-BP_CALCULATED_FORWARD_CONSENUS]
+   --p-adapter  [15-BP_CALCULATED_REVERSE_CONSENUS]
+```
+
+### 💻 Required Code Changes for `itsxpress/q2_itsxpress.py`
+
+Update your proposed wrapper registration to output these calculated consensus strings as metadata or via the standard logging channel so the user receives them:
+
+```python
+# In itsxpress/q2_itsxpress.py:
+def trim_pacbio_ccs(
+    per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt,
+    region: str,
+    front: str,
+    taxa: str = "F",
+    threads: int = 1
+) -> CasavaOneEightSingleLanePerSampleDirFmt:
+    # 1. Reorient files in per_sample_sequences using the forward primer (front)
+    # 2. Run the single-end trimming pipeline, leaving 15 bp flanking anchor boundaries
+    # 3. Compute the 15 bp consensus sequences based on the 'taxa' and 'region' matrix
+    # 4. Log/Print the calculated --p-front and --p-adapter strings for DADA2 compatibility
+    # 5. Return results format expected by DADA2 denoise-ccs
+```
+
+***
+
+Would you like to double-check the **exact 15 bp consensus nucleotide sequences** for the fungal junctions (18S, 5.8S, and 28S) to ensure they are hardcoded accurately for the script?
+
 ---
 
 ## 4. Operational Pipeline Checklist
@@ -144,3 +190,4 @@ When executing this pipeline for DADA2 `denoise-ccs`:
 2. **Conserved Primers Removal:** Conserved primer regions must be completely sliced off, leaving only the variable spacer sequences.
 3. **No Quality Distortions:** Phred quality scores must be accurately preserved and untouched.
 4. **Valid Format:** The output FASTQ file must be a valid Single-End format (`SampleData[SequencesWithQuality]`) compatible with `qiime dada2 denoise-ccs`.
+
