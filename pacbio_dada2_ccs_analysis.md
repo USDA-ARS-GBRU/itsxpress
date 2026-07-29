@@ -138,7 +138,7 @@ plugin.methods.register_function(
 ### E. Step 5: Consensus Flanking Anchors for DADA2 Compatibility
 To satisfy DADA2 `denoise-ccs`'s mandatory requirement for primer sequences without re-introducing non-biological artifacts, `ITSxpress` will utilize a fixed-length trimming window rather than an absolute boundary slice.
 
-1. **Junction Anchor Slicing:** 
+1. **Junction Anchor Slicing:**
    Instead of cutting exactly at the coordinates identified by the HMMER search, the trimming function will expand the coordinate boundaries outward to include exactly **15 base pairs** of the conserved flanking structural genes.
    - **5' Edge (Forward Anchor):** Retain the last 15 bp of the upstream gene (e.g., 18S for ITS1, or 5.8S for ITS2).
    - **3' Edge (Reverse Anchor):** Retain the first 15 bp of the downstream gene (e.g., 5.8S for ITS1, or 28S for ITS2).
@@ -190,4 +190,3 @@ When executing this pipeline for DADA2 `denoise-ccs`:
 2. **Conserved Primers Removal:** Conserved primer regions must be completely sliced off, leaving only the variable spacer sequences.
 3. **No Quality Distortions:** Phred quality scores must be accurately preserved and untouched.
 4. **Valid Format:** The output FASTQ file must be a valid Single-End format (`SampleData[SequencesWithQuality]`) compatible with `qiime dada2 denoise-ccs`.
-
