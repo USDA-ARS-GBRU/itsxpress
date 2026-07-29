@@ -44,10 +44,7 @@ from numpy import empty
 from Bio import SeqIO
 
 from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio
-from itsxpress.Dedup import Dedup
-from itsxpress.ITSposition import ItsPosition
-from itsxpress.SeqSamplePaired import SeqSamplePairedNotInterleaved
-from itsxpress.SeqSampleNotPaired import SeqSampleNotPaired
+from itsxpress.SeqSample import Dedup, ItsPosition, SeqSamplePairedNotInterleaved, SeqSampleNotPaired
 from ._version import __version__
 
 def restricted_float(x):
