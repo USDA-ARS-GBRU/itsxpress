@@ -7,6 +7,7 @@ from typing import Dict, Tuple, Optional, Any, Generator, Iterator, Union, List
 
 import pyzstd as zstd
 from Bio import SeqIO
+from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
 from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio, vsearch_fastq_qmax
@@ -43,6 +44,42 @@ class SeqSample:
         self.seq_file: Optional[str] = None
         self.r1: Optional[str] = None
         self.fastq2: Optional[str] = None
+
+    def orient_reads(self, threads: Union[int, str] = 1) -> None:
+        """Orients reads using Vsearch --orient against the universal reference database.
+
+        Args:
+            threads: The number of processor threads to use.
+
+        Raises:
+            subprocess.CalledProcessError: If Vsearch execution fails.
+            FileNotFoundError: If Vsearch binary cannot be located.
+        """
+        try:
+            orient_ref = os.path.join(ROOT_DIR, "universal_orient_ref_clean.fasta.gz")
+            oriented_fastq = os.path.join(self.tempdir, 'oriented.fq')
+            parameters = [
+                "vsearch",
+                "--orient", self.fastq,
+                "--db", orient_ref,
+                "--fastqout", oriented_fastq,
+                "--id", "0.35",
+                "--threads", str(threads)
+            ]
+            p = subprocess.run(parameters, stderr=subprocess.PIPE)
+            p.check_returncode()
+            logging.info(p.stderr.decode('utf-8'))
+
+            # Update the sequence files to point to the oriented fastq
+            self.fastq = oriented_fastq
+            self.seq_file = oriented_fastq
+            self.r1 = oriented_fastq
+        except subprocess.CalledProcessError as e:
+            logging.exception("Could not orient reads with Vsearch. Error from Vsearch was:\n {}".format(p.stderr.decode('utf-8')))
+            raise e
+        except FileNotFoundError as f:
+            logging.error("Vsearch was not found, make sure Vsearch is installed and executable")
+            raise f
 
     def deduplicate(self, threads: Union[int, str] = 1) -> None:
         """Runs Vsearch dereplication to create a FASTA file of non-redundant sequences.
@@ -430,7 +467,7 @@ class Dedup:
             logging.exception("Could not parse the Vsearch '.uc' file.")
             raise e
 
-    def _get_paired_seq_generator(self, zipseqgen: Iterator[Tuple[SeqRecord, SeqRecord]], itspos: ItsPosition, wri_file: bool) -> Tuple[Generator[SeqRecord, None, None], Generator[SeqRecord, None, None]]:
+    def _get_paired_seq_generator(self, zipseqgen: Iterator[Tuple[SeqRecord, SeqRecord]], itspos: ItsPosition, wri_file: bool, trim_ccs: bool = False) -> Tuple[Generator[SeqRecord, None, None], Generator[SeqRecord, None, None]]:
         """This function takes a zipped object of two Biopython SeqIO sequence generators, and
 
         returns two generators of Biopython SeqRecords for Dada2. Sequences where the ITS ends could
@@ -441,6 +478,7 @@ class Dedup:
                 for the forward and reverse input sequences.
             itspos: An itsxpress ItsPosition object.
             wri_file: Whether the sequences will be written to files.
+            trim_ccs: Whether the trim_ccs mode is enabled (attaches synthetic primers).
 
         Returns:
             A tuple of two python generators yielding forward and reverse trimmed SeqRecords.
@@ -458,6 +496,28 @@ class Dedup:
                 return False
             except KeyError:
                 return False
+
+        def _stitch_primers(record: SeqRecord) -> SeqRecord:
+            fwd_seq = "GACAGGTACAAGAAGGA"
+            rev_seq = "TTAACCCAGTCTCCAGT"
+
+            new_seq = Seq(fwd_seq) + record.seq + Seq(rev_seq)
+            fwd_qual = [93] * len(fwd_seq)
+            rev_qual = [93] * len(rev_seq)
+
+            if "phred_quality" in record.letter_annotations:
+                new_qual = fwd_qual + list(record.letter_annotations["phred_quality"]) + rev_qual
+            else:
+                new_qual = fwd_qual + [93] * len(record) + rev_qual
+
+            new_record = SeqRecord(
+                new_seq,
+                id=record.id,
+                name=record.name,
+                description=record.description
+            )
+            new_record.letter_annotations["phred_quality"] = new_qual
+            return new_record
 
         def _map_func(ziprecord: Tuple[SeqRecord, SeqRecord]) -> Tuple[SeqRecord, SeqRecord]:
             """Trims the record down to the selected ITS region."""
@@ -486,6 +546,11 @@ class Dedup:
             except ValueError as e:
                 logging.exception(e)
                 raise e
+
+            if trim_ccs:
+                record1_return = _stitch_primers(record1_return)
+                record2_return = _stitch_primers(record2_return)
+
             return record1_return, record2_return
 
         def _split_gen(gen: Iterator[Tuple[SeqRecord, SeqRecord]]) -> Tuple[Generator[SeqRecord, None, None], Generator[SeqRecord, None, None]]:
@@ -527,7 +592,7 @@ class Dedup:
 
         return gen1_split_a, gen1_split_b
 
-    def create_paired_trimmed_seqs(self, outfile1: str, outfile2: str, gzipped: bool, zstd_file: bool, itspos: ItsPosition, wri_file: bool) -> None:
+    def create_paired_trimmed_seqs(self, outfile1: str, outfile2: str, gzipped: bool, zstd_file: bool, itspos: ItsPosition, wri_file: bool, trim_ccs: bool = False) -> None:
         """Writes two FASTQ files, optionally compressed, with the reads trimmed to the selected region.
 
         Args:
@@ -537,6 +602,7 @@ class Dedup:
             zstd_file: Should the output files be zstd compressed? (.zst files)
             itspos: an ItsPosition object.
             wri_file: Should file be written or checked for empty sequences?
+            trim_ccs: Whether the trim_ccs mode is enabled.
 
         Raises:
             ValueError: If file suffix combinations are mixed or unsupported.
@@ -561,7 +627,7 @@ class Dedup:
             seqgen1 = SeqIO.parse(f, 'fastq')
             seqgen2 = SeqIO.parse(g, 'fastq')
             zipseqgen = zip(seqgen1, seqgen2)
-            seqs1, seqs2 = self._get_paired_seq_generator(zipseqgen, itspos, wri_file)
+            seqs1, seqs2 = self._get_paired_seq_generator(zipseqgen, itspos, wri_file, trim_ccs=trim_ccs)
             if wri_file:
                 _write_seqs(seqs1, outfile1)
                 _write_seqs(seqs2, outfile2)
@@ -588,7 +654,7 @@ class Dedup:
         except Exception as e:
             raise e
 
-    def _get_trimmed_seq_generator(self, seqgen: Iterator[SeqRecord], itspos: ItsPosition, wri_file: bool) -> Generator[SeqRecord, None, None]:
+    def _get_trimmed_seq_generator(self, seqgen: Iterator[SeqRecord], itspos: ItsPosition, wri_file: bool, trim_ccs: bool = False) -> Generator[SeqRecord, None, None]:
         """This function takes a Biopython SeqIO sequence generator, and
 
         returns a generator of trimmed sequences suitable for Deblur. Sequences where the ITS ends could
@@ -598,6 +664,7 @@ class Dedup:
             seqgen: A Biopython SeqIO generator of all input sequences.
             itspos: An itsxpress ItsPosition object.
             wri_file: Whether the output will be written.
+            trim_ccs: Whether the trim_ccs mode is enabled.
 
         Returns:
             A python generator yielding trimmed SeqRecords.
@@ -615,6 +682,28 @@ class Dedup:
             except KeyError:
                 return False
 
+        def _stitch_primers(record: SeqRecord) -> SeqRecord:
+            fwd_seq = "GACAGGTACAAGAAGGA"
+            rev_seq = "TTAACCCAGTCTCCAGT"
+
+            new_seq = Seq(fwd_seq) + record.seq + Seq(rev_seq)
+            fwd_qual = [93] * len(fwd_seq)
+            rev_qual = [93] * len(rev_seq)
+
+            if "phred_quality" in record.letter_annotations:
+                new_qual = fwd_qual + list(record.letter_annotations["phred_quality"]) + rev_qual
+            else:
+                new_qual = fwd_qual + [93] * len(record) + rev_qual
+
+            new_record = SeqRecord(
+                new_seq,
+                id=record.id,
+                name=record.name,
+                description=record.description
+            )
+            new_record.letter_annotations["phred_quality"] = new_qual
+            return new_record
+
         def map_func(record: SeqRecord) -> SeqRecord:
             """Trims the record down to the selected ITS region."""
             if self.matchdict is None:
@@ -623,7 +712,10 @@ class Dedup:
             start, stop, tlen = itspos.get_position(repseq)
             if start is None or stop is None:
                 raise ValueError(f"Could not retrieve valid positions for sequence {record.id}")
-            return record[start:stop]
+            trimmed = record[start:stop]
+            if trim_ccs:
+                trimmed = _stitch_primers(trimmed)
+            return trimmed
 
         filt = filter(_filterfunc, seqgen)
         filt_a, filt_b = tee(filt, 2)
@@ -644,7 +736,7 @@ class Dedup:
 
         return (map_func(rec) for rec in filt_b)
 
-    def create_trimmed_seqs(self, outfile: str, gzipped: bool, zstd_file: bool, itspos: ItsPosition, wri_file: bool, tempdir: str) -> None:
+    def create_trimmed_seqs(self, outfile: str, gzipped: bool, zstd_file: bool, itspos: ItsPosition, wri_file: bool, tempdir: str, trim_ccs: bool = False) -> None:
         """Creates a FASTQ file, optionally compressed, with the reads trimmed to the selected region.
 
         Args:
@@ -654,6 +746,7 @@ class Dedup:
             itspos: An ItsPosition object.
             wri_file: Should file be written or checked for empty sequences?
             tempdir: Path to a temporary directory.
+            trim_ccs: Whether the trim_ccs mode is enabled.
         """
         def _write_seqs(seqs: Generator[SeqRecord, None, None]) -> None:
             if gzipped:
@@ -676,18 +769,18 @@ class Dedup:
         if self.seq_file.endswith(".gz"):
             with gzip.open(self.seq_file, 'rt') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
-                seqs = self._get_trimmed_seq_generator(seqgen, itspos, wri_file)
+                seqs = self._get_trimmed_seq_generator(seqgen, itspos, wri_file, trim_ccs=trim_ccs)
                 if wri_file:
                     _write_seqs(seqs)
         elif self.seq_file.endswith(".zst"):
             with zstd.open(self.seq_file, 'rt') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
-                seqs = self._get_trimmed_seq_generator(seqgen, itspos, wri_file)
+                seqs = self._get_trimmed_seq_generator(seqgen, itspos, wri_file, trim_ccs=trim_ccs)
                 if wri_file:
                     _write_seqs(seqs)
         else:
             with open(self.seq_file, 'r') as f:
                 seqgen = SeqIO.parse(f, 'fastq')
-                seqs = self._get_trimmed_seq_generator(seqgen, itspos, wri_file)
+                seqs = self._get_trimmed_seq_generator(seqgen, itspos, wri_file, trim_ccs=trim_ccs)
                 if wri_file:
                     _write_seqs(seqs)

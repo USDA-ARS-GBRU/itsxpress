@@ -326,3 +326,42 @@ def test_generator_exhaustion_wri_file_false():
 	res_list = list(res_gen)
 	assert len(res_list) == 1
 	assert len(res_list[0].seq) == 10
+
+def test_trim_ccs_stitching():
+	"""Verifies that enabling trim_ccs properly stitches fake primers and sets maximum quality scores."""
+	from Bio.Seq import Seq
+	from Bio.SeqRecord import SeqRecord
+
+	class MockItsPosition:
+		def get_position(self, seq_id):
+			return (5, 15, 100)
+
+	itspos = MockItsPosition()
+
+	uc = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "uc.txt")
+	seq = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "seq.fq.gz")
+	rep = os.path.join(TEST_DIR, "test_data", "ex_tmpdir", "rep.fa")
+	dedup = itsxpress.main.Dedup(uc_file=uc, rep_file=rep, seq_file=seq)
+	dedup.matchdict = {"seq1": "seq1"}
+
+	original_seq = "N" * 50
+	seqgen = [SeqRecord(Seq(original_seq), id="seq1", description="")]
+	# Set simple mock quality scores
+	seqgen[0].letter_annotations["phred_quality"] = [40] * len(original_seq)
+
+	# Get generator with trim_ccs=True
+	res_gen = dedup._get_trimmed_seq_generator(iter(seqgen), itspos, wri_file=True, trim_ccs=True)
+	res_list = list(res_gen)
+
+	assert len(res_list) == 1
+	stitched = res_list[0]
+
+	fwd_primer = "GACAGGTACAAGAAGGA"
+	rev_primer_rc = "TTAACCCAGTCTCCAGT"
+	expected_seq = fwd_primer + "N" * 10 + rev_primer_rc
+
+	assert str(stitched.seq) == expected_seq
+
+	# Quality scores should align perfectly: fwd_primer has 93s, trimmed sequence has 40s, rev_primer_rc has 93s
+	expected_quals = [93] * 17 + [40] * 10 + [93] * 17
+	assert stitched.letter_annotations["phred_quality"] == expected_quals

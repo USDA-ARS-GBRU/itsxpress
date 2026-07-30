@@ -75,6 +75,8 @@ def myparser():
     parser.add_argument('--taxa', help='The taxonomic group sequenced.', choices=taxa_choices, default="Fungi")
     parser.add_argument('--cluster_id', help='The percent identity for clustering reads range [0.99-1.0], set to 1 for exact dereplication.', type=restricted_float, default=1.0)
     parser.add_argument('--reversed_primers', '-rp',  help="Primers are in reverse orientation as in Taylor et al. 2016, DOI:10.1128/AEM.02576-16. If selected ITSxpress returns trimmed reads flipped to the forward orientation", action='store_true')
+    parser.add_argument('--trim-ccs', dest='trim_ccs', action='store_true', default=False,
+                        help='Stitch fake forward and reverse complement of fake reverse primer for DADA2 denoise-ccs on PacBio reads.')
     parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
     parser.add_argument('--threads' ,help="Number of processor threads to use.", type=int, default=1)
     parser.add_argument('--version', '-v' , help="display version",  action="version", version="ITSxpress version: " + __version__)
@@ -290,6 +292,8 @@ def main(args=None):
         args = parser.parse_args()
     _logger_setup(args.log)
     try:
+        if args.trim_ccs:
+            args.single_end = True
         logging.info("Starting ITSxpress version  {}".format(__version__))
         logging.info("Verifying the input sequences.")
         _check_fastqs(args.fastq, args.fastq2)
@@ -303,6 +307,9 @@ def main(args=None):
         elif not paired_end:
             logging.info("Sequences are assumed to be single-end.")
             sobj = SeqSampleNotPaired(fastq=args.fastq, tempdir=session_tempdir)
+        if args.trim_ccs:
+            logging.info("Orients PacBio reads using Vsearch --orient against the universal reference database.")
+            sobj.orient_reads(threads=str(args.threads))
         # Deduplicate
         logging.info("Unique sequences are being written to a temporary FASTA file with Vsearch.")
         if math.isclose(args.cluster_id, 1, rel_tol=1e-05):
@@ -321,26 +328,26 @@ def main(args=None):
         # Trim sequences
         if args.outfile2:
             if args.outfile.split('.')[-1] == 'gz' and args.outfile2.split('.')[-1] == 'gz':
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True,zstd_file = False,  itspos=its_pos,wri_file=True)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True,zstd_file = False,  itspos=its_pos,wri_file=True, trim_ccs=args.trim_ccs)
                 #dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True,zstd_file = False,  itspos=its_pos,wri_file=False)
             elif args.outfile.split('.')[-1] == 'zst' and args.outfile2.split('.')[-1] == 'zst':
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=True)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=True, trim_ccs=args.trim_ccs)
                 #dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=False)
             else:
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False,zstd_file = False,  itspos=its_pos,wri_file=True)
+                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False,zstd_file = False,  itspos=its_pos,wri_file=True, trim_ccs=args.trim_ccs)
                 #dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False,zstd_file = False,  itspos=its_pos,wri_file=False)
 
         else:
             if args.outfile.split('.')[-1] == 'gz':
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=True,tempdir=sobj.tempdir)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=True,tempdir=sobj.tempdir, trim_ccs=args.trim_ccs)
                 #dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=False)
                 #add function with above create_trimmed_seqs
                 #use said function to check for 0 length seqs
             elif args.outfile.split('.')[-1] == 'zst':
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=True,tempdir=sobj.tempdir)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=True,tempdir=sobj.tempdir, trim_ccs=args.trim_ccs)
                 #dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=False)
             else:
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=True,tempdir=sobj.tempdir)
+                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=True,tempdir=sobj.tempdir, trim_ccs=args.trim_ccs)
                 #dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=False)
         # Count reads after trimming
         logging.info("Counting reads after trimming.")
