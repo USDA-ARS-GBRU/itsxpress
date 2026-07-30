@@ -1,20 +1,21 @@
-FROM condaforge/mambaforge:24.7.1-0
-
-# # Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Build directly on top of the official QIIME 2 Amplicon environment 
+FROM quay.io/qiime2/amplicon:2026.7
 
 LABEL org.opencontainers.image.source="https://github.com/usda-ars-gbru/itsxpress"
-# Install conda dependencies
-RUN conda update mamba -c conda-forge
-RUN mamba install -c conda-forge python>=3.9
-RUN mamba install -c bioconda vsearch=2.22.1 hmmer=3.1b2
 
-# Copy the itsxpress package files and install dependencies
-COPY .. /app
-RUN cd /app && git clone https://github.com/USDA-ARS-GBRU/itsxpress.git && cd itsxpress && pip install .
+# Update/Install matching core dependencies within the container context
+RUN conda install -y -c bioconda vsearch=2.30.4 hmmer=3.4 biopython=1.84 && \
+    pip install pyzstd pytest
 
-# Set the default command to run itsxpress
+# Copy your local, pushed repository files cleanly into the working directory
+WORKDIR /app
+COPY . /app
+
+# Install itsxpress directly into the active base environment
+RUN pip install .
+
+# Pre-refresh the plugin cache so the itsxpress plugin is instantly available to users
+RUN qiime dev refresh-cache
+
+# Set the default command to run itsxpress standalone CLI
 CMD ["itsxpress"]

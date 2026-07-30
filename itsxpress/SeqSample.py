@@ -63,7 +63,6 @@ class SeqSample:
                 "--orient", self.fastq,
                 "--db", orient_ref,
                 "--fastqout", oriented_fastq,
-                "--id", "0.35",
                 "--threads", str(threads)
             ]
             p = subprocess.run(parameters, stderr=subprocess.PIPE)
