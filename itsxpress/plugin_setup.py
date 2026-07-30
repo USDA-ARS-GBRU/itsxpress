@@ -45,7 +45,8 @@ plugin.methods.register_function(
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),
                 'threads': Int,
-                'cluster_id': Float % Range(0.995, 1.0, inclusive_start=True, inclusive_end=True)},
+                'cluster_id': Float % Range(0.995, 1.0, inclusive_start=True, inclusive_end=True),
+                'trim_ccs': Bool},
     outputs=[('trimmed', SampleData[SequencesWithQuality])],
     input_descriptions={'per_sample_sequences': 'The artifact that contains the sequence file(s).'
                                                 ' Either Joined Paired or just a single fastq.'
@@ -54,7 +55,8 @@ plugin.methods.register_function(
         'region': ('\nThe regions ITS2, ITS1, and ALL that can be selected from.'),
         'taxa': ('\nThe selected taxonomic group sequenced that can be selected from.'),
         'threads': ('\nThe number of processor threads to use in the run.'),\
-        'cluster_id': ('\nThe percent identity for clustering reads, set to 1 for exact dereplication.')
+        'cluster_id': ('\nThe percent identity for clustering reads, set to 1 for exact dereplication.'),
+        'trim_ccs': ('\nWhether to enable trim-ccs mode for PacBio CCS reads.')
     },
     output_descriptions={'trimmed': 'The trimmed sequences from ITSxpress.'},
     name='Trim single-end reads',

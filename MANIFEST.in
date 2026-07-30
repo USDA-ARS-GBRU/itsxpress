@@ -6,3 +6,4 @@ include LICENSE.txt
 include itsxpress/citations.bib
 include changelog.md 
 include Dockerfile
+include itsxpress/universal_orient_ref_clean.fasta.gz

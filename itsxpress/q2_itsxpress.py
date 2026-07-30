@@ -13,24 +13,23 @@ ITSxpress is a high-speed implementation of the methods in ITSx than also allows
 files to be processed. Processing FASTQ files Which is essential for analyzing
 sequences using the newer exact Sequence Variant methods in Qiime2, Dada2, Deblur
 and Unoise that are replacing OTU clustering.
-
 """
+
 import os
 import pathlib
 import shutil
 import math
 import tempfile
+from typing import Any
 
 import pandas as pd
 from q2_types.per_sample_sequences import (SingleLanePerSamplePairedEndFastqDirFmt,
                                            SingleLanePerSampleSingleEndFastqDirFmt,
                                            CasavaOneEightSingleLanePerSampleDirFmt)
 from itsxpress import main as itsxpress
-from itsxpress.definitions import (taxa_dict,
-                   ROOT_DIR)
+from itsxpress.definitions import taxa_dict, ROOT_DIR
 
-#default_cluster_id=0.995
-default_cluster_id=1.0
+default_cluster_id: float = 1.0
 
 
 def _set_fastqs_and_check(fastq: str,
@@ -40,75 +39,81 @@ def _set_fastqs_and_check(fastq: str,
                           single_end: bool,
                           reversed_primers: bool,
                           allow_staggered_reads: bool,
-                          threads: int) -> object:
+                          threads: int) -> Any:
     """Checks and writes the fastqs as well as if they are paired end and single end.
 
-        Args:
-            fastq (str): The path to the forward reads file.
-            fastq2 (str): The path to the reverse reads file.
-            sample_id (str): The Sample ID.
-            single_end (bool): If the sequences are singled ended or not
-            threads (int): The amount of threads to use
+    Args:
+        fastq: The path to the forward reads file.
+        fastq2: The path to the reverse reads file.
+        tempdir: Path to a temporary directory.
+        sample_id: The Sample ID.
+        single_end: If the sequences are singled ended or not.
+        reversed_primers: Primers are in reverse orientation.
+        allow_staggered_reads: Allow merging staggered reads.
+        threads: The amount of threads to use.
 
-        Returns:
-            (object): The sobj object
+    Returns:
+        The sequence sample object.
 
-        Raises:
-            ValueError1: for FASTQ format issue.
-
-        """
-    # checking fastqs
+    Raises:
+        ValueError: for FASTQ format issue.
+    """
     try:
         itsxpress._check_fastqs(fastq=fastq, fastq2=fastq2)
-        # Parse input types
         paired_end = itsxpress._is_paired(fastq=fastq,
                                           fastq2=fastq2,
                                           single_end=single_end)
-    except (NotADirectoryError,
-            FileNotFoundError):
-
+    except (NotADirectoryError, FileNotFoundError):
         raise ValueError("There is a problem with the fastq file(s) you selected")
-        # Create SeqSample objects and merge if needed.
 
-    
     if paired_end:
         sobj = itsxpress.SeqSamplePairedNotInterleaved(fastq=fastq,
                                                        fastq2=fastq2,
                                                        tempdir=tempdir,
                                                        reversed_primers=reversed_primers)
-        sobj._merge_reads(threads=threads,stagger=allow_staggered_reads)
+        sobj._merge_reads(threads=threads, stagger=allow_staggered_reads)
         return sobj
-
-    elif not paired_end:
+    else:
         sobj = itsxpress.SeqSampleNotPaired(fastq=fastq,
                                             tempdir=tempdir)
         return sobj
 
 
 def _taxa_prefix_to_taxa(taxa_prefix: str) -> str:
-    """Turns the taxa prefix letter into the taxa
+    """Turns the taxa prefix letter into the taxa name.
 
-        Args:
-            taxa_prefix (str): The taxa prefix that will be converted to taxa.
+    Args:
+        taxa_prefix: The taxa prefix character.
 
-        Returns:
-            (str): The Taxa
-
+    Returns:
+        The taxonomical group name.
     """
     taxa_dic = {"A": "Alveolata", "B": "Bryophyta", "C": "Bacillariophyta", "D": "Amoebozoa", "E": "Euglenozoa",
                 "F": "Fungi", "G": "Chlorophyta", "H": "Rhodophyta", "I": "Phaeophyceae", "L": "Marchantiophyta",
                 "M": "Metazoa", "O": "Oomycota", "P": "Haptophyceae", "Q": "Raphidophyceae", "R": "Rhizaria",
-                "S": "Synurophyceae", "T": "Tracheophyta", "U": "Eustigmatophyceae","Y": "Parabasalia", "ALL": "All"}
-    taxa_choice = taxa_dic[taxa_prefix]
-    return taxa_choice
+                "S": "Synurophyceae", "T": "Tracheophyta", "U": "Eustigmatophyceae", "Y": "Parabasalia", "ALL": "All"}
+    return taxa_dic[taxa_prefix]
 
 
-# First command Trim for SingleLanePerSampleSingleEndFastqDirFmt
 def trim_single(per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt,
                 region: str,
                 taxa: str = "F",
                 threads: int = 1,
-                cluster_id: float = default_cluster_id) -> CasavaOneEightSingleLanePerSampleDirFmt:
+                cluster_id: float = default_cluster_id,
+                trim_ccs: bool = False) -> CasavaOneEightSingleLanePerSampleDirFmt:
+    """Trims single-end sequence reads.
+
+    Args:
+        per_sample_sequences: Input single-end sequences.
+        region: The target ITS region to trim.
+        taxa: Taxonomic group of interest.
+        threads: Number of threads to use.
+        cluster_id: Dereplication or clustering threshold identity.
+        trim_ccs: Whether trim-ccs mode is enabled for PacBio reads.
+
+    Returns:
+        The Casava 1.8 single-end directory output.
+    """
     results = main(per_sample_sequences=per_sample_sequences,
                    threads=threads,
                    taxa=taxa,
@@ -116,12 +121,12 @@ def trim_single(per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt,
                    paired_in=False,
                    paired_out=False,
                    reversed_primers=False,
-                   allow_staggered_reads = False,
-                   cluster_id=cluster_id)
+                   allow_staggered_reads=False,
+                   cluster_id=cluster_id,
+                   trim_ccs=trim_ccs)
     return results
 
 
-# Second command Trim for SingleLanePerSamplePairedEndFastqDirFmt
 def trim_pair(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
               region: str,
               taxa: str = "F",
@@ -129,6 +134,20 @@ def trim_pair(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
               reversed_primers: bool = False,
               allow_staggered_reads: bool = True,
               cluster_id: float = default_cluster_id) -> CasavaOneEightSingleLanePerSampleDirFmt:
+    """Trims paired-end sequence reads.
+
+    Args:
+        per_sample_sequences: Input paired-end sequences.
+        region: The target ITS region to trim.
+        taxa: Taxonomic group of interest.
+        threads: Number of threads to use.
+        reversed_primers: Primers are in reverse orientation.
+        allow_staggered_reads: Allow merging staggered reads.
+        cluster_id: Dereplication or clustering threshold identity.
+
+    Returns:
+        The Casava 1.8 directory output.
+    """
     results = main(per_sample_sequences=per_sample_sequences,
                    threads=threads,
                    taxa=taxa,
@@ -136,18 +155,33 @@ def trim_pair(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
                    paired_in=True,
                    paired_out=False,
                    reversed_primers=reversed_primers,
-                   allow_staggered_reads = allow_staggered_reads,
-                   cluster_id=cluster_id)
+                   allow_staggered_reads=allow_staggered_reads,
+                   cluster_id=cluster_id,
+                   trim_ccs=False)
     return results
 
-# Second command Trim for SingleLanePerSamplePairedEndFastqDirFmt
+
 def trim_pair_output_unmerged(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
-              region: str,
-              taxa: str = "F",
-              threads: int = 1,
-              reversed_primers: bool = False,
-              allow_staggered_reads: bool = True,
-              cluster_id: float = default_cluster_id) -> CasavaOneEightSingleLanePerSampleDirFmt:
+                              region: str,
+                              taxa: str = "F",
+                              threads: int = 1,
+                              reversed_primers: bool = False,
+                              allow_staggered_reads: bool = True,
+                              cluster_id: float = default_cluster_id) -> CasavaOneEightSingleLanePerSampleDirFmt:
+    """Trims paired-end sequence reads, keeping them unmerged.
+
+    Args:
+        per_sample_sequences: Input paired-end sequences.
+        region: The target ITS region to trim.
+        taxa: Taxonomic group of interest.
+        threads: Number of threads to use.
+        reversed_primers: Primers are in reverse orientation.
+        allow_staggered_reads: Allow merging staggered reads.
+        cluster_id: Dereplication or clustering threshold identity.
+
+    Returns:
+        The Casava 1.8 directory output.
+    """
     results = main(per_sample_sequences=per_sample_sequences,
                    threads=threads,
                    taxa=taxa,
@@ -155,11 +189,13 @@ def trim_pair_output_unmerged(per_sample_sequences: SingleLanePerSamplePairedEnd
                    paired_in=True,
                    paired_out=True,
                    reversed_primers=reversed_primers,
-                   allow_staggered_reads = allow_staggered_reads,
-                   cluster_id=cluster_id)
+                   allow_staggered_reads=allow_staggered_reads,
+                   cluster_id=cluster_id,
+                   trim_ccs=False)
     return results
-# The ITSxpress handling
-def main(per_sample_sequences,
+
+
+def main(per_sample_sequences: Any,
          threads: int,
          taxa: str,
          region: str,
@@ -167,41 +203,38 @@ def main(per_sample_sequences,
          paired_out: bool,
          reversed_primers: bool,
          allow_staggered_reads: bool,
-         cluster_id: float) -> CasavaOneEightSingleLanePerSampleDirFmt:
+         cluster_id: float,
+         trim_ccs: bool = False) -> CasavaOneEightSingleLanePerSampleDirFmt:
     """The main communication between the plugin and the ITSxpress program.
 
     Args:
-        per_sample_sequences (SingleLanePerSampleSingleEndFastqDirFmt or SingleLanePerSamplePairedEndFastqDirFmt):
-        the input sequences.
-        threads (int) : The number of threads to use.
-        taxa (str): The taxa to be used for the search.
-        region (str) : The region to be used for the search.
-        paired_in (bool): Declares if input files are paired.
-        paired_out (bool): Declares if output files should be paired.
-        allow_staggered_reads (bool):  Allows merging of staggered reads. Default True.
-        cluster_id (float):The percent identity for clustering reads, set to 1 for exact dereplication.
+        per_sample_sequences: The input sequences.
+        threads: The number of threads to use.
+        taxa: The taxonomic group used for the search.
+        region: The region used for the search.
+        paired_in: Declares if input files are paired.
+        paired_out: Declares if output files should be paired.
+        reversed_primers: Primers are in reverse orientation.
+        allow_staggered_reads: Allows merging of staggered reads.
+        cluster_id: The percent identity for clustering reads.
+        trim_ccs: Whether the trim-ccs mode is enabled.
 
     Returns:
-        (CasavaOneEightSingleLanePerSampleDirFmt): A catch-all output type for
-        both single and paired-end reads.
+        A directory output type for fastq files.
 
     Raises:
-        ValueError1: hmmsearch error.
-
+        ValueError: hmmsearch error or folder creation error.
     """
-    # Setting the taxa
     taxa = _taxa_prefix_to_taxa(taxa)
     samples = per_sample_sequences.manifest.view(pd.DataFrame)
     try:
         tempdir = tempfile.mkdtemp(prefix='itsxpress_')
-        # print("tempdir location {}".format(tempdir))
-    except Exception as e:
+    except Exception:
         raise ValueError("Could not create temporary directory")
-    # Creating result dir
+
     results = CasavaOneEightSingleLanePerSampleDirFmt()
-    # Running the for loop for each sample
+
     for sample in samples.itertuples():
-        # writing fastqs and their attributes and checking the files
         sobj = _set_fastqs_and_check(
             fastq=sample.forward,
             fastq2=sample.reverse if paired_in else None,
@@ -210,55 +243,48 @@ def main(per_sample_sequences,
             single_end=False if paired_in else True,
             reversed_primers=reversed_primers,
             allow_staggered_reads=allow_staggered_reads,
-            threads=threads)
-        # Deduplicate
-        if math.isclose(cluster_id, 1,rel_tol=1e-05):
+            threads=threads
+        )
+        if trim_ccs:
+            sobj.orient_reads(threads=threads)
+
+        if math.isclose(cluster_id, 1, rel_tol=1e-05):
             sobj.deduplicate(threads=threads)
         else:
             sobj.cluster(threads=threads, cluster_id=cluster_id)
+
         try:
-            # HMMSearch for ITS regions
             hmmfile = os.path.join(ROOT_DIR, "ITSx_db", "HMMs", taxa_dict[taxa])
             sobj._search(hmmfile=hmmfile, threads=threads)
-        except (ModuleNotFoundError,
-                FileNotFoundError,
-                NotADirectoryError):
-
+        except (ModuleNotFoundError, FileNotFoundError, NotADirectoryError):
             raise ValueError("hmmsearch was not found, make sure HMMER3 is installed and executable")
 
-        # Parse HMMseach output.
-        its_pos = itsxpress.ItsPosition(domtable=sobj.dom_file,
-                                        region=region)
-        # Create deduplication object.
+        its_pos = itsxpress.ItsPosition(domtable=sobj.dom_file, region=region)
         dedup_obj = itsxpress.Dedup(uc_file=sobj.uc_file,
                                     rep_file=sobj.rep_file,
                                     seq_file=sobj.seq_file,
                                     fastq=sobj.r1,
                                     fastq2=sobj.fastq2)
 
-        # Copy the original filename, that way we preserve all filename fields.
-        out_path_fwd = os.path.join(str(results),
-                                    pathlib.Path(sample.forward).name)
+        out_path_fwd = os.path.join(str(results), pathlib.Path(sample.forward).name)
 
-        # Create trimmed sequences.
         if paired_out:
-            # Copy the original filename, that way we preserve all filename fields.
-            out_path_rev = os.path.join(str(results),
-                                        pathlib.Path(sample.reverse).name)
+            out_path_rev = os.path.join(str(results), pathlib.Path(sample.reverse).name)
             dedup_obj.create_paired_trimmed_seqs(out_path_fwd,
                                                  out_path_rev,
                                                  gzipped=True,
                                                  zstd_file=False,
                                                  itspos=its_pos,
-                                                 wri_file=True,)
+                                                 wri_file=True,
+                                                 trim_ccs=trim_ccs)
         else:
             dedup_obj.create_trimmed_seqs(out_path_fwd,
-                                      gzipped=True,
-                                      zstd_file=False,
-                                      itspos=its_pos,
-                                      wri_file=True,
-                                      tempdir=sobj.tempdir)
-        # Deleting the temp files.
+                                          gzipped=True,
+                                          zstd_file=False,
+                                          itspos=its_pos,
+                                          wri_file=True,
+                                          tempdir=sobj.tempdir,
+                                          trim_ccs=trim_ccs)
+
     shutil.rmtree(tempdir)
-    # Writing out the results.
     return results
