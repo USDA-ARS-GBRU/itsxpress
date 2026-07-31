@@ -39,17 +39,16 @@ def trim_single(
     Returns:
         The combined trimmed single-end sequence artifact.
     """
-    split_demux = ctx.get_action('demux', 'partition_samples_single')
+    split_action = ctx.get_action('itsxpress', 'split_single_end')
     trim_method = ctx.get_action('itsxpress', 'trim_single_sample')
-    collate_demux = ctx.get_action('demux', 'collate_samples')
+    combine_action = ctx.get_action('itsxpress', 'combine_single')
 
     # SPLIT STAGE
-    split_results = split_demux(demux=per_sample_sequences)
-    samples_dict = split_results.partitioned_demux
+    splits, = split_action(per_sample_sequences=per_sample_sequences)
 
     # APPLY STAGE (Concurrently trims every sample)
     trimmed_futures = {}
-    for sample_id, sample_artifact in samples_dict.items():
+    for sample_id, sample_artifact in splits.items():
         try:
             future_result = trim_method(
                 per_sample_sequences=sample_artifact,
@@ -67,8 +66,8 @@ def trim_single(
         trimmed_futures[sample_id] = trimmed
 
     # COMBINE STAGE
-    collated = collate_demux(results=trimmed_futures)
-    return collated.collated_demux
+    combined_trimmed, = combine_action(results=trimmed_futures)
+    return combined_trimmed
 
 
 def trim_pair(
@@ -98,17 +97,16 @@ def trim_pair(
     Returns:
         The combined trimmed and merged paired-end sequence artifact.
     """
-    split_demux = ctx.get_action('demux', 'partition_samples_paired')
+    split_action = ctx.get_action('itsxpress', 'split_paired_end')
     trim_method = ctx.get_action('itsxpress', 'trim_pair_sample')
-    collate_demux = ctx.get_action('demux', 'collate_samples')
+    combine_action = ctx.get_action('itsxpress', 'combine_pair')
 
     # SPLIT STAGE
-    split_results = split_demux(demux=per_sample_sequences)
-    samples_dict = split_results.partitioned_demux
+    splits, = split_action(per_sample_sequences=per_sample_sequences)
 
     # APPLY STAGE
     trimmed_futures = {}
-    for sample_id, sample_artifact in samples_dict.items():
+    for sample_id, sample_artifact in splits.items():
         try:
             future_result = trim_method(
                 per_sample_sequences=sample_artifact,
@@ -125,8 +123,8 @@ def trim_pair(
         trimmed_futures[sample_id] = trimmed
 
     # COMBINE STAGE
-    collated = collate_demux(results=trimmed_futures)
-    return collated.collated_demux
+    combined_trimmed, = combine_action(results=trimmed_futures)
+    return combined_trimmed
 
 
 def trim_pair_output_unmerged(
@@ -156,17 +154,16 @@ def trim_pair_output_unmerged(
     Returns:
         The combined trimmed unmerged paired-end sequence artifact.
     """
-    split_demux = ctx.get_action('demux', 'partition_samples_paired')
+    split_action = ctx.get_action('itsxpress', 'split_paired_end')
     trim_method = ctx.get_action('itsxpress', 'trim_pair_sample_unmerged')
-    collate_demux = ctx.get_action('demux', 'collate_samples')
+    combine_action = ctx.get_action('itsxpress', 'combine_pair_unmerged')
 
     # SPLIT STAGE
-    split_results = split_demux(demux=per_sample_sequences)
-    samples_dict = split_results.partitioned_demux
+    splits, = split_action(per_sample_sequences=per_sample_sequences)
 
     # APPLY STAGE
     trimmed_futures = {}
-    for sample_id, sample_artifact in samples_dict.items():
+    for sample_id, sample_artifact in splits.items():
         try:
             future_result = trim_method(
                 per_sample_sequences=sample_artifact,
@@ -183,5 +180,5 @@ def trim_pair_output_unmerged(
         trimmed_futures[sample_id] = trimmed
 
     # COMBINE STAGE
-    collated = collate_demux(results=trimmed_futures)
-    return collated.collated_demux
+    combined_trimmed, = combine_action(results=trimmed_futures)
+    return combined_trimmed
