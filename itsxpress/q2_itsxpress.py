@@ -254,7 +254,8 @@ def main(per_sample_sequences: Any,
             sobj.cluster(threads=threads, cluster_id=cluster_id)
 
         try:
-            hmmfile = os.path.join(ROOT_DIR, "ITSx_db", "HMMs", taxa_dict[taxa])
+            from itsxpress.main import create_runtime_hmm
+            hmmfile = create_runtime_hmm(taxa, region, tempdir)
             sobj._search(hmmfile=hmmfile, threads=threads)
         except (ModuleNotFoundError, FileNotFoundError, NotADirectoryError):
             raise ValueError("hmmsearch was not found, make sure HMMER3 is installed and executable")
@@ -285,6 +286,24 @@ def main(per_sample_sequences: Any,
                                           wri_file=True,
                                           tempdir=sobj.tempdir,
                                           trim_ccs=trim_ccs)
+
+    if trim_ccs:
+        import logging
+        msg = (
+            "\n" + "=" * 80 + "\n"
+            "PacBio CCS trimming complete. You can denoise these sequences in DADA2 using:\n\n"
+            "qiime dada2 denoise-ccs \\\n"
+            "  --i-demultiplexed-seqs pacbio-trimmed.qza \\\n"
+            "  --p-front GACAGGTACAAGAAGGA \\\n"
+            "  --p-adapter ACTGGAGACTGGGTTAA \\\n"
+            "  --p-min-len 50 \\\n"
+            "  --p-max-len 1600 \\\n"
+            "  --p-n-threads 4 \\\n"
+            "  --output-dir dada2-results\n"
+            "*" * 80 + "\n"
+        )
+        print(msg)
+        logging.info(msg)
 
     shutil.rmtree(tempdir)
     return results

@@ -9,12 +9,16 @@ from qiime2.plugin import (Plugin,
                            Float,
                            Range,
                            Bool,
-                           Citations)
+                           Citations,
+                           Collection)
 
 from itsxpress.q2_itsxpress import (trim_single,
                                      trim_pair,
                                      trim_pair_output_unmerged,
                                      default_cluster_id)
+from itsxpress.pipelines import (parallel_trim_single,
+                                  parallel_trim_pair,
+                                  parallel_trim_output_unmerged)
 from ._version import __version__
 plugin = Plugin(
     name='itsxpress',
@@ -138,6 +142,83 @@ plugin.methods.register_function(
                 '\nY = Parabasalia\n'
                 '\nALL = All'
 
+)
+
+
+plugin.pipelines.register_function(
+    function=parallel_trim_single,
+    inputs={'per_sample_sequences': SampleData[SequencesWithQuality]},
+    parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
+                'taxa': Str % Choices(taxaList),
+                'threads': Int,
+                'cluster_id': Float % Range(0.995, 1.0, inclusive_start=True, inclusive_end=True),
+                'trim_ccs': Bool,
+                'num_splits': Int},
+    outputs=[('trimmed', SampleData[SequencesWithQuality])],
+    input_descriptions={'per_sample_sequences': 'The artifact that contains the sequence file(s).'},
+    parameter_descriptions={
+        'region': '\nThe regions ITS2, ITS1, and ALL that can be selected from.',
+        'taxa': '\nThe selected taxonomic group sequenced that can be selected from.',
+        'threads': '\nThe number of processor threads to use in the run.',
+        'cluster_id': '\nThe percent identity for clustering reads, set to 1 for exact dereplication.',
+        'trim_ccs': '\nWhether to enable trim-ccs mode for PacBio CCS reads.',
+        'num_splits': '\nThe number of splits to create (unused/deprecated).'
+    },
+    output_descriptions={'trimmed': 'The trimmed sequences from ITSxpress.'},
+    name='Parallel trim single-end reads',
+    description='QIIME 2 Pipeline for parallel processing of single-end reads.'
+)
+
+plugin.pipelines.register_function(
+    function=parallel_trim_pair,
+    inputs={'per_sample_sequences': SampleData[PairedEndSequencesWithQuality]},
+    parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
+                'taxa': Str % Choices(taxaList),
+                'threads': Int,
+                'reversed_primers': Bool,
+                'allow_staggered_reads': Bool,
+                'cluster_id': Float % Range(0.995, 1.0, inclusive_start=True, inclusive_end=True),
+                'num_splits': Int},
+    outputs=[('trimmed', SampleData[JoinedSequencesWithQuality])],
+    input_descriptions={'per_sample_sequences': 'The artifact that contains the sequence file(s).'},
+    parameter_descriptions={
+        'region': '\nThe regions ITS2, ITS1, and ALL that can be selected from.',
+        'taxa': '\nThe selected taxonomic group sequenced that can be selected from.',
+        'threads': '\nThe number of processor threads to use in the run.',
+        'cluster_id': '\nThe percent identity for clustering reads, set to 1 for exact dereplication.',
+        'allow_staggered_reads': '\nAllows merging of staggered reads.',
+        'reversed_primers': '\n Primers are in reverse orientation.',
+        'num_splits': '\nThe number of splits to create (unused/deprecated).'
+    },
+    output_descriptions={'trimmed': 'The resulting trimmed sequences from ITSxpress.'},
+    name='Parallel trim paired-end reads (merged output)',
+    description='QIIME 2 Pipeline for parallel processing of paired-end reads.'
+)
+
+plugin.pipelines.register_function(
+    function=parallel_trim_output_unmerged,
+    inputs={'per_sample_sequences': SampleData[PairedEndSequencesWithQuality]},
+    parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
+                'taxa': Str % Choices(taxaList),
+                'threads': Int,
+                'reversed_primers': Bool,
+                'allow_staggered_reads': Bool,
+                'cluster_id': Float % Range(0.995, 1.0, inclusive_start=True, inclusive_end=True),
+                'num_splits': Int},
+    outputs=[('trimmed', SampleData[PairedEndSequencesWithQuality])],
+    input_descriptions={'per_sample_sequences': 'The artifact that contains the sequence file(s).'},
+    parameter_descriptions={
+        'region': '\nThe regions ITS2, ITS1, and ALL that can be selected from.',
+        'taxa': '\nThe selected taxonomic group sequenced that can be selected from.',
+        'threads': '\nThe number of processor threads to use in the run.',
+        'cluster_id': '\nThe percent identity for clustering reads, set to 1 for exact dereplication.',
+        'allow_staggered_reads': '\nAllows merging of staggered reads.',
+        'reversed_primers': '\n Primers are in reverse orientation.',
+        'num_splits': '\nThe number of splits to create (unused/deprecated).'
+    },
+    output_descriptions={'trimmed': 'The resulting trimmed sequences from ITSxpress.'},
+    name='Parallel trim paired-end reads (unmerged output)',
+    description='QIIME 2 Pipeline for parallel processing of paired-end reads.'
 )
 
 plugin.methods.register_function(

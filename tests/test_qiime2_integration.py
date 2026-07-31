@@ -170,3 +170,27 @@ if HAS_QIIME2:
                 '4774-1-MSITS3,4774-1-MSITS3_1_L001_R2_001.fastq.gz,reverse\n'
             ]
             self.assertEqual(obs_manifest, exp_manifest)
+
+
+    class ParallelProcessingTests(unittest.TestCase):
+        def setUp(self):
+            self.plugin = qiime2.sdk.PluginManager().plugins['itsxpress']
+            self.parallel_trim_single_fn = self.plugin.pipelines['parallel_trim_single']
+            self.parallel_trim_pair_fn = self.plugin.pipelines['parallel_trim_pair']
+            self.parallel_trim_output_unmerged_fn = self.plugin.pipelines['parallel_trim_output_unmerged']
+
+            self.se_seqs = qiime2.Artifact.import_data(
+                'SampleData[SequencesWithQuality]',
+                TEST_FILE_SINGLEIN,
+                'SingleLanePerSampleSingleEndFastqDirFmt'
+            )
+            self.pe_seqs = qiime2.Artifact.import_data(
+                'SampleData[PairedEndSequencesWithQuality]',
+                TEST_FILE,
+                'SingleLanePerSamplePairedEndFastqDirFmt'
+            )
+
+        def test_pipeline_registration(self):
+            self.assertIsNotNone(self.parallel_trim_single_fn)
+            self.assertIsNotNone(self.parallel_trim_pair_fn)
+            self.assertIsNotNone(self.parallel_trim_output_unmerged_fn)
