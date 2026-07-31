@@ -12,9 +12,9 @@ from qiime2.plugin import (Plugin,
                            Citations,
                            Collection)
 
-from itsxpress.q2_itsxpress import (trim_single as trim_single_sample,
-                                     trim_pair as trim_pair_sample,
-                                     trim_pair_output_unmerged as trim_pair_sample_unmerged,
+from itsxpress.q2_itsxpress import (trim_single_sample,
+                                     trim_pair_sample,
+                                     trim_pair_sample_unmerged,
                                      default_cluster_id)
 from itsxpress.pipelines import (trim_single,
                                   trim_pair,

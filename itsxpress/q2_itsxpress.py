@@ -95,12 +95,12 @@ def _taxa_prefix_to_taxa(taxa_prefix: str) -> str:
     return taxa_dic[taxa_prefix]
 
 
-def trim_single(per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt,
-                region: str,
-                taxa: str = "F",
-                threads: int = 1,
-                cluster_id: float = default_cluster_id,
-                trim_ccs: bool = False) -> CasavaOneEightSingleLanePerSampleDirFmt:
+def trim_single_sample(per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt,
+                       region: str,
+                       taxa: str = "F",
+                       threads: int = 1,
+                       cluster_id: float = default_cluster_id,
+                       trim_ccs: bool = False) -> CasavaOneEightSingleLanePerSampleDirFmt:
     """Trims single-end sequence reads.
 
     Args:
@@ -127,13 +127,13 @@ def trim_single(per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt,
     return results
 
 
-def trim_pair(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
-              region: str,
-              taxa: str = "F",
-              threads: int = 1,
-              reversed_primers: bool = False,
-              allow_staggered_reads: bool = True,
-              cluster_id: float = default_cluster_id) -> CasavaOneEightSingleLanePerSampleDirFmt:
+def trim_pair_sample(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
+                     region: str,
+                     taxa: str = "F",
+                     threads: int = 1,
+                     reversed_primers: bool = False,
+                     allow_staggered_reads: bool = True,
+                     cluster_id: float = default_cluster_id) -> CasavaOneEightSingleLanePerSampleDirFmt:
     """Trims paired-end sequence reads.
 
     Args:
@@ -161,7 +161,7 @@ def trim_pair(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
     return results
 
 
-def trim_pair_output_unmerged(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
+def trim_pair_sample_unmerged(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
                               region: str,
                               taxa: str = "F",
                               threads: int = 1,
