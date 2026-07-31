@@ -95,12 +95,12 @@ def _taxa_prefix_to_taxa(taxa_prefix: str) -> str:
     return taxa_dic[taxa_prefix]
 
 
-def trim_single_sample(per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt,
-                       region: str,
-                       taxa: str = "F",
-                       threads: int = 1,
-                       cluster_id: float = default_cluster_id,
-                       trim_ccs: bool = False) -> CasavaOneEightSingleLanePerSampleDirFmt:
+def trim_single(per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt,
+                region: str,
+                taxa: str = "F",
+                threads: int = 1,
+                cluster_id: float = default_cluster_id,
+                trim_ccs: bool = False) -> CasavaOneEightSingleLanePerSampleDirFmt:
     """Trims single-end sequence reads.
 
     Args:
@@ -127,13 +127,13 @@ def trim_single_sample(per_sample_sequences: SingleLanePerSampleSingleEndFastqDi
     return results
 
 
-def trim_pair_sample(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
-                     region: str,
-                     taxa: str = "F",
-                     threads: int = 1,
-                     reversed_primers: bool = False,
-                     allow_staggered_reads: bool = True,
-                     cluster_id: float = default_cluster_id) -> CasavaOneEightSingleLanePerSampleDirFmt:
+def trim_pair(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
+              region: str,
+              taxa: str = "F",
+              threads: int = 1,
+              reversed_primers: bool = False,
+              allow_staggered_reads: bool = True,
+              cluster_id: float = default_cluster_id) -> CasavaOneEightSingleLanePerSampleDirFmt:
     """Trims paired-end sequence reads.
 
     Args:
@@ -161,7 +161,7 @@ def trim_pair_sample(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirF
     return results
 
 
-def trim_pair_sample_unmerged(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
+def trim_pair_output_unmerged(per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt,
                               region: str,
                               taxa: str = "F",
                               threads: int = 1,
@@ -307,3 +307,109 @@ def main(per_sample_sequences: Any,
 
     shutil.rmtree(tempdir)
     return results
+
+
+def split_single_end(
+    per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt
+) -> dict:
+    """Splits single-end sequences into individual samples.
+
+    Args:
+        per_sample_sequences: Input single-end sequences directory format.
+
+    Returns:
+        A dictionary mapping sample_id to a SingleLanePerSampleSingleEndFastqDirFmt containing that sample's fastq file.
+    """
+    import pandas as pd
+    import shutil
+    import os
+    samples = per_sample_sequences.manifest.view(pd.DataFrame)
+    result = {}
+    for sample_id, row in samples.iterrows():
+        split_dir = SingleLanePerSampleSingleEndFastqDirFmt()
+        fwd_path = row['forward']
+        shutil.copy(fwd_path, os.path.join(str(split_dir), os.path.basename(fwd_path)))
+        result[str(sample_id)] = split_dir
+    return result
+
+
+def split_paired_end(
+    per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt
+) -> dict:
+    """Splits paired-end sequences into individual samples.
+
+    Args:
+        per_sample_sequences: Input paired-end sequences directory format.
+
+    Returns:
+        A dictionary mapping sample_id to a SingleLanePerSamplePairedEndFastqDirFmt containing that sample's fastq files.
+    """
+    import pandas as pd
+    import shutil
+    import os
+    samples = per_sample_sequences.manifest.view(pd.DataFrame)
+    result = {}
+    for sample_id, row in samples.iterrows():
+        split_dir = SingleLanePerSamplePairedEndFastqDirFmt()
+        fwd_path = row['forward']
+        rev_path = row['reverse']
+        shutil.copy(fwd_path, os.path.join(str(split_dir), os.path.basename(fwd_path)))
+        shutil.copy(rev_path, os.path.join(str(split_dir), os.path.basename(rev_path)))
+        result[str(sample_id)] = split_dir
+    return result
+
+
+def _combine_results_helper(results: dict) -> CasavaOneEightSingleLanePerSampleDirFmt:
+    """Helper to combine a dictionary of split results into a single output directory.
+
+    Args:
+        results: Dictionary mapping sample_id to a single CasavaOneEightSingleLanePerSampleDirFmt.
+
+    Returns:
+        A combined CasavaOneEightSingleLanePerSampleDirFmt.
+    """
+    import os
+    import shutil
+    combined = CasavaOneEightSingleLanePerSampleDirFmt()
+    for sample_id, result_dir in results.items():
+        for filename in os.listdir(str(result_dir)):
+            if filename.endswith('.fastq.gz') or filename.endswith('.fq.gz'):
+                shutil.copy(os.path.join(str(result_dir), filename),
+                            os.path.join(str(combined), filename))
+    return combined
+
+
+def combine_single(results: dict) -> CasavaOneEightSingleLanePerSampleDirFmt:
+    """Combines split single-end sequence trimming results.
+
+    Args:
+        results: Dictionary mapping sample_id to trimmed single-end sequence directory.
+
+    Returns:
+        A combined CasavaOneEightSingleLanePerSampleDirFmt.
+    """
+    return _combine_results_helper(results)
+
+
+def combine_pair(results: dict) -> CasavaOneEightSingleLanePerSampleDirFmt:
+    """Combines split paired-end sequence trimming results (merged reads).
+
+    Args:
+        results: Dictionary mapping sample_id to trimmed merged sequence directory.
+
+    Returns:
+        A combined CasavaOneEightSingleLanePerSampleDirFmt.
+    """
+    return _combine_results_helper(results)
+
+
+def combine_pair_unmerged(results: dict) -> CasavaOneEightSingleLanePerSampleDirFmt:
+    """Combines split paired-end sequence trimming results (unmerged reads).
+
+    Args:
+        results: Dictionary mapping sample_id to trimmed unmerged sequence directory.
+
+    Returns:
+        A combined CasavaOneEightSingleLanePerSampleDirFmt.
+    """
+    return _combine_results_helper(results)

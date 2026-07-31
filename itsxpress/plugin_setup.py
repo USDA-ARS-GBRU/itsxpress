@@ -12,14 +12,28 @@ from qiime2.plugin import (Plugin,
                            Citations,
                            Collection)
 
-from itsxpress.q2_itsxpress import (trim_single_sample,
-                                     trim_pair_sample,
-                                     trim_pair_sample_unmerged,
+from itsxpress.q2_itsxpress import (trim_single,
+                                     trim_pair,
+                                     trim_pair_output_unmerged,
+                                     split_single_end,
+                                     split_paired_end,
+                                     combine_single,
+                                     combine_pair,
+                                     combine_pair_unmerged,
                                      default_cluster_id)
-from itsxpress.pipelines import (trim_single,
-                                  trim_pair,
-                                  trim_pair_output_unmerged)
+from itsxpress.pipelines import (trim_single as trim_single_pipeline,
+                                  trim_pair as trim_pair_pipeline,
+                                  trim_pair_output_unmerged as trim_pair_output_unmerged_pipeline)
 from ._version import __version__
+
+trim_single_sample = trim_single
+trim_single_sample.__name__ = "trim_single_sample"
+
+trim_pair_sample = trim_pair
+trim_pair_sample.__name__ = "trim_pair_sample"
+
+trim_pair_sample_unmerged = trim_pair_output_unmerged
+trim_pair_sample_unmerged.__name__ = "trim_pair_sample_unmerged"
 plugin = Plugin(
     name='itsxpress',
     version=__version__,
@@ -144,9 +158,69 @@ plugin.methods.register_function(
 
 )
 
+plugin.methods.register_function(
+    function=split_single_end,
+    inputs={'per_sample_sequences': SampleData[SequencesWithQuality]},
+    parameters={},
+    outputs=[('splits', Collection[SampleData[SequencesWithQuality]])],
+    input_descriptions={'per_sample_sequences': 'The single-end sequence artifact to split.'},
+    parameter_descriptions={},
+    output_descriptions={'splits': 'The individual single-end sequence splits.'},
+    name='Split single-end reads',
+    description='Splits single-end sequence artifact into individual sample artifacts.'
+)
+
+plugin.methods.register_function(
+    function=split_paired_end,
+    inputs={'per_sample_sequences': SampleData[PairedEndSequencesWithQuality]},
+    parameters={},
+    outputs=[('splits', Collection[SampleData[PairedEndSequencesWithQuality]])],
+    input_descriptions={'per_sample_sequences': 'The paired-end sequence artifact to split.'},
+    parameter_descriptions={},
+    output_descriptions={'splits': 'The individual paired-end sequence splits.'},
+    name='Split paired-end reads',
+    description='Splits paired-end sequence artifact into individual sample artifacts.'
+)
+
+plugin.methods.register_function(
+    function=combine_single,
+    inputs={'results': Collection[SampleData[SequencesWithQuality]]},
+    parameters={},
+    outputs=[('combined', SampleData[SequencesWithQuality])],
+    input_descriptions={'results': 'The trimmed single-end sequence splits to combine.'},
+    parameter_descriptions={},
+    output_descriptions={'combined': 'The combined trimmed single-end sequence artifact.'},
+    name='Combine single-end reads',
+    description='Combines trimmed single-end sequence splits back into one unified artifact.'
+)
+
+plugin.methods.register_function(
+    function=combine_pair,
+    inputs={'results': Collection[SampleData[JoinedSequencesWithQuality]]},
+    parameters={},
+    outputs=[('combined', SampleData[JoinedSequencesWithQuality])],
+    input_descriptions={'results': 'The trimmed merged paired-end sequence splits to combine.'},
+    parameter_descriptions={},
+    output_descriptions={'combined': 'The combined trimmed merged paired-end sequence artifact.'},
+    name='Combine merged paired-end reads',
+    description='Combines trimmed merged paired-end sequence splits back into one unified artifact.'
+)
+
+plugin.methods.register_function(
+    function=combine_pair_unmerged,
+    inputs={'results': Collection[SampleData[PairedEndSequencesWithQuality]]},
+    parameters={},
+    outputs=[('combined', SampleData[PairedEndSequencesWithQuality])],
+    input_descriptions={'results': 'The trimmed unmerged paired-end sequence splits to combine.'},
+    parameter_descriptions={},
+    output_descriptions={'combined': 'The combined trimmed unmerged paired-end sequence artifact.'},
+    name='Combine unmerged paired-end reads',
+    description='Combines trimmed unmerged paired-end sequence splits back into one unified artifact.'
+)
+
 
 plugin.pipelines.register_function(
-    function=trim_single,
+    function=trim_single_pipeline,
     inputs={'per_sample_sequences': SampleData[SequencesWithQuality]},
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),
@@ -170,7 +244,7 @@ plugin.pipelines.register_function(
 )
 
 plugin.pipelines.register_function(
-    function=trim_pair,
+    function=trim_pair_pipeline,
     inputs={'per_sample_sequences': SampleData[PairedEndSequencesWithQuality]},
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),
@@ -196,7 +270,7 @@ plugin.pipelines.register_function(
 )
 
 plugin.pipelines.register_function(
-    function=trim_pair_output_unmerged,
+    function=trim_pair_output_unmerged_pipeline,
     inputs={'per_sample_sequences': SampleData[PairedEndSequencesWithQuality]},
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),
