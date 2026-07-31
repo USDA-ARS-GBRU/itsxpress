@@ -130,3 +130,4 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+itsxpress/_version.py
