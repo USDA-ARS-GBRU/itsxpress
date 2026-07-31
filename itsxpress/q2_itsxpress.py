@@ -311,7 +311,7 @@ def main(per_sample_sequences: Any,
 
 def split_single_end(
     per_sample_sequences: SingleLanePerSampleSingleEndFastqDirFmt
-) -> dict:
+) -> SingleLanePerSampleSingleEndFastqDirFmt:
     """Splits single-end sequences into individual samples.
 
     Args:
@@ -335,7 +335,7 @@ def split_single_end(
 
 def split_paired_end(
     per_sample_sequences: SingleLanePerSamplePairedEndFastqDirFmt
-) -> dict:
+) -> SingleLanePerSamplePairedEndFastqDirFmt:
     """Splits paired-end sequences into individual samples.
 
     Args:
@@ -359,7 +359,7 @@ def split_paired_end(
     return result
 
 
-def _combine_results_helper(results: dict) -> CasavaOneEightSingleLanePerSampleDirFmt:
+def _combine_results_helper(results: Any) -> CasavaOneEightSingleLanePerSampleDirFmt:
     """Helper to combine a dictionary of split results into a single output directory.
 
     Args:
@@ -379,7 +379,7 @@ def _combine_results_helper(results: dict) -> CasavaOneEightSingleLanePerSampleD
     return combined
 
 
-def combine_single(results: dict) -> CasavaOneEightSingleLanePerSampleDirFmt:
+def combine_single(results: SingleLanePerSampleSingleEndFastqDirFmt) -> CasavaOneEightSingleLanePerSampleDirFmt:
     """Combines split single-end sequence trimming results.
 
     Args:
@@ -391,7 +391,7 @@ def combine_single(results: dict) -> CasavaOneEightSingleLanePerSampleDirFmt:
     return _combine_results_helper(results)
 
 
-def combine_pair(results: dict) -> CasavaOneEightSingleLanePerSampleDirFmt:
+def combine_pair(results: CasavaOneEightSingleLanePerSampleDirFmt) -> CasavaOneEightSingleLanePerSampleDirFmt:
     """Combines split paired-end sequence trimming results (merged reads).
 
     Args:
@@ -403,7 +403,7 @@ def combine_pair(results: dict) -> CasavaOneEightSingleLanePerSampleDirFmt:
     return _combine_results_helper(results)
 
 
-def combine_pair_unmerged(results: dict) -> CasavaOneEightSingleLanePerSampleDirFmt:
+def combine_pair_unmerged(results: SingleLanePerSamplePairedEndFastqDirFmt) -> CasavaOneEightSingleLanePerSampleDirFmt:
     """Combines split paired-end sequence trimming results (unmerged reads).
 
     Args:
