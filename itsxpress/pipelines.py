@@ -39,7 +39,7 @@ def trim_single(
     Returns:
         The combined trimmed single-end sequence artifact.
     """
-    split_demux = ctx.get_action('demux', 'split_samples')
+    split_demux = ctx.get_action('demux', 'partition_samples_single')
     trim_method = ctx.get_action('itsxpress', 'trim_single_sample')
     collate_demux = ctx.get_action('demux', 'collate_samples')
 
@@ -98,7 +98,7 @@ def trim_pair(
     Returns:
         The combined trimmed and merged paired-end sequence artifact.
     """
-    split_demux = ctx.get_action('demux', 'split_samples')
+    split_demux = ctx.get_action('demux', 'partition_samples_paired')
     trim_method = ctx.get_action('itsxpress', 'trim_pair_sample')
     collate_demux = ctx.get_action('demux', 'collate_samples')
 
@@ -156,7 +156,7 @@ def trim_pair_output_unmerged(
     Returns:
         The combined trimmed unmerged paired-end sequence artifact.
     """
-    split_demux = ctx.get_action('demux', 'split_samples')
+    split_demux = ctx.get_action('demux', 'partition_samples_paired')
     trim_method = ctx.get_action('itsxpress', 'trim_pair_sample_unmerged')
     collate_demux = ctx.get_action('demux', 'collate_samples')
 
