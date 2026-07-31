@@ -1,18 +1,29 @@
 """Pipelines.py: Parallel QIIME 2 pipelines for ITSxpress.
 
 """
-from typing import Any
+try:
+    from qiime2.plugin import IContext
+except ImportError:
+    class IContext:
+        pass
+
+try:
+    from qiime2.sdk import Artifact
+except ImportError:
+    class Artifact:
+        pass
+
 
 def parallel_trim_single(
-    ctx: Any,
-    per_sample_sequences: Any,
+    ctx: IContext,
+    per_sample_sequences: Artifact,
     region: str,
     taxa: str,
     threads: int = 1,
     cluster_id: float = 1.0,
     trim_ccs: bool = False,
     num_splits: int = None
-) -> Any:
+) -> Artifact:
     """Runs ITSxpress trim_single across multiple samples in parallel using Parsl.
 
     Args:
@@ -23,6 +34,7 @@ def parallel_trim_single(
         threads: Number of processor threads to use per parallel worker job.
         cluster_id: Dereplication or clustering threshold identity.
         trim_ccs: Whether to enable trim-ccs mode for PacBio CCS reads.
+        num_splits: Unused.
 
     Returns:
         The combined trimmed single-end sequence artifact.
@@ -60,15 +72,16 @@ def parallel_trim_single(
 
 
 def parallel_trim_pair(
-    ctx: Any,
-    per_sample_sequences: Any,
+    ctx: IContext,
+    per_sample_sequences: Artifact,
     region: str,
     taxa: str,
     threads: int = 1,
     reversed_primers: bool = False,
     allow_staggered_reads: bool = True,
-    cluster_id: float = 1.0
-) -> Any:
+    cluster_id: float = 1.0,
+    num_splits: int = None
+) -> Artifact:
     """Runs ITSxpress trim_pair across multiple samples in parallel using Parsl.
 
     Args:
@@ -80,6 +93,7 @@ def parallel_trim_pair(
         reversed_primers: Primers are in reverse orientation.
         allow_staggered_reads: Allow merging staggered reads.
         cluster_id: Dereplication or clustering threshold identity.
+        num_splits: Unused.
 
     Returns:
         The combined trimmed and merged paired-end sequence artifact.
@@ -116,15 +130,16 @@ def parallel_trim_pair(
 
 
 def parallel_trim_output_unmerged(
-    ctx: Any,
-    per_sample_sequences: Any,
+    ctx: IContext,
+    per_sample_sequences: Artifact,
     region: str,
     taxa: str,
     threads: int = 1,
     reversed_primers: bool = False,
     allow_staggered_reads: bool = True,
-    cluster_id: float = 1.0
-) -> Any:
+    cluster_id: float = 1.0,
+    num_splits: int = None
+) -> Artifact:
     """Runs ITSxpress trim_pair_output_unmerged across multiple samples in parallel using Parsl.
 
     Args:
@@ -136,6 +151,7 @@ def parallel_trim_output_unmerged(
         reversed_primers: Primers are in reverse orientation.
         allow_staggered_reads: Allow merging staggered reads.
         cluster_id: Dereplication or clustering threshold identity.
+        num_splits: Unused.
 
     Returns:
         The combined trimmed unmerged paired-end sequence artifact.
