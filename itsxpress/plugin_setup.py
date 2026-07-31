@@ -12,13 +12,13 @@ from qiime2.plugin import (Plugin,
                            Citations,
                            Collection)
 
-from itsxpress.q2_itsxpress import (trim_single,
-                                     trim_pair,
-                                     trim_pair_output_unmerged,
+from itsxpress.q2_itsxpress import (trim_single as trim_single_sample,
+                                     trim_pair as trim_pair_sample,
+                                     trim_pair_output_unmerged as trim_pair_sample_unmerged,
                                      default_cluster_id)
-from itsxpress.pipelines import (parallel_trim_single,
-                                  parallel_trim_pair,
-                                  parallel_trim_output_unmerged)
+from itsxpress.pipelines import (trim_single,
+                                  trim_pair,
+                                  trim_pair_output_unmerged)
 from ._version import __version__
 plugin = Plugin(
     name='itsxpress',
@@ -44,7 +44,7 @@ plugin = Plugin(
 taxaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'ALL', 'O', 'P', 'Q', 'R', 'S', 'T', 'U','Y']
 
 plugin.methods.register_function(
-    function=trim_single,
+    function=trim_single_sample,
     inputs={'per_sample_sequences': SampleData[SequencesWithQuality]},
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),
@@ -93,7 +93,7 @@ plugin.methods.register_function(
 )
 
 plugin.methods.register_function(
-    function=trim_pair,
+    function=trim_pair_sample,
     inputs={'per_sample_sequences': SampleData[PairedEndSequencesWithQuality]},
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),
@@ -146,7 +146,7 @@ plugin.methods.register_function(
 
 
 plugin.pipelines.register_function(
-    function=parallel_trim_single,
+    function=trim_single,
     inputs={'per_sample_sequences': SampleData[SequencesWithQuality]},
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),
@@ -165,12 +165,12 @@ plugin.pipelines.register_function(
         'num_splits': '\nThe number of splits to create (unused/deprecated).'
     },
     output_descriptions={'trimmed': 'The trimmed sequences from ITSxpress.'},
-    name='Parallel trim single-end reads',
-    description='QIIME 2 Pipeline for parallel processing of single-end reads.'
+    name='Trim single-end reads',
+    description='Pipeline for trimming of single-end reads.'
 )
 
 plugin.pipelines.register_function(
-    function=parallel_trim_pair,
+    function=trim_pair,
     inputs={'per_sample_sequences': SampleData[PairedEndSequencesWithQuality]},
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),
@@ -191,12 +191,12 @@ plugin.pipelines.register_function(
         'num_splits': '\nThe number of splits to create (unused/deprecated).'
     },
     output_descriptions={'trimmed': 'The resulting trimmed sequences from ITSxpress.'},
-    name='Parallel trim paired-end reads (merged output)',
-    description='QIIME 2 Pipeline for parallel processing of paired-end reads.'
+    name='Trim paired-end reads, output merged reads for use with Deblur',
+    description='Pipeline for trimming of paired-end reads (merged output).'
 )
 
 plugin.pipelines.register_function(
-    function=parallel_trim_output_unmerged,
+    function=trim_pair_output_unmerged,
     inputs={'per_sample_sequences': SampleData[PairedEndSequencesWithQuality]},
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),
@@ -217,12 +217,12 @@ plugin.pipelines.register_function(
         'num_splits': '\nThe number of splits to create (unused/deprecated).'
     },
     output_descriptions={'trimmed': 'The resulting trimmed sequences from ITSxpress.'},
-    name='Parallel trim paired-end reads (unmerged output)',
-    description='QIIME 2 Pipeline for parallel processing of paired-end reads.'
+    name='Trim paired-end reads, output unmerged reads for use with Dada2',
+    description='Pipeline for trimming of paired-end reads (unmerged output).'
 )
 
 plugin.methods.register_function(
-    function=trim_pair_output_unmerged,
+    function=trim_pair_sample_unmerged,
     inputs={'per_sample_sequences': SampleData[PairedEndSequencesWithQuality]},
     parameters={'region': Str % Choices(['ITS2', 'ITS1', 'ALL']),
                 'taxa': Str % Choices(taxaList),

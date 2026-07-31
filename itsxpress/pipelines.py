@@ -14,7 +14,7 @@ except ImportError:
         pass
 
 
-def parallel_trim_single(
+def trim_single(
     ctx: IContext,
     per_sample_sequences: Artifact,
     region: str,
@@ -24,7 +24,7 @@ def parallel_trim_single(
     trim_ccs: bool = False,
     num_splits: int = None
 ) -> Artifact:
-    """Runs ITSxpress trim_single across multiple samples in parallel using Parsl.
+    """Runs ITSxpress trim_single_sample across multiple samples in parallel using Parsl.
 
     Args:
         ctx: QIIME 2 pipeline execution context.
@@ -40,7 +40,7 @@ def parallel_trim_single(
         The combined trimmed single-end sequence artifact.
     """
     split_demux = ctx.get_action('demux', 'split_samples')
-    trim_method = ctx.get_action('itsxpress', 'trim_single')
+    trim_method = ctx.get_action('itsxpress', 'trim_single_sample')
     collate_demux = ctx.get_action('demux', 'collate_samples')
 
     # SPLIT STAGE
@@ -71,7 +71,7 @@ def parallel_trim_single(
     return collated.collated_demux
 
 
-def parallel_trim_pair(
+def trim_pair(
     ctx: IContext,
     per_sample_sequences: Artifact,
     region: str,
@@ -82,7 +82,7 @@ def parallel_trim_pair(
     cluster_id: float = 1.0,
     num_splits: int = None
 ) -> Artifact:
-    """Runs ITSxpress trim_pair across multiple samples in parallel using Parsl.
+    """Runs ITSxpress trim_pair_sample across multiple samples in parallel using Parsl.
 
     Args:
         ctx: QIIME 2 pipeline execution context.
@@ -99,7 +99,7 @@ def parallel_trim_pair(
         The combined trimmed and merged paired-end sequence artifact.
     """
     split_demux = ctx.get_action('demux', 'split_samples')
-    trim_method = ctx.get_action('itsxpress', 'trim_pair')
+    trim_method = ctx.get_action('itsxpress', 'trim_pair_sample')
     collate_demux = ctx.get_action('demux', 'collate_samples')
 
     # SPLIT STAGE
@@ -129,7 +129,7 @@ def parallel_trim_pair(
     return collated.collated_demux
 
 
-def parallel_trim_output_unmerged(
+def trim_pair_output_unmerged(
     ctx: IContext,
     per_sample_sequences: Artifact,
     region: str,
@@ -140,7 +140,7 @@ def parallel_trim_output_unmerged(
     cluster_id: float = 1.0,
     num_splits: int = None
 ) -> Artifact:
-    """Runs ITSxpress trim_pair_output_unmerged across multiple samples in parallel using Parsl.
+    """Runs ITSxpress trim_pair_sample_unmerged across multiple samples in parallel using Parsl.
 
     Args:
         ctx: QIIME 2 pipeline execution context.
@@ -157,7 +157,7 @@ def parallel_trim_output_unmerged(
         The combined trimmed unmerged paired-end sequence artifact.
     """
     split_demux = ctx.get_action('demux', 'split_samples')
-    trim_method = ctx.get_action('itsxpress', 'trim_pair_output_unmerged')
+    trim_method = ctx.get_action('itsxpress', 'trim_pair_sample_unmerged')
     collate_demux = ctx.get_action('demux', 'collate_samples')
 
     # SPLIT STAGE
