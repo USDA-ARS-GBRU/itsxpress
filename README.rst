@@ -197,18 +197,13 @@ Usage
 +-------------------------+---------------------------------------------------------------+
 
 
-Advanced & Parallel Features
-----------------------------
+Advanced Features
+-----------------
 
 PacBio CCS Trimming (--trim-ccs)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When analyzing PacBio CCS reads, the `--trim-ccs` parameter is supported. This feature orients sequence reads against a universal reference database and stitches synthetic dummy primers (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) with uniform Phred quality scores of 93 (`~`) onto the trimmed reads to satisfy downstream DADA2 requirements.
 At completion, ITSxpress provides a log message displaying the correct `qiime dada2 denoise-ccs` arguments for denoising.
-
-Parallel Processing in QIIME 2 (--parallel & --p-num-splits)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Starting with QIIME 2026.7, ITSxpress supports native parallel processing of samples using PARSL. Instead of splitting and rewriting FASTQ files, it leverages a split-apply-combine queue architecture where individual sample files are assigned to workers in the processor pool as they become available.
-To use parallel processing in QIIME 2, include the `--parallel` flag and configure the pipeline. The `--p-num-splits` parameter is accepted as part of the parallel pipeline parameters to configure the execution chunks.
 
 
 Examples
