@@ -288,8 +288,6 @@ def main(per_sample_sequences: Any,
                                           trim_ccs=trim_ccs)
 
     if trim_ccs:
-        import os
-        import tempfile
         import logging
         parent_pid = os.getppid()
         marker_path = os.path.join(tempfile.gettempdir(), f"itsxpress_trim_ccs_{parent_pid}.tmp")
