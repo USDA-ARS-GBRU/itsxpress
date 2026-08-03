@@ -85,6 +85,64 @@ def myparser():
 
 ## Utility Functions
 
+def create_runtime_hmm(taxa: str, region: str, tempdir: str) -> str:
+    """Dynamically creates a filtered HMM file for the specified taxa and region at runtime.
+
+    Args:
+        taxa: The taxonomic group sequenced (e.g., "Fungi" or "All").
+        region: The target ITS region to search ("ITS2", "ITS1", or "ALL").
+        tempdir: Path to the temporary directory where the file should be created.
+
+    Returns:
+        The file path to the dynamically generated temporary HMM file.
+    """
+    from itsxpress.definitions import taxa_dict, ROOT_DIR
+
+    hmm_dir = os.path.join(ROOT_DIR, "ITSx_db", "HMMs")
+    source_files = []
+
+    if taxa == "All" or taxa == "all.hmm":
+        for t, f in taxa_dict.items():
+            if t != "All" and f != "all.hmm":
+                source_files.append(os.path.join(hmm_dir, f))
+    else:
+        f = taxa_dict.get(taxa, taxa)
+        source_files.append(os.path.join(hmm_dir, f))
+
+    prefixes = ()
+    if region == "ITS2":
+        prefixes = ("3_", "4_")
+    elif region == "ITS1":
+        prefixes = ("1_", "2_")
+    elif region == "ALL":
+        prefixes = ("1_", "4_")
+    else:
+        prefixes = ("1_", "2_", "3_", "4_")
+
+    target_path = os.path.join(tempdir, "runtime_selected.hmm")
+
+    with open(target_path, 'w') as out_f:
+        for path in source_files:
+            if not os.path.exists(path):
+                continue
+            with open(path, 'r') as in_f:
+                current_block = []
+                include_block = False
+                for line in in_f:
+                    current_block.append(line)
+                    if line.startswith("NAME  "):
+                        name = line[6:].strip()
+                        if name.startswith(prefixes):
+                            include_block = True
+                    if line.strip() == "//":
+                        if include_block:
+                            out_f.writelines(current_block)
+                        current_block = []
+                        include_block = False
+
+    return target_path
+
+
 def _is_paired(fastq, fastq2, single_end):
     """Determines the workflow based on file inputs.
     Args:
@@ -318,7 +376,7 @@ def main(args=None):
             sobj.cluster(threads=str(args.threads),cluster_id=args.cluster_id)
         # HMMSearch for ITS regions
         logging.info("Searching for ITS start and stop sites using HMMSearch. This step takes a while.")
-        hmmfile = os.path.join(ROOT_DIR, "ITSx_db","HMMs", taxa_dict[args.taxa])
+        hmmfile = create_runtime_hmm(args.taxa, args.region, session_tempdir)
         sobj._search(hmmfile=hmmfile, threads=str(args.threads))
         # Parse Hmmsearch output
         logging.info("Parsing HMM results.")
