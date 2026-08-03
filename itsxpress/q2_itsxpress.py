@@ -288,22 +288,32 @@ def main(per_sample_sequences: Any,
                                           trim_ccs=trim_ccs)
 
     if trim_ccs:
+        import os
+        import tempfile
         import logging
-        msg = (
-            "\n" + "=" * 80 + "\n"
-            "PacBio CCS trimming complete. You can denoise these sequences in DADA2 using:\n\n"
-            "qiime dada2 denoise-ccs \\\n"
-            "  --i-demultiplexed-seqs pacbio-trimmed.qza \\\n"
-            "  --p-front GACAGGTACAAGAAGGA \\\n"
-            "  --p-adapter ACTGGAGACTGGGTTAA \\\n"
-            "  --p-min-len 50 \\\n"
-            "  --p-max-len 1600 \\\n"
-            "  --p-n-threads 4 \\\n"
-            "  --output-dir dada2-results\n"
-            "*" * 80 + "\n"
-        )
-        print(msg)
-        logging.info(msg)
+        parent_pid = os.getppid()
+        marker_path = os.path.join(tempfile.gettempdir(), f"itsxpress_trim_ccs_{parent_pid}.tmp")
+        if not os.path.exists(marker_path):
+            try:
+                with open(marker_path, 'w') as f:
+                    f.write('printed')
+            except Exception:
+                pass
+            msg = (
+                "\n" + "=" * 80 + "\n"
+                "PacBio CCS trimming complete. You can denoise these sequences in DADA2 using:\n\n"
+                "qiime dada2 denoise-ccs \\\n"
+                "  --i-demultiplexed-seqs pacbio-trimmed.qza \\\n"
+                "  --p-front GACAGGTACAAGAAGGA \\\n"
+                "  --p-adapter ACTGGAGACTGGGTTAA \\\n"
+                "  --p-min-len 50 \\\n"
+                "  --p-max-len 1600 \\\n"
+                "  --p-n-threads 4 \\\n"
+                "  --output-dir dada2-results\n"
+                "*" * 80 + "\n"
+            )
+            print(msg)
+            logging.info(msg)
 
     shutil.rmtree(tempdir)
     return results
