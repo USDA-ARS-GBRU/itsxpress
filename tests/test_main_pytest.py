@@ -365,3 +365,58 @@ def test_trim_ccs_stitching():
 	# Quality scores should align perfectly: fwd_primer has 93s, trimmed sequence has 40s, rev_primer_rc has 93s
 	expected_quals = [93] * 17 + [40] * 10 + [93] * 17
 	assert stitched.letter_annotations["phred_quality"] == expected_quals
+
+
+def test_create_runtime_hmm():
+    """Test that create_runtime_hmm properly filters HMM profiles according to the region."""
+    from itsxpress.main import create_runtime_hmm
+    temp_dir = tempfile.mkdtemp()
+    try:
+        # Test ITS2 region for Fungi (F.hmm)
+        hmm_path = create_runtime_hmm(taxa="Fungi", region="ITS2", tempdir=temp_dir)
+        assert os.path.exists(hmm_path)
+
+        # Parse output HMM file and check names
+        with open(hmm_path, 'r') as f:
+            for line in f:
+                if line.startswith("NAME  "):
+                    name = line[6:].strip()
+                    # For ITS2, prefixes must start with 3_ or 4_
+                    assert name.startswith(("3_", "4_"))
+                    assert not name.startswith(("1_", "2_"))
+
+        # Test ITS1 region for Fungi
+        hmm_path_its1 = create_runtime_hmm(taxa="Fungi", region="ITS1", tempdir=temp_dir)
+        assert os.path.exists(hmm_path_its1)
+        with open(hmm_path_its1, 'r') as f:
+            for line in f:
+                if line.startswith("NAME  "):
+                    name = line[6:].strip()
+                    # For ITS1, prefixes must start with 1_ or 2_
+                    assert name.startswith(("1_", "2_"))
+                    assert not name.startswith(("3_", "4_"))
+
+        # Test ALL region for Fungi
+        hmm_path_all = create_runtime_hmm(taxa="Fungi", region="ALL", tempdir=temp_dir)
+        assert os.path.exists(hmm_path_all)
+        with open(hmm_path_all, 'r') as f:
+            for line in f:
+                if line.startswith("NAME  "):
+                    name = line[6:].strip()
+                    assert name.startswith(("1_", "4_"))
+                    assert not name.startswith(("2_", "3_"))
+
+        # Test taxa="All"
+        hmm_path_taxa_all = create_runtime_hmm(taxa="All", region="ITS2", tempdir=temp_dir)
+        assert os.path.exists(hmm_path_taxa_all)
+        with open(hmm_path_taxa_all, 'r') as f:
+            names = []
+            for line in f:
+                if line.startswith("NAME  "):
+                    names.append(line[6:].strip())
+            # For "All" and "ITS2", should have multiple taxa profiles starting with 3_ or 4_
+            assert len(names) > 0
+            for name in names:
+                assert name.startswith(("3_", "4_"))
+    finally:
+        shutil.rmtree(temp_dir)

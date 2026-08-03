@@ -192,7 +192,18 @@ Usage
 |                         | for Vsearch --fastq_mergepairs. See Vsearch documentation.    |
 |                         | (Optional) Default is true.                                   |
 +-------------------------+---------------------------------------------------------------+
+| --trim-ccs              | PacBio CCS reads mode. Stitch fake primers (GACAGGTACAAGAAGGA |
+|                         | and adapter ACTGGAGACTGGGTTAA) with uniform quality scores.   |
++-------------------------+---------------------------------------------------------------+
 
+
+Advanced Features
+-----------------
+
+PacBio CCS Trimming (--trim-ccs)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When analyzing PacBio CCS reads, the `--trim-ccs` parameter is supported. This feature orients sequence reads against a universal reference database and stitches synthetic dummy primers (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) with uniform Phred quality scores of 93 (`~`) onto the trimmed reads to satisfy downstream DADA2 requirements.
+At completion, ITSxpress provides a log message displaying the correct `qiime dada2 denoise-ccs` arguments for denoising.
 
 
 Examples
