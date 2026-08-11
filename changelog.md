@@ -1,3 +1,5 @@
+
+
 # 2.1.4 (2025-01-13)
 
 - Fixed a bug in [Issue 60](https://github.com/USDA-ARS-GBRU/itsxpress/issues/60) That caused the QIIME 2 plugin of ITSXpress to crash when running `.qza` files with more than one sample (thanks @hyphaltip). This bug was introduced in v2.1.2 or v2.1.3.

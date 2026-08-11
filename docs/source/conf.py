@@ -14,19 +14,39 @@
 #
 import os
 import sys
+import subprocess
 sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'ITSxpress'
-copyright = '2018, Adam R. Rivers'
+copyright = 'CC0 Public Domain Attribution 2018'
 author = 'Adam R. Rivers'
 
-# The short X.Y version
-version = ''
-# The full version, including alpha/beta/rc tags
-release = '1.7.0'
+
+
+try:
+    # Fetches "v2.1.4-17-gd6fd54b"
+    git_version = subprocess.check_output(
+        ["git", "describe", "--tags", "--always"],
+        stderr=subprocess.STDOUT
+    ).strip().decode("utf-8")
+    
+    # Strip the leading 'v' if present (becomes "2.1.4-17-gd6fd54b")
+    if git_version.startswith("v"):
+        git_version = git_version[1:]
+        
+except Exception:
+    # Fallback to your baseline version if git fails
+    git_version = "1.7.0"
+
+# The full version, including alpha/beta/rc tags and commit suffix
+release = git_version
+
+# The short X.Y version (extracts "2.1" from "2.1.4-17-gd6fd54b")
+version = ".".join(git_version.split(".")[:2]) if "." in git_version else git_version
+
 
 
 # -- General configuration ---------------------------------------------------

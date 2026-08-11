@@ -20,11 +20,10 @@ ITSxpress: Software to rapidly trim  the internal transcribed spacer (ITS) regio
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1304349.svg
   :target: https://doi.org/10.5281/zenodo.1304349
 
-Author
+Authors
 -------
-* Adam R. Rivers, US Department of Agriculture, Agricultural Research Service
-* Sveinn V. Einarsson, US Department of Agriculture, Agricultural Research Service
-
+* Adam R. Rivers, US Department of Agriculture, Agricultural Research Service, Gainesville, FL, USA
+* Sveinn V. Einarsson, Queens University, Charlotte, NC, USA
 Citations
 ---------
 
@@ -50,13 +49,13 @@ the 5.8s genes and two variable length spacer regions. In amplicon sequencing st
 common practice to trim off the conserved (SSU, 5,8S or LSU) regions. `Bengtsson-Palme
 et al. (2013)`_ published software the software package ITSx_ to do this.
 
-ITSxpress is designed to support the calling of exact sequence variants rather than OTUs_.
+ITSxpress is designed to support the calling of exact amplicon sequence variants (ASVs) rather than OTUs_.
 This newer method of sequence error-correction requires quality score data from each
 sequence, so each input sequence must be trimmed. ITSXpress makes this possible by
-taking FASTQ data, de-replicating the sequences then identifying the start and stop
-sites using HMMSearch.  Results are parsed and the trimmed files are returned. The ITS 1,
+taking FASTQ data, de-replicating the sequences with Vsearch then identifying the start and stop
+sites using HMMER hmmsearch.  Results are parsed and the trimmed files are returned. The ITS1,
 ITS2 or the entire ITS region including the 5.8s rRNA gene can be selected. ITSxpress
-uses the hmm model from ITSx so results are comparable.
+uses the hmm models from ITSx so results are comparable.
 
 ITSxpress is also a QIIME2 plugin. Starting from version 2.0.0 of ITSxpress, the QIIME2 plugin is included with
 the command line version of ITSxpress. The installation method will be slightly different depending on whether 
@@ -72,16 +71,18 @@ Installing ITSxpress for use as a QIIME2 Plugin
 ----------------------------------------------------
 
 To install ITSxpress as a plugin for QIIME 2, first install QIIME 2 Amplicon Distribution as a separate Conda/Mamba environemnt using their instructions 
-https://docs.qiime2.org/2024.10/install/native then add ITSxpress to the QIIME 2 Conda environment. The examples below are for QIIME2 
-version 2024.10 an so please update the commands if you want a newer release.
+https://library.qiime2.org/quickstart/qiime2 then add ITSxpress to the QIIME 2 Conda environment. The examples below are for QIIME2 
+version 2026.7 an so please update the commands if you want a newer release.
  
 
 For Linux:
 
 .. code-block:: bash
 
-    conda env create -n qiime2-amplicon-2024.10 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.10-py310-linux-conda.yml
-    conda activate qiime2-amplicon-2024.10
+    conda env create \
+      --name rachis-qiime2-2026.7 \
+      --file https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml
+    conda activate rachis-qiime2-2026.7
     conda install -c bioconda -c conda-forge ITSxpress
     qiime dev refresh-cache
 
@@ -89,16 +90,20 @@ For maxOS (Intel) and OS X:
 
 .. code-block:: bash
 
-    conda env create -n qiime2-amplicon-2024.10 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.10-py310-osx-conda.yml
-    conda activate qiime2-amplicon-2024.10
+    conda env create \
+        --name rachis-qiime2-2026.7 \
+        --file https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-osx-64-conda.yml
+    conda activate rachis-qiime2-2026.7
     conda install -c bioconda -c conda-forge ITSxpress
     qiime dev refresh-cache
 
 For macOS (Arm / Apple Silicon):
 
 .. code-block:: bash
-    CONDA_SUBDIR=osx-64 conda env create -n qiime2-amplicon-2024.10 --file https://data.qiime2.org/distro/amplicon/qiime2-amplicon-2024.10-py310-osx-conda.yml
-    conda activate qiime2-amplicon-2024.10
+    CONDA_SUBDIR=osx-64 conda env create \
+     --name rachis-qiime2-2026.7 \
+     --file https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-osx-64-conda.yml
+    conda activate rachis-qiime2-2026.7
     conda config --env --set subdir osx-64
     CONDA_SUBDIR=osx-64 conda install -c bioconda -c conda-forge ITSxpress
     qiime dev refresh-cache
@@ -197,11 +202,9 @@ Usage
 +-------------------------+---------------------------------------------------------------+
 
 
-Advanced Features
------------------
 
 PacBio CCS Trimming (--trim-ccs)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 When analyzing PacBio CCS reads, the `--trim-ccs` parameter is supported. This feature orients sequence reads against a universal reference database and stitches synthetic dummy primers (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) with uniform Phred quality scores of 93 (`~`) onto the trimmed reads to satisfy downstream DADA2 requirements.
 At completion, ITSxpress provides a log message displaying the correct `qiime dada2 denoise-ccs` arguments for denoising.
 
@@ -244,9 +247,21 @@ an single-ended gzipped FASTQ files using two cpu threads.
 Single ended data is less common and may come from a platform like Oxford Nanopore or PacBio with long single-end reads. 
 Pre-merging paired-end reads is not recommended because the next step for most people is DADA2 which prefers paired-end reads.
 
+
+ITS HMM Models
+--------------------
+
+The HMM models for identifying ITS regions were built by Henrik Nilsson at the University of Gothenburg. 
+Originally, they were built for the ITSx software package; Dr. Nilsson has continued to update the models, but not on the same schedule as ITSx. 
+To provide clarity about the reference data used, I have created a separate, versioned repository for the 
+ITS sequence models: `its-hmm-models on GitHub <https://github.com/itsxpress/its-hmm-models>`_ and assigned it a `DOI <https://doi.org/10.5281/zenodo.13285214>`_. 
+
+ITSXpress currently uses ITS_HMMS version 2.0.0.
+
+
 License information
 --------------------
-This software is a work of the United States Department of Agriculture,
-Agricultural Research Service and is released under a Creative Commons CC0
+This software is a work of the United States Department of Agriculture, Agricultural Research Service.
+Under 17 U.S. Code § 105 the work is not copyrightable.  It is released under a Creative Commons CC0
 public domain attribution.
 
