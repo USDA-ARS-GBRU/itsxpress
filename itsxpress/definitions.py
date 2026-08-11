@@ -1,10 +1,10 @@
-"""Definitions.py: variables shared across the package.
+"""Definitions.py: variables shared across the package."""
 
-"""
 import os
+from typing import List, Dict
 
 # This is the project Root
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR: str = os.path.dirname(os.path.abspath(__file__))
 
 # Define Taxa that Hmms were created for
 # A = Alveolata
@@ -29,20 +29,54 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 # X = Apusozoa (No longer present in ITSx files)
 # Y = Parabasalia
 
-taxa_choices = ["Alveolata", "Bryophyta", "Bacillariophyta","Amoebozoa", "Euglenozoa", "Fungi",
- "Chlorophyta","Rhodophyta","Phaeophyceae","Marchantiophyta","Metazoa",
- "Oomycota","Haptophyceae", "Raphidophyceae"," Rhizaria","Synurophyceae",
- "Tracheophyta","Eustigmatophyceae","Parabasalia", "All"]
+taxa_choices: List[str] = [
+    "Alveolata",
+    "Bryophyta",
+    "Bacillariophyta",
+    "Amoebozoa",
+    "Euglenozoa",
+    "Fungi",
+    "Chlorophyta",
+    "Rhodophyta",
+    "Phaeophyceae",
+    "Marchantiophyta",
+    "Metazoa",
+    "Oomycota",
+    "Haptophyceae",
+    "Raphidophyceae",
+    " Rhizaria",
+    "Synurophyceae",
+    "Tracheophyta",
+    "Eustigmatophyceae",
+    "Parabasalia",
+    "All",
+]
 
-taxa_dict = {"Alveolata":"A.hmm","Bryophyta":"B.hmm", "Bacillariophyta":"C.hmm",
- "Amoebozoa":"D.hmm", "Euglenozoa":"E.hmm", "Fungi":"F.hmm","Chlorophyta":"G.hmm",
- "Rhodophyta":"H.hmm","Phaeophyceae":"I.hmm","Marchantiophyta":"L.hmm","Metazoa":"M.hmm",
- "Oomycota":"O.hmm","Haptophyceae":"P.hmm",
- "Raphidophyceae":"Q.hmm"," Rhizaria":"R.hmm","Synurophyceae":"S.hmm",
- "Tracheophyta":"T.hmm","Eustigmatophyceae":"U.hmm","Parabasalia":"Y.hmm","All":"all.hmm"}
+taxa_dict: Dict[str, str] = {
+    "Alveolata": "A.hmm",
+    "Bryophyta": "B.hmm",
+    "Bacillariophyta": "C.hmm",
+    "Amoebozoa": "D.hmm",
+    "Euglenozoa": "E.hmm",
+    "Fungi": "F.hmm",
+    "Chlorophyta": "G.hmm",
+    "Rhodophyta": "H.hmm",
+    "Phaeophyceae": "I.hmm",
+    "Marchantiophyta": "L.hmm",
+    "Metazoa": "M.hmm",
+    "Oomycota": "O.hmm",
+    "Haptophyceae": "P.hmm",
+    "Raphidophyceae": "Q.hmm",
+    " Rhizaria": "R.hmm",
+    "Synurophyceae": "S.hmm",
+    "Tracheophyta": "T.hmm",
+    "Eustigmatophyceae": "U.hmm",
+    "Parabasalia": "Y.hmm",
+    "All": "all.hmm",
+}
 
 
-maxmismatches = 40
-maxratio = 0.3
+maxmismatches: int = 40
+maxratio: float = 0.3
 # vsearch sets the max fasq_qmax value as 126 - the fastq_ascii value (normally this is 33 but on very old fastqs this can be 64)
-vsearch_fastq_qmax = 93
+vsearch_fastq_qmax: int = 93

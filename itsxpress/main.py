@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """ITSxpress: A python module to rapidly trim ITS amplicon sequences from FASTQ files.
+
 Authors: Adam Rivers, Kyle weber, USDA Agricultural Research Service
 The internally transcribed spacer region is a region between the highly conserved small
 subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. The eukaryotic ITS contains
@@ -24,8 +25,6 @@ Reference:
     eukaryotes for use in environmental sequencing. Methods in Ecology and Evolution,
     4: 914-919, 2013 (DOI: 10.1111/2041-210X.12073)
 """
- 
-
 
 import gzip
 import pyzstd as zstd
@@ -36,54 +35,141 @@ import os
 import shutil
 import math
 import tempfile
-from itertools import tee, islice
+from itertools import islice
 import contextlib
-
-from numpy import empty
+from typing import Optional, Any, Iterator
 
 from Bio import SeqIO
 
-from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio
-from itsxpress.SeqSample import Dedup, ItsPosition, SeqSamplePairedNotInterleaved, SeqSampleNotPaired
+from itsxpress.definitions import taxa_choices
+from itsxpress.SeqSample import (
+    Dedup,
+    ItsPosition,
+    SeqSamplePairedNotInterleaved,
+    SeqSampleNotPaired,
+)
 from ._version import __version__
 
-def restricted_float(x):
+
+def restricted_float(x: Any) -> float:
+    """Restricts parser argument to a float range [0.99, 1.0].
+
+    Args:
+        x: The input float value as string or other.
+
+    Returns:
+        The validated float value.
+
+    Raises:
+        argparse.ArgumentTypeError: If the value is out of range.
+    """
     x = float(x)
     if x < 0.99 or x > 1.0:
-        raise argparse.ArgumentTypeError("%r not in range [0.99, 1.0]"%(x,))
+        raise argparse.ArgumentTypeError("%r not in range [0.99, 1.0]" % (x,))
     return x
 
 
-def myparser():
-    parser = argparse.ArgumentParser(description='ITSxpress: A python module to rapidly \
-        trim ITS amplicon sequences from Fastq files.')
-    parser.add_argument('--fastq', '-f', type=str, required=True,
-                        help='A .fastq, .fq, .fastq.gz or .fq.gz file. Interleaved or not.')
-    parser.add_argument('--single_end', '-s', action='store_true', default=False,
-                        help='A flag to specify that the FASTQ file is single-ended (not paired). Default is false.')
-    parser.add_argument('--fastq2', '-f2', type=str, default=None,
-                        help='A .fastq, .fq, .fastq.gz or .fq.gz file. representing read 2 (optional)')
-    parser.add_argument('--outfile', '-o', type=str, help="the trimmed Fastq file, if it \
-                        ends in 'gz' it will be gzipped", required=True)
-    parser.add_argument('--outfile2', '-o2', type=str, help="the trimmed read 2 Fastq file, if it \
-                            ends in 'gz' it will be gzipped. If provided, reads will be returned unmerged.", default=None)
-    parser.add_argument('--tempdir', help='The temp file directory', default=None)
-    parser.add_argument('--allow_staggered_reads', help='Allow merging of staggered reads with --fastq_allowmergestagger \
-                        for Vsearch --fastq_mergepairs. See Vsearch documentation. (Optional) Default is true.', default=True)
-    parser.add_argument('--keeptemp' ,help="Should intermediate files be kept?", action='store_true')
-    parser.add_argument('--region', help='', choices=["ITS2", "ITS1", "ALL"], required=True)
-    parser.add_argument('--taxa', help='The taxonomic group sequenced.', choices=taxa_choices, default="Fungi")
-    parser.add_argument('--cluster_id', help='The percent identity for clustering reads range [0.99-1.0], set to 1 for exact dereplication.', type=restricted_float, default=1.0)
-    parser.add_argument('--reversed_primers', '-rp',  help="Primers are in reverse orientation as in Taylor et al. 2016, DOI:10.1128/AEM.02576-16. If selected ITSxpress returns trimmed reads flipped to the forward orientation", action='store_true')
-    parser.add_argument('--trim-ccs', dest='trim_ccs', action='store_true', default=False,
-                        help='Stitch fake forward and reverse complement of fake reverse primer for DADA2 denoise-ccs on PacBio reads.')
-    parser.add_argument('--log' ,help="Log file", default="ITSxpress.log")
-    parser.add_argument('--threads' ,help="Number of processor threads to use.", type=int, default=1)
-    parser.add_argument('--version', '-v' , help="display version",  action="version", version="ITSxpress version: " + __version__)
+def myparser() -> argparse.ArgumentParser:
+    """Creates the argument parser for ITSxpress command line.
+
+    Returns:
+        An ArgumentParser object configured with ITSxpress options.
+    """
+    parser = argparse.ArgumentParser(
+        description="ITSxpress: A python module to rapidly trim ITS amplicon sequences from Fastq files."
+    )
+    parser.add_argument(
+        "--fastq",
+        "-f",
+        type=str,
+        required=True,
+        help="A .fastq, .fq, .fastq.gz or .fq.gz file. Interleaved or not.",
+    )
+    parser.add_argument(
+        "--single_end",
+        "-s",
+        action="store_true",
+        default=False,
+        help="A flag to specify that the FASTQ file is single-ended (not paired). Default is false.",
+    )
+    parser.add_argument(
+        "--fastq2",
+        "-f2",
+        type=str,
+        default=None,
+        help="A .fastq, .fq, .fastq.gz or .fq.gz file. representing read 2 (optional)",
+    )
+    parser.add_argument(
+        "--outfile",
+        "-o",
+        type=str,
+        help="the trimmed Fastq file, if it ends in 'gz' it will be gzipped",
+        required=True,
+    )
+    parser.add_argument(
+        "--outfile2",
+        "-o2",
+        type=str,
+        help="the trimmed read 2 Fastq file, if it ends in 'gz' it will be gzipped. If provided, reads will be returned unmerged.",
+        default=None,
+    )
+    parser.add_argument("--tempdir", help="The temp file directory", default=None)
+    parser.add_argument(
+        "--allow_staggered_reads",
+        help="Allow merging of staggered reads with --fastq_allowmergestagger for Vsearch --fastq_mergepairs. See Vsearch documentation. (Optional) Default is true.",
+        default=True,
+    )
+    parser.add_argument(
+        "--keeptemp",
+        help="Should intermediate files be kept?",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--region", help="", choices=["ITS2", "ITS1", "ALL"], required=True
+    )
+    parser.add_argument(
+        "--taxa",
+        help="The taxonomic group sequenced.",
+        choices=taxa_choices,
+        default="Fungi",
+    )
+    parser.add_argument(
+        "--cluster_id",
+        help="The percent identity for clustering reads range [0.99-1.0], set to 1 for exact dereplication.",
+        type=restricted_float,
+        default=1.0,
+    )
+    parser.add_argument(
+        "--reversed_primers",
+        "-rp",
+        help="Primers are in reverse orientation as in Taylor et al. 2016, DOI:10.1128/AEM.02576-16. If selected ITSxpress returns trimmed reads flipped to the forward orientation",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--trim-ccs",
+        dest="trim_ccs",
+        action="store_true",
+        default=False,
+        help="Stitch fake forward and reverse complement of fake reverse primer for DADA2 denoise-ccs on PacBio reads.",
+    )
+    parser.add_argument("--log", help="Log file", default="ITSxpress.log")
+    parser.add_argument(
+        "--threads",
+        help="Number of processor threads to use.",
+        type=int,
+        default=1,
+    )
+    parser.add_argument(
+        "--version",
+        "-v",
+        action="version",
+        version="ITSxpress version: " + __version__,
+    )
     return parser
 
 
 ## Utility Functions
+
 
 def create_runtime_hmm(taxa: str, region: str, tempdir: str) -> str:
     """Dynamically creates a filtered HMM file for the specified taxa and region at runtime.
@@ -121,11 +207,11 @@ def create_runtime_hmm(taxa: str, region: str, tempdir: str) -> str:
 
     target_path = os.path.join(tempdir, "runtime_selected.hmm")
 
-    with open(target_path, 'w') as out_f:
+    with open(target_path, "w") as out_f:
         for path in source_files:
             if not os.path.exists(path):
                 continue
-            with open(path, 'r') as in_f:
+            with open(path, "r") as in_f:
                 current_block = []
                 include_block = False
                 for line in in_f:
@@ -143,12 +229,19 @@ def create_runtime_hmm(taxa: str, region: str, tempdir: str) -> str:
     return target_path
 
 
-def _is_paired(fastq, fastq2, single_end):
+def _is_paired(fastq: Optional[str], fastq2: Optional[str], single_end: bool) -> bool:
     """Determines the workflow based on file inputs.
+
     Args:
-    fastq (str): The path to a fastq or fastq.gz file
-    fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
-    single_end (bool): A flag to specify that the FASTQ file is single-ended (not paired). Default is false.
+        fastq: The path to a fastq or fastq.gz file.
+        fastq2: The path to a fastq or fastq.gz file for the reverse sequences.
+        single_end: A flag to specify that the FASTQ file is single-ended.
+
+    Returns:
+        bool: True if the workflow is paired-end, False otherwise.
+
+    Raises:
+        AssertionError: If parameters are inconsistent.
     """
     paired_end = None
     if fastq and fastq2:
@@ -160,53 +253,64 @@ def _is_paired(fastq, fastq2, single_end):
         logging.info("Only one fastq file provided. Assuming single-end.")
     else:
         try:
-            assert paired_end != None
+            assert paired_end is not None
         except AssertionError as a:
-            logging.error("ITSxpress requires either a single-end file or two paired-end files. If this is a single-end file, please use the --single_end flag.")
+            logging.error(
+                "ITSxpress requires either a single-end file or two paired-end files. If this is a single-end file, please use the --single_end flag."
+            )
             raise a
     return paired_end
 
-def _logger_setup(logfile):
+
+def _logger_setup(logfile: str) -> None:
     """Set up logging to a logfile and the terminal standard out.
+
     Args:
-        fastq (str): The path to a fastq or fastq.gz file
-        fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
+        logfile: The path to the logfile.
     """
     try:
-        logging.basicConfig(level=logging.DEBUG,
-                            format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                            datefmt='%m-%d %H:%M',
-                            filename=logfile,
-                            filemode='w')
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+            datefmt="%m-%d %H:%M",
+            filename=logfile,
+            filemode="w",
+        )
         # define a Handler which writes INFO messages or higher to the sys.stderr
         console = logging.StreamHandler()
         console.setLevel(logging.INFO)
         # set a format which is simpler for console use
-        formatter = logging.Formatter('%(asctime)s: %(levelname)-8s %(message)s')
+        formatter = logging.Formatter("%(asctime)s: %(levelname)-8s %(message)s")
         # tell the handler to use this format
         console.setFormatter(formatter)
         # add the handler to the root logger
-        logging.getLogger('').addHandler(console)
+        logging.getLogger("").addHandler(console)
     except Exception as e:
         print("An error occurred setting up logging")
         raise e
 
-@contextlib.contextmanager
-def read_file(filename: str, mode: str ='r') -> contextlib.contextmanager:
-    """ A context manager for opening gzipped, stdz compressed or uncompressed files.
 
-        Args:
-            filename: the filename to open
-            mode: 'r' for read 'w' for write. 't' will be added automatically for compressed files.
-        
-        Returns a context manager so the file can be opened using 'with'
+@contextlib.contextmanager
+def read_file(filename: str, mode: str = "r") -> Iterator[Any]:
+    """A context manager for opening gzipped, stdz compressed or uncompressed files.
+
+    Args:
+        filename: the filename to open.
+        mode: 'r' for read 'w' for write. 't' will be added automatically for compressed files.
+
+    Returns:
+        An iterator/generator yielding the opened file object.
+
+    Raises:
+        FileNotFoundError: If the file is not found.
+        Exception: If any error occurs reading the file.
     """
     try:
-        if filename.endswith('.gz'):
-            file = gzip.open(filename, mode +'t')
+        if filename.endswith(".gz"):
+            file = gzip.open(filename, mode + "t")
             yield file
-        elif filename.endswith('.zst'):
-            file = zstd.open(filename, mode + 't')
+        elif filename.endswith(".zst"):
+            file = zstd.open(filename, mode + "t")
             yield file
         else:
             file = open(filename, mode)
@@ -215,41 +319,63 @@ def read_file(filename: str, mode: str ='r') -> contextlib.contextmanager:
         logging.error("The input file {} could not be found.".format(filename))
         raise f
     except Exception as g:
-        logging.error("There appears to be an issue reading the input file {}.".format(filename))
+        logging.error(
+            "There appears to be an issue reading the input file {}.".format(filename)
+        )
         raise g
     finally:
-        if 'file' in locals():
+        if "file" in locals():
             file.close()
-    
-def _check_fastqs(fastq: str, fastq2: str=None) -> None:
-    """Verifies the input files are valid fastq or fastq.gz files. Also checks for interleaved files which are no longer supported.
+
+
+def _check_fastqs(fastq: str, fastq2: Optional[str] = None) -> None:
+    """Verifies the input files are valid fastq or fastq.gz files.
+
+    Also checks for interleaved files which are no longer supported.
+
     Args:
-        fastq (str): The path to a fastq or fastq.gz file
-        fastq2 (str): The path to a fastq or fastq.gz file for the reverse sequences
+        fastq: The path to a fastq or fastq.gz file.
+        fastq2: The path to a fastq or fastq.gz file for the reverse sequences.
 
     Raises:
-        ValueError: If Biopython detected invalid FASTQ files
+        ValueError: If Biopython detected invalid FASTQ files.
     """
+
     # Validation method from BBtools (Thanks Brian!)
-    def test_pair_names_str(id1, id2):
+    def test_pair_names_str(id1: str, id2: str) -> bool:
         len1 = len(id1)
         len2 = len(id2)
         if len1 != len2:
             return False  # Can happen in PacBio names, but never Illumina
-        idx_slash1 = id1.rfind('/')
-        idx_slash2 = id2.rfind('/')
-        idx_space1 = id1.find(' ')
-        idx_space2 = id2.find(' ')
-        
-        if idx_space1 == idx_space2 and idx_space1 > 0 and len1 >= idx_space1 + 3 and len2 >= idx_space2 + 3:
-            if id1[idx_space1 + 1] == '1' and id1[idx_space1 + 2] == ':' and id2[idx_space2 + 1] == '2' and id2[idx_space2 + 2] == ':':
+        idx_slash1 = id1.rfind("/")
+        idx_slash2 = id2.rfind("/")
+        idx_space1 = id1.find(" ")
+        idx_space2 = id2.find(" ")
+
+        if (
+            idx_space1 == idx_space2
+            and idx_space1 > 0
+            and len1 >= idx_space1 + 3
+            and len2 >= idx_space2 + 3
+        ):
+            if (
+                id1[idx_space1 + 1] == "1"
+                and id1[idx_space1 + 2] == ":"
+                and id2[idx_space2 + 1] == "2"
+                and id2[idx_space2 + 2] == ":"
+            ):
                 for i in range(idx_space1):
                     if id1[i] != id2[i]:
                         return False
                 return True
-        
-        if idx_slash1 == idx_slash2 and idx_slash1 > 0 and len1 >= idx_slash1 + 2 and len2 >= idx_slash2 + 2:
-            if id1[idx_slash1 + 1] == '1' and id2[idx_slash2 + 1] == '2':
+
+        if (
+            idx_slash1 == idx_slash2
+            and idx_slash1 > 0
+            and len1 >= idx_slash1 + 2
+            and len2 >= idx_slash2 + 2
+        ):
+            if id1[idx_slash1 + 1] == "1" and id2[idx_slash2 + 1] == "2":
                 for i in range(idx_slash1):
                     if id1[i] != id2[i]:
                         return False
@@ -257,12 +383,12 @@ def _check_fastqs(fastq: str, fastq2: str=None) -> None:
                     if id1[i] != id2[i]:
                         return False
                 return True
-        
+
         return id1 == id2
-    
-    def core(filename):
+
+    def core(filename: str) -> bool:
         with read_file(filename) as handle:
-            records = SeqIO.parse(handle, 'fastq')
+            records = SeqIO.parse(handle, "fastq")
             reclist = list(islice(records, 2))
             if not reclist:
                 # If file is empty, test_pair_names_str isn't applicable, return False
@@ -271,48 +397,57 @@ def _check_fastqs(fastq: str, fastq2: str=None) -> None:
                 # Single read file, cannot check paired name structure
                 return False
             return test_pair_names_str(reclist[0].id, reclist[1].id)
-        
-    def warn_mess(filename):
-        return logging.warning( "The file {} may be interleaved, which is not supported. Please verify your input file manually.")
-    
+
+    def warn_mess(filename: str) -> None:
+        logging.warning(
+            "The file {} may be interleaved, which is not supported. Please verify your input file manually.".format(
+                filename
+            )
+        )
+
     if core(fastq):
         warn_mess(fastq)
     if fastq2:
         if core(fastq2):
             warn_mess(fastq2)
 
-def _check_total_reads(file, file2 = None):
+
+def _check_total_reads(file: str, file2: Optional[str] = None) -> None:
     """Check the total number of reads in the input file(s).
+
+    Args:
+        file: Path to the main fastq file.
+        file2: Path to the secondary fastq file.
     """
-    #Count every fourth line in fastq file.
-    def core(file):
-        with read_file(file) as handle:
+
+    # Count every fourth line in fastq file.
+    def core(f: str) -> int:
+        with read_file(f) as handle:
             n = 0
             for i, _ in enumerate(handle):
                 if i % 4 == 0:
                     n += 1
             return n
-    
+
     reads = core(file)
     logging.info("Total number of reads in file {} is {}.".format(file, reads))
-    #Why is file2 False? 
     if file2:
         reads = core(file2)
         logging.info("Total number of reads in file {} is {}.".format(file2, reads))
 
-def create_temp_directory(tempdir_arg=None):
-    """
-    Creates a temporary directory at a user-defined location or at the default location.
+
+def create_temp_directory(tempdir_arg: Optional[str] = None) -> Optional[str]:
+    """Creates a temporary directory at a user-defined location or at the default location.
+
     The directory name is prefixed with 'itsxpress_'.
-    
     Ensures no file with the same name exists before creating the directory.
-    
-    Parameters:
-    - tempdir_arg (str): Path to a directory provided by the user. If None, 
-      a new temporary directory is created at the default location.
-    
+
+    Args:
+        tempdir_arg: Path to a directory provided by the user. If None,
+            a new temporary directory is created at the default location.
+
     Returns:
-    - str: Path to the temporary directory, or None if there was an error.
+        Path to the temporary directory, or None if there was an error.
     """
     try:
         if tempdir_arg:
@@ -321,27 +456,36 @@ def create_temp_directory(tempdir_arg=None):
                 logging.info(f"Directory '{tempdir_arg}' has been created.")
             else:
                 if os.path.isfile(tempdir_arg):
-                    logging.error(f"A file with the same name '{tempdir_arg}' already exists. Cannot create directory.")
+                    logging.error(
+                        f"A file with the same name '{tempdir_arg}' already exists. Cannot create directory."
+                    )
                     return None
                 logging.info(f"Directory '{tempdir_arg}' already exists.")
-            
+
             # Try creating a unique temporary directory inside user-specified directory
-            temp_dir =  tempfile.mkdtemp(prefix="itsxpress_", dir=tempdir_arg)
-            logging.info(f"Temporary directory '{temp_dir}' has been created at the user-defined location.")
+            temp_dir = tempfile.mkdtemp(prefix="itsxpress_", dir=tempdir_arg)
+            logging.info(
+                f"Temporary directory '{temp_dir}' has been created at the user-defined location."
+            )
         else:
             # Create a temporary directory at default location
             temp_dir = tempfile.mkdtemp(prefix="itsxpress_")
-            logging.info(f"Temporary directory '{temp_dir}' has been created at the default location.")
-        
+            logging.info(
+                f"Temporary directory '{temp_dir}' has been created at the default location."
+            )
+
         return temp_dir
-    
+
     except Exception as e:
         logging.error(f"Failed to create temporary directory: {e}")
         return None
 
 
-def main(args=None):
+def main(args: Optional[argparse.Namespace] = None) -> None:
     """Run Complete ITS trimming workflow.
+
+    Args:
+        args: Optional command line arguments namespace.
     """
     # Set up logging
     t0 = time.time()
@@ -358,55 +502,124 @@ def main(args=None):
         # Parse input types
         paired_end = _is_paired(args.fastq, args.fastq2, args.single_end)
         session_tempdir = create_temp_directory(tempdir_arg=args.tempdir)
+        if session_tempdir is None:
+            raise ValueError("Failed to create temporary directory")
         if paired_end:
-            logging.info("Sequences are paired-end in two files. They will be merged using Vsearch.")
-            sobj = SeqSamplePairedNotInterleaved(fastq=args.fastq, fastq2=args.fastq2, tempdir=session_tempdir, reversed_primers=args.reversed_primers)
-            sobj._merge_reads(threads=str(args.threads), stagger=args.allow_staggered_reads)
+            logging.info(
+                "Sequences are paired-end in two files. They will be merged using Vsearch."
+            )
+            sobj = SeqSamplePairedNotInterleaved(
+                fastq=args.fastq,
+                fastq2=args.fastq2,
+                tempdir=session_tempdir,
+                reversed_primers=args.reversed_primers,
+            )
+            sobj._merge_reads(
+                threads=str(args.threads), stagger=args.allow_staggered_reads
+            )
         elif not paired_end:
             logging.info("Sequences are assumed to be single-end.")
             sobj = SeqSampleNotPaired(fastq=args.fastq, tempdir=session_tempdir)
         if args.trim_ccs:
-            logging.info("Orients PacBio reads using Vsearch --orient against the universal reference database.")
+            logging.info(
+                "Orients PacBio reads using Vsearch --orient against the universal reference database."
+            )
             sobj.orient_reads(threads=str(args.threads))
         # Deduplicate
-        logging.info("Unique sequences are being written to a temporary FASTA file with Vsearch.")
+        logging.info(
+            "Unique sequences are being written to a temporary FASTA file with Vsearch."
+        )
         if math.isclose(args.cluster_id, 1, rel_tol=1e-05):
             sobj.deduplicate(threads=str(args.threads))
         else:
-            sobj.cluster(threads=str(args.threads),cluster_id=args.cluster_id)
+            sobj.cluster(threads=str(args.threads), cluster_id=args.cluster_id)
         # HMMSearch for ITS regions
-        logging.info("Searching for ITS start and stop sites using HMMSearch. This step takes a while.")
+        logging.info(
+            "Searching for ITS start and stop sites using HMMSearch. This step takes a while."
+        )
         hmmfile = create_runtime_hmm(args.taxa, args.region, session_tempdir)
         sobj._search(hmmfile=hmmfile, threads=str(args.threads))
         # Parse Hmmsearch output
         logging.info("Parsing HMM results.")
         its_pos = ItsPosition(domtable=sobj.dom_file, region=args.region)
         # Create deduplication object
-        dedup_obj = Dedup(uc_file=sobj.uc_file, rep_file=sobj.rep_file, seq_file=sobj.seq_file, fastq=sobj.r1, fastq2=sobj.fastq2)
+        dedup_obj = Dedup(
+            uc_file=sobj.uc_file,
+            rep_file=sobj.rep_file,
+            seq_file=sobj.seq_file,
+            fastq=sobj.r1,
+            fastq2=sobj.fastq2,
+        )
         # Trim sequences
         if args.outfile2:
-            if args.outfile.split('.')[-1] == 'gz' and args.outfile2.split('.')[-1] == 'gz':
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True,zstd_file = False,  itspos=its_pos,wri_file=True, trim_ccs=args.trim_ccs)
-                #dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=True,zstd_file = False,  itspos=its_pos,wri_file=False)
-            elif args.outfile.split('.')[-1] == 'zst' and args.outfile2.split('.')[-1] == 'zst':
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=True, trim_ccs=args.trim_ccs)
-                #dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=False)
+            if (
+                args.outfile.split(".")[-1] == "gz"
+                and args.outfile2.split(".")[-1] == "gz"
+            ):
+                dedup_obj.create_paired_trimmed_seqs(
+                    args.outfile,
+                    args.outfile2,
+                    gzipped=True,
+                    zstd_file=False,
+                    itspos=its_pos,
+                    wri_file=True,
+                    trim_ccs=args.trim_ccs,
+                )
+            elif (
+                args.outfile.split(".")[-1] == "zst"
+                and args.outfile2.split(".")[-1] == "zst"
+            ):
+                dedup_obj.create_paired_trimmed_seqs(
+                    args.outfile,
+                    args.outfile2,
+                    gzipped=False,
+                    zstd_file=True,
+                    itspos=its_pos,
+                    wri_file=True,
+                    trim_ccs=args.trim_ccs,
+                )
             else:
-                dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False,zstd_file = False,  itspos=its_pos,wri_file=True, trim_ccs=args.trim_ccs)
-                #dedup_obj.create_paired_trimmed_seqs(args.outfile, args.outfile2, gzipped=False,zstd_file = False,  itspos=its_pos,wri_file=False)
+                dedup_obj.create_paired_trimmed_seqs(
+                    args.outfile,
+                    args.outfile2,
+                    gzipped=False,
+                    zstd_file=False,
+                    itspos=its_pos,
+                    wri_file=True,
+                    trim_ccs=args.trim_ccs,
+                )
 
         else:
-            if args.outfile.split('.')[-1] == 'gz':
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=True,tempdir=sobj.tempdir, trim_ccs=args.trim_ccs)
-                #dedup_obj.create_trimmed_seqs(args.outfile, gzipped=True,zstd_file = False, itspos=its_pos,wri_file=False)
-                #add function with above create_trimmed_seqs
-                #use said function to check for 0 length seqs
-            elif args.outfile.split('.')[-1] == 'zst':
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=True,tempdir=sobj.tempdir, trim_ccs=args.trim_ccs)
-                #dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False, zstd_file = True, itspos=its_pos,wri_file=False)
+            if args.outfile.split(".")[-1] == "gz":
+                dedup_obj.create_trimmed_seqs(
+                    args.outfile,
+                    gzipped=True,
+                    zstd_file=False,
+                    itspos=its_pos,
+                    wri_file=True,
+                    tempdir=sobj.tempdir,
+                    trim_ccs=args.trim_ccs,
+                )
+            elif args.outfile.split(".")[-1] == "zst":
+                dedup_obj.create_trimmed_seqs(
+                    args.outfile,
+                    gzipped=False,
+                    zstd_file=True,
+                    itspos=its_pos,
+                    wri_file=True,
+                    tempdir=sobj.tempdir,
+                    trim_ccs=args.trim_ccs,
+                )
             else:
-                dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=True,tempdir=sobj.tempdir, trim_ccs=args.trim_ccs)
-                #dedup_obj.create_trimmed_seqs(args.outfile, gzipped=False,zstd_file = False, itspos=its_pos,wri_file=False)
+                dedup_obj.create_trimmed_seqs(
+                    args.outfile,
+                    gzipped=False,
+                    zstd_file=False,
+                    itspos=its_pos,
+                    wri_file=True,
+                    tempdir=sobj.tempdir,
+                    trim_ccs=args.trim_ccs,
+                )
         # Count reads after trimming
         logging.info("Counting reads after trimming.")
         if args.outfile2:
@@ -421,9 +634,9 @@ def main(args=None):
             else:
                 _check_total_reads(args.fastq)
             _check_total_reads(args.outfile)
-        
+
         t1 = time.time()
-        fmttime = time.strftime("%H:%M:%S", time.gmtime(t1-t0))
+        fmttime = time.strftime("%H:%M:%S", time.gmtime(t1 - t0))
         logging.info("ITSxpress ran in {}".format(fmttime))
     except Exception as e:
         logging.error("ITSxpress terminated with errors. See the log file for details.")
@@ -438,5 +651,6 @@ def main(args=None):
         except AttributeError:
             pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
