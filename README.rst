@@ -17,8 +17,8 @@ ITSxpress: Software to rapidly trim  the internal transcribed spacer (ITS) regio
    :target: https://github.com/USDA-ARS-GBRU/itsxpress/releases/latest
    :alt: GitHub release (latest by date)
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1304349.svg
-  :target: https://doi.org/10.5281/zenodo.1304349
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.14645760.svg
+  :target: https://doi.org/10.5281/zenodo.14645760
 
 Authors
 -------

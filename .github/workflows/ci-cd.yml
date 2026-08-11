@@ -17,8 +17,30 @@ jobs:
     defaults:
       run:
         shell: bash -el {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Define the two build variants
+        environment: [release_2026_7, latest_dev]
+        # Include specific variables for each matrix variant
+        include:
+          - environment: release_2026_7
+            env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
+          - environment: latest_dev
+            env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
 
     steps:
+      # CRITICAL FILTER: Skip 'latest_dev' matrix leg on push/release, and skip 'release_2026_7' leg on schedule.
+      - name: Check trigger event compatibility
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" && "${{ matrix.environment }}" != "latest_dev" ]]; then
+            echo "Skipping stable release test for scheduled monthly build."
+            exit 0
+          elif [[ "${{ github.event_name }}" != "schedule" && "${{ matrix.environment }}" != "release_2026_7" ]]; then
+            echo "Skipping dev test for push/release build."
+            exit 0
+          fi
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
@@ -38,13 +60,12 @@ jobs:
 
       - name: Set up QIIME Conda environment
         run: |
-          conda env create -n testenv --file=https://qiime2.org
+          conda env create -n testenv --file=${{ matrix.env_url }}
 
       - name: Install Dependencies
         run: |
           conda activate testenv
-          conda install -y biopython=1.84
-          pip install pyzstd pytest
+          conda install -y biopython=1.84 pip install pyzstd pytest
           pip install .
 
       - name: Test with pytest
