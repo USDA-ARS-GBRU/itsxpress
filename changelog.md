@@ -1,3 +1,11 @@
+
+
+# 2.2.0 (2026-08-11)
+
+- Added support for trimming PacBio reads and then calling ASVs with DADA2 using the command `qiime dada2 denoise-ccs` inside of QIIME 2.
+- Refactored package modules for better maintainability
+- Added dynamic reference HMM parsing that speeds up search by about 40% by reducing the number of profiles searched
+
 # 2.1.4 (2025-01-13)
 
 - Fixed a bug in [Issue 60](https://github.com/USDA-ARS-GBRU/itsxpress/issues/60) That caused the QIIME 2 plugin of ITSXpress to crash when running `.qza` files with more than one sample (thanks @hyphaltip). This bug was introduced in v2.1.2 or v2.1.3.
