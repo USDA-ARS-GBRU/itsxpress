@@ -5,9 +5,10 @@ ITSxpress: Software to rapidly trim  the internal transcribed spacer (ITS) regio
     :target: https://itsxpress-package.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/python-package-conda.yml/badge.svg
-   :target: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/python-package-conda.yml
-   :alt: Build Status
+.. image:: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/ci-cd.yml/badge.svg
+   :target: https://github.com/USDA-ARS-GBRU/itsxpress/actions/workflows/ci-cd.yml
+   :alt: CI/CD Pipeline (Test & Publish Docker)
+
 
 .. image:: https://anaconda.org/bioconda/itsxpress/badges/downloads.svg
    :target: https://anaconda.org/bioconda/itsxpress

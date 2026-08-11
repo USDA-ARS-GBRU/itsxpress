@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 
 project = 'ITSxpress'
-copyright = 'CC0 Public Domain Attribution 2018'
+copyright = 'CC0 Public Domain Attribution 2018-2026'
 author = 'Adam R. Rivers'
 
 
