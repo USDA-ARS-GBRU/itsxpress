@@ -10,49 +10,26 @@ on:
     branches:
       - main
 
-# Explicitly grant permissions required for keyless signing and package publishing
 permissions:
   contents: read
   packages: write
   id-token: write
 
 jobs:
-  test:
-    name: Run Integration Tests (${{ matrix.environment }})
+  # =========================================================================
+  # JOB 1: Test against stable release (Runs on pushes, tags, manual triggers)
+  # =========================================================================
+  test-stable:
+    name: Run Stable Integration Tests (2026.7)
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -el {0}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - environment: release_2026_7
-            env_url: "https://githubusercontent.com"
-            biopython_ver: "1.88"
-            pyzstd_ver: "==0.19.1"
-
-          - environment: latest_dev
-            env_url: "https://githubusercontent.com"
-            biopython_ver: "1.88"
-            pyzstd_ver: ">=0.19.1,<0.20.0"
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Clean Step-Level Filtering: Safely handles your cron vs push strategy
-      - name: Check Trigger Event Eligibility
-        run: |
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ matrix.environment }}" != "latest_dev" ]; then
-            echo "Skipping stable release test for scheduled nightly check."
-            exit 0
-          elif [ "${{ github.event_name }}" != "schedule" ] && [ "${{ matrix.environment }}" == "latest_dev" ]; then
-            echo "Skipping latest dev test for standard push/release trigger."
-            exit 0
-          fi
-
-      # Removed actions/setup-python completely to speed up execution
       - name: Initiate Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
@@ -60,13 +37,14 @@ jobs:
           auto-activate-base: true
 
       - name: Set up QIIME Conda environment
-        run: conda env create -n testenv --file=${{ matrix.env_url }}
+        run: |
+          conda env create -n testenv --file="https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
 
       - name: Install Dependencies & Package
         run: |
           conda activate testenv
-          conda install -y -c conda-forge pyzstd${{ matrix.pyzstd_ver }} biopython=${{ matrix.biopython_ver }}
-          pip install .
+          conda install -y -c conda-forge pyzstd==0.19.1 
+          pip install biopython==1.88 .
 
       - name: Test with pytest
         run: |
@@ -79,14 +57,59 @@ jobs:
           qiime dev refresh-cache
           qiime itsxpress --help
 
+  # =========================================================================
+  # JOB 2: Test against bleeding edge (Runs ONLY on monthly cron schedule)
+  # =========================================================================
+  test-latest-dev:
+    name: Run Nightly Dev Integration Tests (Latest)
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Initiate Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          channels: conda-forge,bioconda,defaults
+          auto-activate-base: true
+
+      - name: Set up QIIME Conda environment
+        run: |
+          conda env create -n testenv --file="https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
+
+      - name: Install Dependencies & Package
+        run: |
+          conda activate testenv
+          conda install -y -c conda-forge "pyzstd>=0.19.1,<0.20.0" 
+          pip install biopython==1.88 .
+
+      - name: Test with pytest
+        run: |
+          conda activate testenv
+          pytest
+
+      - name: Test QIIME Plugin Integration
+        run: |
+          conda activate testenv
+          qiime dev refresh-cache
+          qiime itsxpress --help
+
+  # =========================================================================
+  # JOB 3: Build, Publish, and Cryptographically Sign the Docker Image
+  # =========================================================================
   docker:
     name: Build and Push Docker Image
-    needs: test
-    runs-on: ubuntu-latest
+    needs: [test-stable, test-latest-dev]
+    # Ensures it executes if either test track succeeds, but never runs on raw automated cron events
     if: |
-      github.event_name == 'workflow_dispatch' || 
-      github.ref == 'refs/heads/main' || 
-      startsWith(github.ref, 'refs/tags/')
+      always() && 
+      github.event_name != 'schedule' && 
+      (needs.test-stable.result == 'success' || needs.test-latest-dev.result == 'success')
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -127,7 +150,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Added robust conditional execution so Cosign only attempts to sign on actual image pushes
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3
 
