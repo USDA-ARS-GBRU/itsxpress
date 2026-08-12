@@ -11,95 +11,76 @@ on:
       - main
 
 jobs:
-
   test:
     name: Run Integration Tests
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -el {0}
-
     strategy:
       fail-fast: false
       matrix:
         environment: [release_2026_7, latest_dev]
         include:
-
           # Normal release testing: main branch, tags, manual triggers, push
           - environment: release_2026_7
             env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
             run_this_leg: ${{ github.event_name != 'schedule' }}
-
           # Scheduled dev testing: only schedule event
           - environment: latest_dev
             env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
             run_this_leg: ${{ github.event_name == 'schedule' }}
 
-    steps:
-      - name: Skip matrix leg if not needed
-        if: matrix.run_this_leg == 'false'
-        run: |
-          echo "Skipping matrix leg not valid for this trigger."
-          exit 0
+    # Cleanest fix: Skip the entire matrix leg immediately at the job level if not needed
+    if: matrix.run_this_leg
 
+    steps:
       - name: Checkout Code
-        if: matrix.run_this_leg == 'true'
         uses: actions/checkout@v4
 
       - name: Set up Python
-        if: matrix.run_this_leg == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Initiate Conda Channels
-        if: matrix.run_this_leg == 'true'
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge,bioconda,default
           auto-activate-base: true
 
       - name: Initialize Conda
-        if: matrix.run_this_leg == 'true'
         run: conda info
 
       - name: Set up QIIME Conda environment
-        if: matrix.run_this_leg == 'true'
         run: |
           conda env create -n testenv --file=${{ matrix.env_url }}
 
       - name: Install Dependencies
-        if: matrix.run_this_leg == 'true'
         run: |
           conda activate testenv
           conda install -y biopython=1.84 pip pyzstd pytest
           pip install .
 
       - name: Test with pytest
-        if: matrix.run_this_leg == 'true'
         run: |
           conda activate testenv
           pytest
 
       - name: Test QIIME Plugin Integration
-        if: matrix.run_this_leg == 'true'
         run: |
           conda activate testenv
           qiime dev refresh-cache
           qiime itsxpress --help
 
-
   docker:
     name: Build and Push Docker Image
     needs: test
     runs-on: ubuntu-latest
-
-    # Manual triggers allowed now
     if: |
-      github.event_name == 'workflow_dispatch' ||
-      github.ref == 'refs/heads/main' ||
+      github.event_name == 'workflow_dispatch' || 
+      github.ref == 'refs/heads/main' || 
       startsWith(github.ref, 'refs/tags/')
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -110,7 +91,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Github Container Registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
