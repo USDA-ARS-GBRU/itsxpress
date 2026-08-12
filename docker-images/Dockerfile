@@ -1,11 +1,12 @@
-# Build directly on top of the official QIIME 2 Amplicon environment 
-FROM quay.io/qiime2/qiime2-workshop:2026.7
+# Build directly on top of the official QIIME 2 environment
+FROM quay.io/qiime2/qiime2:2026.7
 
-LABEL org.opencontainers.image.source="https://github.com/usda-ars-gbru/itsxpress"
+LABEL org.opencontainers.image.source="https://github.com"
 
-# Update/Install matching core dependencies within the container context
-RUN conda install -y -c bioconda vsearch=2.30.4 hmmer=3.4 biopython=1.84 && \
-    pip install pyzstd pytest
+# Update/Install ONLY the missing additions within the container context
+# vsearch, hmmer, and pytest are skipped because the base image already includes them
+RUN conda install -y -c conda-forge pyzstd==0.19.1 && \
+    pip install biopython==1.88
 
 # Copy your local, pushed repository files cleanly into the working directory
 WORKDIR /app
