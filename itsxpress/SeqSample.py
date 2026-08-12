@@ -10,7 +10,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
-from itsxpress.definitions import ROOT_DIR, taxa_choices, taxa_dict, maxmismatches, maxratio, vsearch_fastq_qmax
+from itsxpress.definitions import ROOT_DIR, maxmismatches, vsearch_fastq_qmax
 
 logger = logging.getLogger(__name__)
 
@@ -57,27 +57,37 @@ class SeqSample:
         """
         try:
             orient_ref = os.path.join(ROOT_DIR, "universal_orient_ref_clean.fasta.gz")
-            oriented_fastq = os.path.join(self.tempdir, 'oriented.fq')
+            oriented_fastq = os.path.join(self.tempdir, "oriented.fq")
             parameters = [
                 "vsearch",
-                "--orient", self.fastq,
-                "--db", orient_ref,
-                "--fastqout", oriented_fastq,
-                "--threads", str(threads)
+                "--orient",
+                self.fastq,
+                "--db",
+                orient_ref,
+                "--fastqout",
+                oriented_fastq,
+                "--threads",
+                str(threads),
             ]
             p = subprocess.run(parameters, stderr=subprocess.PIPE)
             p.check_returncode()
-            logging.info(p.stderr.decode('utf-8'))
+            logging.info(p.stderr.decode("utf-8"))
 
             # Update the sequence files to point to the oriented fastq
             self.fastq = oriented_fastq
             self.seq_file = oriented_fastq
             self.r1 = oriented_fastq
         except subprocess.CalledProcessError as e:
-            logging.exception("Could not orient reads with Vsearch. Error from Vsearch was:\n {}".format(p.stderr.decode('utf-8')))
+            logging.exception(
+                "Could not orient reads with Vsearch. Error from Vsearch was:\n {}".format(
+                    p.stderr.decode("utf-8")
+                )
+            )
             raise e
         except FileNotFoundError as f:
-            logging.error("Vsearch was not found, make sure Vsearch is installed and executable")
+            logging.error(
+                "Vsearch was not found, make sure Vsearch is installed and executable"
+            )
             raise f
 
     def deduplicate(self, threads: Union[int, str] = 1) -> None:
@@ -91,27 +101,33 @@ class SeqSample:
             FileNotFoundError: If the Vsearch binary cannot be located.
         """
         try:
-            self.uc_file = os.path.join(self.tempdir, 'uc.txt')
-            self.rep_file = os.path.join(self.tempdir, 'rep.fa')
+            self.uc_file = os.path.join(self.tempdir, "uc.txt")
+            self.rep_file = os.path.join(self.tempdir, "rep.fa")
             parameters = [
                 "vsearch",
                 "--fastx_uniques",
                 self.seq_file,
-                "--fastaout", self.rep_file,
-                "--uc", self.uc_file,
-                "--strand", "both"
+                "--fastaout",
+                self.rep_file,
+                "--uc",
+                self.uc_file,
+                "--strand",
+                "both",
             ]
             p2 = subprocess.run(parameters, stderr=subprocess.PIPE)
-            logging.info(p2.stderr.decode('utf-8'))
+            logging.info(p2.stderr.decode("utf-8"))
             p2.check_returncode()
         except subprocess.CalledProcessError as e:
             logging.exception(
-                "Could not perform dereplication with Vsearch. Error from Vsearch was:\n {}"
-                .format(p2.stderr.decode('utf-8'))
+                "Could not perform dereplication with Vsearch. Error from Vsearch was:\n {}".format(
+                    p2.stderr.decode("utf-8")
+                )
             )
             raise e
         except FileNotFoundError as f:
-            logging.error("Vsearch was not found, make sure Vsearch is installed and executable")
+            logging.error(
+                "Vsearch was not found, make sure Vsearch is installed and executable"
+            )
             raise f
 
     def cluster(self, threads: Union[int, str], cluster_id: float = 0.995) -> None:
@@ -126,28 +142,37 @@ class SeqSample:
             FileNotFoundError: If the Vsearch binary cannot be located.
         """
         try:
-            self.uc_file = os.path.join(self.tempdir, 'uc.txt')
-            self.rep_file = os.path.join(self.tempdir, 'rep.fa')
+            self.uc_file = os.path.join(self.tempdir, "uc.txt")
+            self.rep_file = os.path.join(self.tempdir, "rep.fa")
             parameters = [
                 "vsearch",
-                "--cluster_size", self.seq_file,
-                "--centroids", self.rep_file,
-                "--uc", self.uc_file,
-                "--strand", "both",
-                "--id", str(cluster_id),
-                "--threads", str(threads)
+                "--cluster_size",
+                self.seq_file,
+                "--centroids",
+                self.rep_file,
+                "--uc",
+                self.uc_file,
+                "--strand",
+                "both",
+                "--id",
+                str(cluster_id),
+                "--threads",
+                str(threads),
             ]
             p2 = subprocess.run(parameters, stderr=subprocess.PIPE)
-            print(p2.stderr.decode('utf-8'))
+            print(p2.stderr.decode("utf-8"))
             p2.check_returncode()
         except subprocess.CalledProcessError as e:
             logging.exception(
-                "Could not perform clustering with Vsearch. Error from Vsearch was:\n {}"
-                .format(p2.stderr.decode('utf-8'))
+                "Could not perform clustering with Vsearch. Error from Vsearch was:\n {}".format(
+                    p2.stderr.decode("utf-8")
+                )
             )
             raise e
         except FileNotFoundError as f:
-            logging.error("Vsearch was not found, make sure Vsearch is installed and executable")
+            logging.error(
+                "Vsearch was not found, make sure Vsearch is installed and executable"
+            )
             raise f
 
     def _search(self, hmmfile: str, threads: Union[int, str]) -> None:
@@ -162,29 +187,41 @@ class SeqSample:
             FileNotFoundError: If the hmmsearch binary cannot be located.
         """
         try:
-            self.dom_file = os.path.join(self.tempdir, 'domtbl.txt')
+            self.dom_file = os.path.join(self.tempdir, "domtbl.txt")
             parameters = [
                 "hmmsearch",
-                "--domtblout", self.dom_file,
-                "-T", "10",
-                "--cpu", str(threads),
-                "--tformat", "fasta",
-                "--F1", "1e-6",
-                "--F2", "1e-6",
-                "--F3", "1e-6",
+                "--domtblout",
+                self.dom_file,
+                "-T",
+                "10",
+                "--cpu",
+                str(threads),
+                "--tformat",
+                "fasta",
+                "--F1",
+                "1e-6",
+                "--F2",
+                "1e-6",
+                "--F3",
+                "1e-6",
                 hmmfile,
-                self.rep_file
+                self.rep_file,
             ]
-            p4 = subprocess.run(parameters, stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
+            p4 = subprocess.run(
+                parameters, stderr=subprocess.PIPE, stdout=subprocess.DEVNULL
+            )
             p4.check_returncode()
         except subprocess.CalledProcessError as e:
             logging.exception(
-                "Could not perform ITS identification with hmmsearch. The error was:\n {}"
-                .format(p4.stderr.decode('utf-8'))
+                "Could not perform ITS identification with hmmsearch. The error was:\n {}".format(
+                    p4.stderr.decode("utf-8")
+                )
             )
             raise e
         except FileNotFoundError as f:
-            logging.error("hmmsearch was not found, make sure HMMER3 is installed and executable")
+            logging.error(
+                "hmmsearch was not found, make sure HMMER3 is installed and executable"
+            )
             raise f
 
 
@@ -207,7 +244,9 @@ class SeqSampleNotPaired(SeqSample):
 class SeqSamplePairedNotInterleaved(SeqSample):
     """SeqSample class extended to paired, two FASTQ file format."""
 
-    def __init__(self, fastq: str, tempdir: str, fastq2: str, reversed_primers: bool = False) -> None:
+    def __init__(
+        self, fastq: str, tempdir: str, fastq2: str, reversed_primers: bool = False
+    ) -> None:
         """Initializes a SeqSamplePairedNotInterleaved object.
 
         Args:
@@ -236,60 +275,93 @@ class SeqSamplePairedNotInterleaved(SeqSample):
             FileNotFoundError: If Vsearch is not found.
         """
         try:
-            seq_file = os.path.join(self.tempdir, 'seq.fq')
+            seq_file = os.path.join(self.tempdir, "seq.fq")
             if not os.path.exists(self.tempdir):
-                logging.info(f"Expected {self.tempdir} to exist, but it does not. Creating it now.")
+                logging.info(
+                    f"Expected {self.tempdir} to exist, but it does not. Creating it now."
+                )
                 os.makedirs(self.tempdir)
 
             # Decompress zstd if inputs are in .zst format
-            if self.r1 and self.fastq2 and self.r1.endswith('.zst') and self.fastq2.endswith('.zst'):
-                r1_temp = os.path.join(self.tempdir, 'r1_temp.fq')
-                r2_temp = os.path.join(self.tempdir, 'r2_temp.fq')
+            if (
+                self.r1
+                and self.fastq2
+                and self.r1.endswith(".zst")
+                and self.fastq2.endswith(".zst")
+            ):
+                r1_temp = os.path.join(self.tempdir, "r1_temp.fq")
+                r2_temp = os.path.join(self.tempdir, "r2_temp.fq")
 
-                parameters = ['zstd', '-d', self.r1, '-o', r1_temp]
+                parameters = ["zstd", "-d", self.r1, "-o", r1_temp]
                 p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
                 p1.check_returncode()
-                logging.info(p1.stderr.decode('utf-8'))
+                logging.info(p1.stderr.decode("utf-8"))
 
-                parameters = ['zstd', '-d', self.fastq2, '-o', r2_temp]
+                parameters = ["zstd", "-d", self.fastq2, "-o", r2_temp]
                 p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
                 p1.check_returncode()
-                logging.info(p1.stderr.decode('utf-8'))
+                logging.info(p1.stderr.decode("utf-8"))
 
                 self.r1 = r1_temp
                 self.fastq2 = r2_temp
 
             if self.r1 is None or self.fastq2 is None:
-                raise ValueError("Both r1 and fastq2 paths must be defined to merge reads.")
+                raise ValueError(
+                    "Both r1 and fastq2 paths must be defined to merge reads."
+                )
 
             if stagger:
-                parameters = ['vsearch',
-                          '--fastq_mergepairs', self.r1,
-                          '--reverse', self.fastq2,
-                          '--fastqout', seq_file,
-                          '--fastq_maxdiffs', str(maxmismatches),
-                          '--fastq_maxee', str(2),
-                          '--threads', str(threads),
-                          '--fastq_allowmergestagger',
-                          '--fastq_qmax', str(vsearch_fastq_qmax)]
+                parameters = [
+                    "vsearch",
+                    "--fastq_mergepairs",
+                    self.r1,
+                    "--reverse",
+                    self.fastq2,
+                    "--fastqout",
+                    seq_file,
+                    "--fastq_maxdiffs",
+                    str(maxmismatches),
+                    "--fastq_maxee",
+                    str(2),
+                    "--threads",
+                    str(threads),
+                    "--fastq_allowmergestagger",
+                    "--fastq_qmax",
+                    str(vsearch_fastq_qmax),
+                ]
             else:
-                parameters = ['vsearch',
-                          '--fastq_mergepairs', self.r1,
-                          '--reverse', self.fastq2,
-                          '--fastqout', seq_file,
-                          '--fastq_maxdiffs', str(maxmismatches),
-                          '--fastq_maxee', str(2),
-                          '--threads', str(threads),
-                          '--fastq_qmax', str(vsearch_fastq_qmax)]
+                parameters = [
+                    "vsearch",
+                    "--fastq_mergepairs",
+                    self.r1,
+                    "--reverse",
+                    self.fastq2,
+                    "--fastqout",
+                    seq_file,
+                    "--fastq_maxdiffs",
+                    str(maxmismatches),
+                    "--fastq_maxee",
+                    str(2),
+                    "--threads",
+                    str(threads),
+                    "--fastq_qmax",
+                    str(vsearch_fastq_qmax),
+                ]
             p1 = subprocess.run(parameters, stderr=subprocess.PIPE)
             self.seq_file = seq_file
             p1.check_returncode()
-            logging.info(p1.stderr.decode('utf-8'))
+            logging.info(p1.stderr.decode("utf-8"))
         except subprocess.CalledProcessError as e:
-            logging.exception("Could not perform read merging with vsearch. Error from vsearch was: \n  {}".format(p1.stderr.decode('utf-8')))
+            logging.exception(
+                "Could not perform read merging with vsearch. Error from vsearch was: \n  {}".format(
+                    p1.stderr.decode("utf-8")
+                )
+            )
             raise e
         except FileNotFoundError as f:
-            logging.error("vsearch was not found, make sure vsearch is installed on this environment")
+            logging.error(
+                "vsearch was not found, make sure vsearch is installed on this environment"
+            )
             raise f
 
 
@@ -315,17 +387,25 @@ class ItsPosition:
         self.domtable: str = domtable
         self.ddict: Dict[str, Any] = {}
         if region == "ITS2":
-            self.leftprefix: str = '3_'
-            self.rightprefix: str = '4_'
+            self.leftprefix: str = "3_"
+            self.rightprefix: str = "4_"
         elif region == "ITS1":
-            self.leftprefix = '1_'
-            self.rightprefix = '2_'
+            self.leftprefix = "1_"
+            self.rightprefix = "2_"
         elif region == "ALL":
-            self.leftprefix = '1_'
-            self.rightprefix = '4_'
+            self.leftprefix = "1_"
+            self.rightprefix = "4_"
         self.parse()
 
-    def _score(self, sequence: str, stype: str, score: float, from_pos: int, to_pos: int, tlen: int) -> None:
+    def _score(
+        self,
+        sequence: str,
+        stype: str,
+        score: float,
+        from_pos: int,
+        to_pos: int,
+        tlen: int,
+    ) -> None:
         """Evaluates scores and positions from a domtable line and updates ddict.
 
         Args:
@@ -358,7 +438,7 @@ class ItsPosition:
             Exception: If an error occurs when parsing HMMER hmmsearch results.
         """
         try:
-            with open(self.domtable, 'r') as f:
+            with open(self.domtable, "r") as f:
                 for line in f:
                     if not line.startswith("#"):
                         ll = line.split()
@@ -371,14 +451,18 @@ class ItsPosition:
                         if sequence not in self.ddict:
                             self.ddict[sequence] = {}
                         if hmmprofile.startswith(self.leftprefix):
-                            self._score(sequence, 'left', score, from_pos, to_pos, tlen)
+                            self._score(sequence, "left", score, from_pos, to_pos, tlen)
                         elif hmmprofile.startswith(self.rightprefix):
-                            self._score(sequence, 'right', score, from_pos, to_pos, tlen)
+                            self._score(
+                                sequence, "right", score, from_pos, to_pos, tlen
+                            )
         except Exception as e:
             logging.error("Exception occurred when parsing HMMSearch results")
             raise e
 
-    def get_position(self, sequence: str) -> Tuple[Optional[int], Optional[int], Optional[int]]:
+    def get_position(
+        self, sequence: str
+    ) -> Tuple[Optional[int], Optional[int], Optional[int]]:
         """Returns the start and stop positions for a given sequence.
 
         Args:
@@ -406,7 +490,11 @@ class ItsPosition:
                 tlen = None
             return (start, stop, tlen)
         except KeyError:
-            logging.debug("No ITS stop or start sites were identified for sequence {}, skipping.".format(sequence))
+            logging.debug(
+                "No ITS stop or start sites were identified for sequence {}, skipping.".format(
+                    sequence
+                )
+            )
             raise KeyError
 
 
@@ -426,7 +514,14 @@ class Dedup:
         fastq2 (Optional[str]): The location of the optional Read 2 input FASTQ if paired.
     """
 
-    def __init__(self, uc_file: str, rep_file: str, seq_file: str, fastq: Optional[str] = None, fastq2: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        uc_file: str,
+        rep_file: str,
+        seq_file: str,
+        fastq: Optional[str] = None,
+        fastq2: Optional[str] = None,
+    ) -> None:
         """Initializes the Dedup object and parses the uc file.
 
         Args:
@@ -451,22 +546,28 @@ class Dedup:
             Exception: General exception if the uc file is not parsed properly.
         """
         try:
-            with open(self.uc_file, 'r') as f:
+            with open(self.uc_file, "r") as f:
                 self.matchdict = {}
                 for line in f:
                     ll = line.split()
                     datatype = ll[0]
                     ref = ll[9]
                     seq = ll[8]
-                    if datatype == 'S':
+                    if datatype == "S":
                         self.matchdict[seq] = seq
-                    elif datatype == 'H':
+                    elif datatype == "H":
                         self.matchdict[seq] = ref
         except Exception as e:
             logging.exception("Could not parse the Vsearch '.uc' file.")
             raise e
 
-    def _get_paired_seq_generator(self, zipseqgen: Iterator[Tuple[SeqRecord, SeqRecord]], itspos: ItsPosition, wri_file: bool, trim_ccs: bool = False) -> Tuple[Generator[SeqRecord, None, None], Generator[SeqRecord, None, None]]:
+    def _get_paired_seq_generator(
+        self,
+        zipseqgen: Iterator[Tuple[SeqRecord, SeqRecord]],
+        itspos: ItsPosition,
+        wri_file: bool,
+        trim_ccs: bool = False,
+    ) -> Tuple[Generator[SeqRecord, None, None], Generator[SeqRecord, None, None]]:
         """This function takes a zipped object of two Biopython SeqIO sequence generators, and
 
         returns two generators of Biopython SeqRecords for Dada2. Sequences where the ITS ends could
@@ -482,6 +583,7 @@ class Dedup:
         Returns:
             A tuple of two python generators yielding forward and reverse trimmed SeqRecords.
         """
+
         def _filterfunc(ziprecord: Tuple[SeqRecord, SeqRecord]) -> bool:
             """Filters records down to those that contain a valid ITS start and stop position."""
             try:
@@ -505,43 +607,58 @@ class Dedup:
             rev_qual = [93] * len(rev_seq)
 
             if "phred_quality" in record.letter_annotations:
-                new_qual = fwd_qual + list(record.letter_annotations["phred_quality"]) + rev_qual
+                new_qual = (
+                    fwd_qual
+                    + list(record.letter_annotations["phred_quality"])
+                    + rev_qual
+                )
             else:
                 new_qual = fwd_qual + [93] * len(record) + rev_qual
 
             new_record = SeqRecord(
-                new_seq,
-                id=record.id,
-                name=record.name,
-                description=record.description
+                new_seq, id=record.id, name=record.name, description=record.description
             )
             new_record.letter_annotations["phred_quality"] = new_qual
             return new_record
 
-        def _map_func(ziprecord: Tuple[SeqRecord, SeqRecord]) -> Tuple[SeqRecord, SeqRecord]:
+        def _map_func(
+            ziprecord: Tuple[SeqRecord, SeqRecord],
+        ) -> Tuple[SeqRecord, SeqRecord]:
             """Trims the record down to the selected ITS region."""
             record1, record2 = ziprecord
             if self.matchdict is None:
-                raise ValueError("matchdict must be parsed before calling sequence generators.")
+                raise ValueError(
+                    "matchdict must be parsed before calling sequence generators."
+                )
             repseq = self.matchdict[record1.id]
             start, stop, tlen = itspos.get_position(repseq)
             if start is None or stop is None or tlen is None:
-                raise ValueError(f"Could not retrieve valid positions for sequence {record1.id}")
+                raise ValueError(
+                    f"Could not retrieve valid positions for sequence {record1.id}"
+                )
             r2start = tlen - stop
-            r2end = tlen - start #calculate end of R2
+            r2end = tlen - start  # calculate end of R2
             try:
                 if stop > tlen:
                     record1_return = record1[start:]
                 elif stop <= tlen:
                     record1_return = record1[start:stop]
                 else:
-                    raise ValueError("An error occurred when trimming the forward read of {}".format(record1.id))
+                    raise ValueError(
+                        "An error occurred when trimming the forward read of {}".format(
+                            record1.id
+                        )
+                    )
                 if r2end > tlen:
                     record2_return = record2[r2start:]
                 elif r2end <= tlen:
                     record2_return = record2[r2start:r2end]
                 else:
-                    raise ValueError("An error occurred when trimming the reverse read of {}".format(record2.id))
+                    raise ValueError(
+                        "An error occurred when trimming the reverse read of {}".format(
+                            record2.id
+                        )
+                    )
             except ValueError as e:
                 logging.exception(e)
                 raise e
@@ -552,7 +669,9 @@ class Dedup:
 
             return record1_return, record2_return
 
-        def _split_gen(gen: Iterator[Tuple[SeqRecord, SeqRecord]]) -> Tuple[Generator[SeqRecord, None, None], Generator[SeqRecord, None, None]]:
+        def _split_gen(
+            gen: Iterator[Tuple[SeqRecord, SeqRecord]],
+        ) -> Tuple[Generator[SeqRecord, None, None], Generator[SeqRecord, None, None]]:
             gen_a, gen_b = tee(gen, 2)
             return (a for a, b in gen_a), (b for a, b in gen_b)
 
@@ -591,7 +710,16 @@ class Dedup:
 
         return gen1_split_a, gen1_split_b
 
-    def create_paired_trimmed_seqs(self, outfile1: str, outfile2: str, gzipped: bool, zstd_file: bool, itspos: ItsPosition, wri_file: bool, trim_ccs: bool = False) -> None:
+    def create_paired_trimmed_seqs(
+        self,
+        outfile1: str,
+        outfile2: str,
+        gzipped: bool,
+        zstd_file: bool,
+        itspos: ItsPosition,
+        wri_file: bool,
+        trim_ccs: bool = False,
+    ) -> None:
         """Writes two FASTQ files, optionally compressed, with the reads trimmed to the selected region.
 
         Args:
@@ -607,53 +735,67 @@ class Dedup:
             ValueError: If file suffix combinations are mixed or unsupported.
         """
         if self.fastq is None or self.fastq2 is None:
-            raise ValueError("Both fastq and fastq2 paths must be defined to create paired trimmed sequences.")
+            raise ValueError(
+                "Both fastq and fastq2 paths must be defined to create paired trimmed sequences."
+            )
 
         def _write_seqs(seqs: Generator[SeqRecord, None, None], outfile: str) -> None:
             """Helper function to write sequences in compressed or plain format."""
             if gzipped:
-                with gzip.open(outfile, 'wt') as g:
+                with gzip.open(outfile, "wt") as g:
                     SeqIO.write(seqs, g, "fastq")
             elif zstd_file:
-                with zstd.open(outfile, 'wt') as g:
+                with zstd.open(outfile, "wt") as g:
                     SeqIO.write(seqs, g, "fastq")
             else:
-                with open(outfile, 'w') as g:
+                with open(outfile, "w") as g:
                     SeqIO.write(seqs, g, "fastq")
 
         def _create_gen(f: Any, g: Any) -> None:
             """Create sequence generators and write them."""
-            seqgen1 = SeqIO.parse(f, 'fastq')
-            seqgen2 = SeqIO.parse(g, 'fastq')
+            seqgen1 = SeqIO.parse(f, "fastq")
+            seqgen2 = SeqIO.parse(g, "fastq")
             zipseqgen = zip(seqgen1, seqgen2)
-            seqs1, seqs2 = self._get_paired_seq_generator(zipseqgen, itspos, wri_file, trim_ccs=trim_ccs)
+            seqs1, seqs2 = self._get_paired_seq_generator(
+                zipseqgen, itspos, wri_file, trim_ccs=trim_ccs
+            )
             if wri_file:
                 _write_seqs(seqs1, outfile1)
                 _write_seqs(seqs2, outfile2)
 
         try:
             if self.fastq.endswith(".gz") and self.fastq2.endswith(".gz"):
-                with gzip.open(self.fastq, 'rt') as f:
-                    with gzip.open(self.fastq2, 'rt') as g:
+                with gzip.open(self.fastq, "rt") as f:
+                    with gzip.open(self.fastq2, "rt") as g:
                         _create_gen(f, g)
             elif self.fastq.endswith(".zst") and self.fastq2.endswith(".zst"):
-                with zstd.open(self.fastq, 'rt') as f:
-                    with zstd.open(self.fastq2, 'rt') as g:
+                with zstd.open(self.fastq, "rt") as f:
+                    with zstd.open(self.fastq2, "rt") as g:
                         _create_gen(f, g)
             elif self.fastq.endswith(".fq") and self.fastq2.endswith(".fq"):
-                with open(self.fastq, 'r') as f:
-                    with open(self.fastq2, 'r') as g:
+                with open(self.fastq, "r") as f:
+                    with open(self.fastq2, "r") as g:
                         _create_gen(f, g)
-            elif (self.fastq.endswith(".fastq") or self.fastq.endswith(".fq")) and (self.fastq2.endswith(".fastq") or self.fastq2.endswith(".fq")):
-                with open(self.fastq, 'r') as f:
-                    with open(self.fastq2, 'r') as g:
+            elif (self.fastq.endswith(".fastq") or self.fastq.endswith(".fq")) and (
+                self.fastq2.endswith(".fastq") or self.fastq2.endswith(".fq")
+            ):
+                with open(self.fastq, "r") as f:
+                    with open(self.fastq2, "r") as g:
                         _create_gen(f, g)
             else:
-                raise ValueError("Fastq and Fastq2 files should both be gzipped (.gz), zstd compressed (.zst) or both be uncompressed. Mixed input is not accepted.")
+                raise ValueError(
+                    "Fastq and Fastq2 files should both be gzipped (.gz), zstd compressed (.zst) or both be uncompressed. Mixed input is not accepted."
+                )
         except Exception as e:
             raise e
 
-    def _get_trimmed_seq_generator(self, seqgen: Iterator[SeqRecord], itspos: ItsPosition, wri_file: bool, trim_ccs: bool = False) -> Generator[SeqRecord, None, None]:
+    def _get_trimmed_seq_generator(
+        self,
+        seqgen: Iterator[SeqRecord],
+        itspos: ItsPosition,
+        wri_file: bool,
+        trim_ccs: bool = False,
+    ) -> Generator[SeqRecord, None, None]:
         """This function takes a Biopython SeqIO sequence generator, and
 
         returns a generator of trimmed sequences suitable for Deblur. Sequences where the ITS ends could
@@ -668,6 +810,7 @@ class Dedup:
         Returns:
             A python generator yielding trimmed SeqRecords.
         """
+
         def _filterfunc(record: SeqRecord) -> bool:
             """Filters records down to those that contain a valid ITS start and stop position."""
             try:
@@ -690,15 +833,16 @@ class Dedup:
             rev_qual = [93] * len(rev_seq)
 
             if "phred_quality" in record.letter_annotations:
-                new_qual = fwd_qual + list(record.letter_annotations["phred_quality"]) + rev_qual
+                new_qual = (
+                    fwd_qual
+                    + list(record.letter_annotations["phred_quality"])
+                    + rev_qual
+                )
             else:
                 new_qual = fwd_qual + [93] * len(record) + rev_qual
 
             new_record = SeqRecord(
-                new_seq,
-                id=record.id,
-                name=record.name,
-                description=record.description
+                new_seq, id=record.id, name=record.name, description=record.description
             )
             new_record.letter_annotations["phred_quality"] = new_qual
             return new_record
@@ -706,11 +850,15 @@ class Dedup:
         def map_func(record: SeqRecord) -> SeqRecord:
             """Trims the record down to the selected ITS region."""
             if self.matchdict is None:
-                raise ValueError("matchdict must be parsed before calling sequence generators.")
+                raise ValueError(
+                    "matchdict must be parsed before calling sequence generators."
+                )
             repseq = self.matchdict[record.id]
             start, stop, tlen = itspos.get_position(repseq)
             if start is None or stop is None:
-                raise ValueError(f"Could not retrieve valid positions for sequence {record.id}")
+                raise ValueError(
+                    f"Could not retrieve valid positions for sequence {record.id}"
+                )
             trimmed = record[start:stop]
             if trim_ccs:
                 trimmed = _stitch_primers(trimmed)
@@ -735,7 +883,16 @@ class Dedup:
 
         return (map_func(rec) for rec in filt_b)
 
-    def create_trimmed_seqs(self, outfile: str, gzipped: bool, zstd_file: bool, itspos: ItsPosition, wri_file: bool, tempdir: str, trim_ccs: bool = False) -> None:
+    def create_trimmed_seqs(
+        self,
+        outfile: str,
+        gzipped: bool,
+        zstd_file: bool,
+        itspos: ItsPosition,
+        wri_file: bool,
+        tempdir: str,
+        trim_ccs: bool = False,
+    ) -> None:
         """Creates a FASTQ file, optionally compressed, with the reads trimmed to the selected region.
 
         Args:
@@ -747,39 +904,46 @@ class Dedup:
             tempdir: Path to a temporary directory.
             trim_ccs: Whether the trim_ccs mode is enabled.
         """
+
         def _write_seqs(seqs: Generator[SeqRecord, None, None]) -> None:
             if gzipped:
-                tempf = os.path.join(tempdir, 'temp.fa')
-                with open(tempf, 'w') as g:
+                tempf = os.path.join(tempdir, "temp.fa")
+                with open(tempf, "w") as g:
                     SeqIO.write(seqs, g, "fastq")
-                with open(tempf, 'rb') as f_in, gzip.open(outfile, 'wb') as f_out:
+                with open(tempf, "rb") as f_in, gzip.open(outfile, "wb") as f_out:
                     f_out.writelines(f_in)
             elif zstd_file:
-                tempf = os.path.join(tempdir, 'temp.fa')
-                with open(tempf, 'w') as g:
+                tempf = os.path.join(tempdir, "temp.fa")
+                with open(tempf, "w") as g:
                     SeqIO.write(seqs, g, "fastq")
-                with open(tempf, 'rb') as f_in:
-                    with zstd.open(outfile, 'wb') as f_out:
+                with open(tempf, "rb") as f_in:
+                    with zstd.open(outfile, "wb") as f_out:
                         f_out.writelines(f_in)
             else:
-                with open(outfile, 'w') as g:
+                with open(outfile, "w") as g:
                     SeqIO.write(seqs, g, "fastq")
 
         if self.seq_file.endswith(".gz"):
-            with gzip.open(self.seq_file, 'rt') as f:
-                seqgen = SeqIO.parse(f, 'fastq')
-                seqs = self._get_trimmed_seq_generator(seqgen, itspos, wri_file, trim_ccs=trim_ccs)
+            with gzip.open(self.seq_file, "rt") as f:
+                seqgen = SeqIO.parse(f, "fastq")
+                seqs = self._get_trimmed_seq_generator(
+                    seqgen, itspos, wri_file, trim_ccs=trim_ccs
+                )
                 if wri_file:
                     _write_seqs(seqs)
         elif self.seq_file.endswith(".zst"):
-            with zstd.open(self.seq_file, 'rt') as f:
-                seqgen = SeqIO.parse(f, 'fastq')
-                seqs = self._get_trimmed_seq_generator(seqgen, itspos, wri_file, trim_ccs=trim_ccs)
+            with zstd.open(self.seq_file, "rt") as f:
+                seqgen = SeqIO.parse(f, "fastq")
+                seqs = self._get_trimmed_seq_generator(
+                    seqgen, itspos, wri_file, trim_ccs=trim_ccs
+                )
                 if wri_file:
                     _write_seqs(seqs)
         else:
-            with open(self.seq_file, 'r') as f:
-                seqgen = SeqIO.parse(f, 'fastq')
-                seqs = self._get_trimmed_seq_generator(seqgen, itspos, wri_file, trim_ccs=trim_ccs)
+            with open(self.seq_file, "r") as f:
+                seqgen = SeqIO.parse(f, "fastq")
+                seqs = self._get_trimmed_seq_generator(
+                    seqgen, itspos, wri_file, trim_ccs=trim_ccs
+                )
                 if wri_file:
                     _write_seqs(seqs)
