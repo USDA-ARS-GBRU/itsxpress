@@ -5,7 +5,7 @@ on:
   release:
     types: [published]
   schedule:
-    - cron: "0 0 1 * *"
+    - cron: "17 14 * * 0" # Runs on Sunday at 14:17 UTC
   push:
     branches:
       - main
@@ -58,10 +58,10 @@ jobs:
           qiime itsxpress --help
 
   # =========================================================================
-  # JOB 2: Test against bleeding edge (Runs ONLY on monthly cron schedule)
+  # JOB 2: Test against bleeding edge (Runs ONLY on weekly cron schedule)
   # =========================================================================
   test-latest-dev:
-    name: Run Nightly Dev Integration Tests (Latest)
+    name: Run Weekly Dev Integration Tests (Latest)
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     defaults:
@@ -104,12 +104,13 @@ jobs:
   docker:
     name: Build and Push Docker Image
     needs: [test-stable, test-latest-dev]
-    # Ensures it executes if either test track succeeds, but never runs on raw automated cron events
+    # Explicit status checking: safely runs when test-stable passes and test-latest-dev is skipped
     if: |
-      always() && 
-      github.event_name != 'schedule' && 
-      (needs.test-stable.result == 'success' || needs.test-latest-dev.result == 'success')
+      github.event_name != 'schedule' &&
+      needs.test-stable.result == 'success' &&
+      (needs.test-latest-dev.result == 'success' || needs.test-latest-dev.result == 'skipped')
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

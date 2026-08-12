@@ -12,6 +12,9 @@ RUN conda install -y -c conda-forge pyzstd==0.19.1 && \
 WORKDIR /app
 COPY . /app
 
+# Ensure Git is available for setuptools_scm (if needed) and install build dependencies
+RUN pip install --upgrade pip setuptools wheel setuptools_scm
+
 # Install itsxpress directly into the active base environment
 RUN pip install .
 

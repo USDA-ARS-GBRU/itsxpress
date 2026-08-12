@@ -6,7 +6,7 @@ Authors: Adam Rivers, Kyle Weber, Sveinn Einarsson USDA Agricultural Research Se
 The internally transcribed spacer region is a region between the highly conserved small
 subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. The eukaryotic ITS contains
 the 5.8s gene and two variable length spacer regions. In amplicon sequencing studies it is
-common practice to trim off the conserved (SSU, 5,8S or LSU) regions. Bengtsson-Palme
+common practice to trim off the conserved (SSU, 5.8S, or LSU) regions. Bengtsson-Palme
 et al. (2013) published software the software package ITSx to do this.
 
 ITSxpress is a high-speed implementation of the methods in ITSx than also allows FASTQ
