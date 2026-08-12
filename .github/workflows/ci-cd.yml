@@ -24,50 +24,55 @@ jobs:
         include:
           # Normal release testing: main branch, tags, manual triggers, push
           - environment: release_2026_7
-            env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
+            env_url: "https://githubusercontent.com"
             run_this_leg: ${{ github.event_name != 'schedule' }}
           # Scheduled dev testing: only schedule event
           - environment: latest_dev
-            env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
+            env_url: "https://githubusercontent.com"
             run_this_leg: ${{ github.event_name == 'schedule' }}
-
-    # Cleanest fix: Skip the entire matrix leg immediately at the job level if not needed
-    if: matrix.run_this_leg
 
     steps:
       - name: Checkout Code
+        if: matrix.run_this_leg
         uses: actions/checkout@v4
 
       - name: Set up Python
+        if: matrix.run_this_leg
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Initiate Conda Channels
+        if: matrix.run_this_leg
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge,bioconda,default
           auto-activate-base: true
 
       - name: Initialize Conda
+        if: matrix.run_this_leg
         run: conda info
 
       - name: Set up QIIME Conda environment
+        if: matrix.run_this_leg
         run: |
           conda env create -n testenv --file=${{ matrix.env_url }}
 
       - name: Install Dependencies
+        if: matrix.run_this_leg
         run: |
           conda activate testenv
           conda install -y biopython=1.84 pip pyzstd pytest
           pip install .
 
       - name: Test with pytest
+        if: matrix.run_this_leg
         run: |
           conda activate testenv
           pytest
 
       - name: Test QIIME Plugin Integration
+        if: matrix.run_this_leg
         run: |
           conda activate testenv
           qiime dev refresh-cache
