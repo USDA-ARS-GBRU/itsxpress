@@ -24,53 +24,59 @@ jobs:
         include:
           - environment: release_2026_7
             env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
+            valid_event: ${{ github.event_name != 'schedule' }}
           - environment: latest_dev
             env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
+            valid_event: ${{ github.event_name == 'schedule' }}
 
     steps:
-      - name: Check trigger event compatibility
+      - name: Skip incompatible matrix leg
+        if: matrix.valid_event == 'false'
         run: |
-          if [[ "${{ github.event_name }}" == "schedule" && "${{ matrix.environment }}" != "latest_dev" ]]; then
-            echo "Skipping stable release test for scheduled monthly build."
-            exit 0
-          elif [[ "${{ github.event_name }}" != "schedule" && "${{ matrix.environment }}" != "release_2026_7" ]]; then
-            echo "Skipping dev test for push/release/workflow_dispatch build."
-            exit 0
-          fi
+          echo "Skipping invalid matrix leg for this event type."
+          exit 0
 
       - name: Checkout Code
+        if: matrix.valid_event == 'true'
         uses: actions/checkout@v4
 
       - name: Set up Python
+        if: matrix.valid_event == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Initiate Conda Channels
+        if: matrix.valid_event == 'true'
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge,bioconda,default
           auto-activate-base: true
 
       - name: Initialize Conda
+        if: matrix.valid_event == 'true'
         run: conda info
 
       - name: Set up QIIME Conda environment
+        if: matrix.valid_event == 'true'
         run: |
           conda env create -n testenv --file=${{ matrix.env_url }}
 
       - name: Install Dependencies
+        if: matrix.valid_event == 'true'
         run: |
           conda activate testenv
           conda install -y biopython=1.84 pip pyzstd pytest
           pip install .
 
       - name: Test with pytest
+        if: matrix.valid_event == 'true'
         run: |
           conda activate testenv
           pytest
 
       - name: Test QIIME Plugin Integration
+        if: matrix.valid_event == 'true'
         run: |
           conda activate testenv
           qiime dev refresh-cache
@@ -80,10 +86,9 @@ jobs:
     name: Build and Push Docker Image
     needs: test
     runs-on: ubuntu-latest
-
-    if: >
-      github.ref == 'refs/heads/main'
-      || startsWith(github.ref, 'refs/tags/')
+    if: |
+      github.ref == 'refs/heads/main' ||
+      startsWith(github.ref, 'refs/tags/')
 
     steps:
       - name: Checkout Code
@@ -124,3 +129,11 @@ jobs:
             ghcr.io/usda-ars-gbru/itsxpress:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Keyless sign container image
+        run: |
+          cosign sign \
+            ghcr.io/usda-ars-gbru/itsxpress:${{ env.IMAGE_TAG }}
