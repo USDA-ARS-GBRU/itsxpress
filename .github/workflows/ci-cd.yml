@@ -1,16 +1,16 @@
 name: CI/CD Pipeline (Test & Publish Docker)
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
   schedule:
-    - cron: "0 0 1 * *" # Runs exactly once a month on the 1st at midnight UTC
+    - cron: "0 0 1 * *"
   push:
     branches:
-      - main # Allows manual or push testing on main to verify pipeline updates
+      - main
 
 jobs:
-  # JOB 1: Test your code inside the target environment
   test:
     name: Run Integration Tests
     runs-on: ubuntu-latest
@@ -20,9 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Define the two build variants
         environment: [release_2026_7, latest_dev]
-        # Include specific variables for each matrix variant
         include:
           - environment: release_2026_7
             env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
@@ -30,14 +28,13 @@ jobs:
             env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
 
     steps:
-      # CRITICAL FILTER: Skip 'latest_dev' matrix leg on push/release, and skip 'release_2026_7' leg on schedule.
       - name: Check trigger event compatibility
         run: |
           if [[ "${{ github.event_name }}" == "schedule" && "${{ matrix.environment }}" != "latest_dev" ]]; then
             echo "Skipping stable release test for scheduled monthly build."
             exit 0
           elif [[ "${{ github.event_name }}" != "schedule" && "${{ matrix.environment }}" != "release_2026_7" ]]; then
-            echo "Skipping dev test for push/release build."
+            echo "Skipping dev test for push/release/workflow_dispatch build."
             exit 0
           fi
 
@@ -79,11 +76,15 @@ jobs:
           qiime dev refresh-cache
           qiime itsxpress --help
 
-  # JOB 2: Compile & Push the Container (Only runs if Job 1 passes)
   docker:
     name: Build and Push Docker Image
-    needs: test # CRITICAL: This blocks container pushes if tests fail
+    needs: test
     runs-on: ubuntu-latest
+
+    if: >
+      github.ref == 'refs/heads/main'
+      || startsWith(github.ref, 'refs/tags/')
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -101,16 +102,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get short SHA
-        id: slug
-        run: echo "SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_ENV
+      - name: Determine Tag
+        id: get_tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+            echo "IMAGE_TAG=v${VERSION}" >> $GITHUB_ENV
+          else
+            SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-8)
+            echo "IMAGE_TAG=sha-${SHORT_SHA}" >> $GITHUB_ENV
+          fi
 
-      - name: Build and push itsxpress image
+      - name: Build and push itsxpress image with caching
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/usda-ars-gbru/itsxpress:sha-${{ env.SHORT_SHA }}
+            ghcr.io/usda-ars-gbru/itsxpress:${{ env.IMAGE_TAG }}
             ghcr.io/usda-ars-gbru/itsxpress:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
