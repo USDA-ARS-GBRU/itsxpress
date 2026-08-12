@@ -115,10 +115,10 @@ jobs:
           fi
 
       - name: Build and push itsxpress image with caching
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./docker-imagesDockerfile
           push: true
           tags: |
             ghcr.io/usda-ars-gbru/itsxpress:${{ env.IMAGE_TAG }}
