@@ -19,19 +19,18 @@ jobs:
       run:
         shell: bash -el {0}
 
-    # NEW: Use a job-level filter instead of inside the matrix
-    if: |
-      (github.event_name == 'schedule') ||
-      (github.event_name != 'schedule')
-
     strategy:
       fail-fast: false
       matrix:
         environment: [release_2026_7, latest_dev]
         include:
+
+          # Normal release testing: main branch, tags, manual triggers, push
           - environment: release_2026_7
             env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
             run_this_leg: ${{ github.event_name != 'schedule' }}
+
+          # Scheduled dev testing: only schedule event
           - environment: latest_dev
             env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
             run_this_leg: ${{ github.event_name == 'schedule' }}
@@ -40,7 +39,7 @@ jobs:
       - name: Skip matrix leg if not needed
         if: matrix.run_this_leg == 'false'
         run: |
-          echo "Skipping matrix leg not valid for this event."
+          echo "Skipping matrix leg not valid for this trigger."
           exit 0
 
       - name: Checkout Code
@@ -95,7 +94,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
 
-    # FIXED: Manual triggers now run Docker step
+    # Manual triggers allowed now
     if: |
       github.event_name == 'workflow_dispatch' ||
       github.ref == 'refs/heads/main' ||
@@ -148,4 +147,3 @@ jobs:
         run: |
           cosign sign \
             ghcr.io/usda-ars-gbru/itsxpress:${{ env.IMAGE_TAG }}
-
