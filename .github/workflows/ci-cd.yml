@@ -24,11 +24,11 @@ jobs:
         include:
           # Normal release testing: main branch, tags, manual triggers, push
           - environment: release_2026_7
-            env_url: "https://githubusercontent.com"
+            env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
             run_this_leg: ${{ github.event_name != 'schedule' }}
           # Scheduled dev testing: only schedule event
           - environment: latest_dev
-            env_url: "https://githubusercontent.com"
+            env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
             run_this_leg: ${{ github.event_name == 'schedule' }}
 
     steps:
