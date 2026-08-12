@@ -1,5 +1,5 @@
 # Build directly on top of the official QIIME 2 Amplicon environment 
-FROM quay.io/qiime2/amplicon:2026.7
+FROM quay.io/qiime2/qiime2-workshop:2026.7
 
 LABEL org.opencontainers.image.source="https://github.com/usda-ars-gbru/itsxpress"
 
