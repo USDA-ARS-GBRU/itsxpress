@@ -18,8 +18,8 @@ ITSxpress: Software to rapidly trim  the internal transcribed spacer (ITS) regio
    :target: https://github.com/USDA-ARS-GBRU/itsxpress/releases/latest
    :alt: GitHub release (latest by date)
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.14645760.svg
-  :target: https://doi.org/10.5281/zenodo.14645760
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1304348.svg
+   :target: https://doi.org/10.5281/zenodo.1304348
 
 Authors
 -------
@@ -65,7 +65,7 @@ QIIME2 is being used.
 .. _`Bengtsson-Palme et al. (2013)`: https://doi.org/10.1111/2041-210X.12073
 .. _ITSx: http://microbiology.se/software/itsx/
 .. _OTUs: https://doi.org/10.1038/ismej.2017.119
-.. _`QIIME2 Plugin`: https://github.com/USDA-ARS-GBRU/q2_itsxpress
+
 
 
 Installing ITSxpress for use as a QIIME2 Plugin
@@ -203,14 +203,6 @@ Usage
 +-------------------------+---------------------------------------------------------------+
 
 
-Advanced Features
------------------
-
-PacBio CCS Trimming (--trim-ccs)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-When analyzing PacBio CCS reads, the `--trim-ccs` parameter is supported. This feature orients sequence reads against a universal reference database and stitches synthetic dummy primers (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) with uniform Phred quality scores of 93 (`~`) onto the trimmed reads to satisfy downstream DADA2 requirements.
-At completion, ITSxpress provides a log message displaying the correct `qiime dada2 denoise-ccs` arguments for denoising.
-
 
 PacBio CCS Trimming (--trim-ccs)
 --------------------------------
@@ -263,7 +255,7 @@ ITS HMM Models
 The HMM models for identifying ITS regions were built by Henrik Nilsson at the University of Gothenburg. 
 Originally, they were built for the ITSx software package; Dr. Nilsson has continued to update the models, but not on the same schedule as ITSx. 
 To provide clarity about the reference data used, I have created a separate, versioned repository for the 
-ITS sequence models: `its-hmm-models on GitHub <https://github.com/itsxpress/its-hmm-models>`_ and assigned it a `DOI <https://doi.org/10.5281/zenodo.13285214>`_. 
+ITS sequence models: `its-hmm-models on GitHub <https://github.com/USDA-ARS-GBRU/ITS_HMMs>`_ and assigned it a `DOI <https://doi.org/10.5281/zenodo.13285214>`_. 
 
 ITSXpress currently uses ITS_HMMS version 2.0.0.
 
