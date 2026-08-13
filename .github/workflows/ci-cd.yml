@@ -38,7 +38,8 @@ jobs:
 
       - name: Set up QIIME Conda environment
         run: |
-          conda env create -n testenv --file="https://githubusercontent.com"
+          conda env create -n testenv --file=="https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
+
 
       - name: Install Dependencies & Package
         run: |
@@ -79,7 +80,8 @@ jobs:
 
       - name: Set up QIIME Conda environment
         run: |
-          conda env create -n testenv --file="https://githubusercontent.com"
+          conda env create -n testenv --file=="https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
+
 
       - name: Install Dependencies & Package
         run: |
