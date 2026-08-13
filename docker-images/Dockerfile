@@ -3,22 +3,22 @@ FROM quay.io/qiime2/qiime2:2026.7
 
 LABEL org.opencontainers.image.source="https://github.com"
 
-# 1. Update/Install ONLY the missing additions directly within the active QIIME environment
-RUN conda run -n qiime2-core conda install -y -c conda-forge pyzstd==0.19.1 && \
-    conda run -n qiime2-core pip install biopython==1.88
+# Update/Install ONLY the missing additions within the active container context
+# vsearch, hmmer, and pytest are skipped because the base image already includes them
+RUN conda install -y -c conda-forge pyzstd==0.19.1 && \
+    pip install biopython==1.88
 
-# Copy your local repository files cleanly into the working directory
+# Copy your local, pushed repository files cleanly into the working directory
 WORKDIR /app
 COPY . /app
 
-# 2. Upgrade build tools inside the QIIME environment
-RUN conda run -n qiime2-core pip install --upgrade pip setuptools wheel setuptools_scm
+# Ensure build dependencies are ready and install itsxpress without build isolation
+# This prevents setuptools_scm from failing due to missing build isolation requirements
+RUN pip install --upgrade pip setuptools wheel setuptools_scm && \
+    pip install --no-build-isolation .
 
-# 3. Install itsxpress without build isolation to prevent setuptools_scm lookup failures
-RUN conda run -n qiime2-core pip install --no-build-isolation .
-
-# 4. Pre-refresh the plugin cache inside the target environment
-RUN conda run -n qiime2-core qiime dev refresh-cache
+# Pre-refresh the plugin cache so the itsxpress plugin is instantly available to users
+RUN qiime dev refresh-cache
 
 # Set the default command to run itsxpress standalone CLI
 CMD ["itsxpress"]
