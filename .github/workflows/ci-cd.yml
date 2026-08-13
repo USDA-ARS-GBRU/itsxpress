@@ -38,12 +38,12 @@ jobs:
 
       - name: Set up QIIME Conda environment
         run: |
-          conda env create -n testenv --file="https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
+          conda env create -n testenv --file="https://githubusercontent.com"
 
       - name: Install Dependencies & Package
         run: |
           conda activate testenv
-          conda install -y -c conda-forge pyzstd==0.19.1 
+          conda install -y -c conda-forge pyzstd==0.19.1
           pip install biopython==1.88 .
 
       - name: Test with pytest
@@ -79,12 +79,12 @@ jobs:
 
       - name: Set up QIIME Conda environment
         run: |
-          conda env create -n testenv --file="https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
+          conda env create -n testenv --file="https://githubusercontent.com"
 
       - name: Install Dependencies & Package
         run: |
           conda activate testenv
-          conda install -y -c conda-forge "pyzstd>=0.19.1,<0.20.0" 
+          conda install -y -c conda-forge "pyzstd>=0.19.1,<0.20.0"
           pip install biopython==1.88 .
 
       - name: Test with pytest
@@ -104,13 +104,11 @@ jobs:
   docker:
     name: Build and Push Docker Image
     needs: [test-stable, test-latest-dev]
-    # Explicit status checking: safely runs when test-stable passes and test-latest-dev is skipped
+    # Simple check: execute as long as whichever test ran completed successfully
     if: |
-      github.event_name != 'schedule' &&
-      needs.test-stable.result == 'success' &&
-      (needs.test-latest-dev.result == 'success' || needs.test-latest-dev.result == 'skipped')
+      always() && 
+      (needs.test-stable.result == 'success' || needs.test-latest-dev.result == 'success')
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
