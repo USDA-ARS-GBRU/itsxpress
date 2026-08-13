@@ -34,6 +34,10 @@ repository = "http://github.com"
 tests = [
     "pytest"
 ]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=2.0.0"
+]
 
 [tool.setuptools_scm]
 version_file = "itsxpress/_version.py"
