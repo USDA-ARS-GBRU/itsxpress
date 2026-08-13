@@ -19,7 +19,7 @@ ITSxpress: Software to rapidly trim  the internal transcribed spacer (ITS) regio
    :alt: GitHub release (latest by date)
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1304348.svg
-  :target: https://doi.org/10.5281/zenodo.1304348
+   :target: https://doi.org/10.5281/zenodo.1304348
 
 Authors
 -------
