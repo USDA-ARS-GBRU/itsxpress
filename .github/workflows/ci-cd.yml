@@ -5,65 +5,73 @@ on:
   release:
     types: [published]
   schedule:
-    - cron: "0 0 1 * *"
+    - cron: "17 14 * * 0" # Runs on Sunday at 14:17 UTC
   push:
     branches:
       - main
 
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
 jobs:
-  test:
-    name: Run Integration Tests
+  # =========================================================================
+  # JOB 1: Test against stable release (OPTIMIZED: Runs inside base image)
+  # =========================================================================
+  test-stable:
+    name: Run Stable Integration Tests (2026.7)
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    # Speed Fix: Native container runner bypasses Conda env creation entirely
+    container:
+      image: quay.io/qiime2/qiime2:2026.7
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies & Package
+        run: |
+          conda install -y -c conda-forge pyzstd==0.19.1
+          python -m pip install biopython==1.88 .
+
+      - name: Test with pytest
+        run: pytest
+
+      - name: Test QIIME Plugin Integration
+        run: |
+          qiime dev refresh-cache
+          itsxpress --help
+
+  # =========================================================================
+  # JOB 2: Test against bleeding edge (Runs ONLY on weekly cron schedule)
+  # =========================================================================
+  test-latest-dev:
+    name: Run Weekly Dev Integration Tests (Latest)
+    if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -el {0}
-    strategy:
-      fail-fast: false
-      matrix:
-        environment: [release_2026_7, latest_dev]
-        include:
-          - environment: release_2026_7
-            env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
-          - environment: latest_dev
-            env_url: "https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
-
     steps:
-      - name: Check trigger event compatibility
-        run: |
-          if [[ "${{ github.event_name }}" == "schedule" && "${{ matrix.environment }}" != "latest_dev" ]]; then
-            echo "Skipping stable release test for scheduled monthly build."
-            exit 0
-          elif [[ "${{ github.event_name }}" != "schedule" && "${{ matrix.environment }}" != "release_2026_7" ]]; then
-            echo "Skipping dev test for push/release/workflow_dispatch build."
-            exit 0
-          fi
-
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-
-      - name: Initiate Conda Channels
+      - name: Initiate Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          channels: conda-forge,bioconda,default
+          channels: conda-forge,bioconda,defaults
           auto-activate-base: true
-
-      - name: Initialize Conda
-        run: conda info
 
       - name: Set up QIIME Conda environment
         run: |
-          conda env create -n testenv --file=${{ matrix.env_url }}
+          conda env create -n testenv --file="https://githubusercontent.com"
 
-      - name: Install Dependencies
+      - name: Install Dependencies & Package
         run: |
           conda activate testenv
-          conda install -y biopython=1.84 pip pyzstd pytest
-          pip install .
+          conda install -y -c conda-forge "pyzstd>=0.19.1,<0.20.0"
+          pip install biopython==1.88 .
 
       - name: Test with pytest
         run: |
@@ -76,15 +84,16 @@ jobs:
           qiime dev refresh-cache
           qiime itsxpress --help
 
+  # =========================================================================
+  # JOB 3: Build, Publish, and Cryptographically Sign the Docker Image
+  # =========================================================================
   docker:
     name: Build and Push Docker Image
-    needs: test
+    needs: [test-stable, test-latest-dev]
+    if: |
+      always() && 
+      (needs.test-stable.result == 'success' || needs.test-latest-dev.result == 'success')
     runs-on: ubuntu-latest
-
-    if: >
-      github.ref == 'refs/heads/main'
-      || startsWith(github.ref, 'refs/tags/')
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -95,7 +104,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Github Container Registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -114,13 +123,21 @@ jobs:
           fi
 
       - name: Build and push itsxpress image with caching
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./docker-images/Dockerfile
           push: true
+          build-args: |
+            DOCKER_IMAGE_VERSION=${{ env.IMAGE_TAG }}
           tags: |
             ghcr.io/usda-ars-gbru/itsxpress:${{ env.IMAGE_TAG }}
             ghcr.io/usda-ars-gbru/itsxpress:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Keyless sign container image
+        run: cosign sign --yes ghcr.io/usda-ars-gbru/itsxpress:${{ env.IMAGE_TAG }}
