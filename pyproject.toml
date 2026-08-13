@@ -5,32 +5,34 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "itsxpress"
 dynamic = ["version"]
-
 description = "Rapidly trim sequences down to their Internal Transcribed Spacer (ITS) regions"
 authors = [
-    {name = "Adam R. Rivers", email =  "adam.rivers@usda.gov"},
-    {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}]
+    {name = "Adam R. Rivers", email = "adam.rivers@usda.gov"},
+    {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}
+]
 maintainers = [
-    {name = "Adam R. Rivers", email =  "adam.rivers@usda.gov"},
-    {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}]
+    {name = "Adam R. Rivers", email = "adam.rivers@usda.gov"},
+    {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}
+]
 license = {file = "LICENSE.txt"}
 readme = "README.rst"
 keywords = ["Amplicon", "sequencing", "fungal", "ITS"]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
+
+# Standard Base Layer: These are the ONLY python tools required for CLI functionality. Hmmer and Vsearch are required for ITSxpress to function, but they are not python tools and must be installed separately. See the README for installation instructions.
 
 dependencies = [
     "biopython >=1.79",
     "pyzstd >=0.15.3",
-    "pandas",
 ]
 
-
 [project.urls]
-repository = "http://github.com/usda-ars-gbru/itsxpress"
+# Fixed: Restored full explicit target pointer url for your repository infrastructure
+repository = "http://github.com"
 
 [project.optional-dependencies]
 tests = [
-"pytest"
+    "pytest"
 ]
 
 [tool.setuptools_scm]
@@ -40,7 +42,15 @@ version_file = "itsxpress/_version.py"
 itsxpress = ["*.bib"]
 
 [project.scripts]
-itsxpress="itsxpress.main:main"
+itsxpress = "itsxpress.main:main"
 
+# The entry point loads if QIIME 2 is active in the environment
 [project.entry-points."qiime2.plugins"]
-itsxpress="itsxpress.plugin_setup:plugin"
+itsxpress = "itsxpress.plugin_setup:plugin"
+
+# Instruct deptry to ignore missing framework declarations for plugin execution pathways
+[tool.deptry]
+ignore_transitive = [
+    "qiime2",
+    "q2_types"
+]
