@@ -17,46 +17,31 @@ permissions:
 
 jobs:
   # =========================================================================
-  # JOB 1: Test against stable release (Runs on pushes, tags, manual triggers)
+  # JOB 1: Test against stable release (OPTIMIZED: Runs inside base image)
   # =========================================================================
   test-stable:
     name: Run Stable Integration Tests (2026.7)
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -el {0}
+    # Speed Fix: Native container runner bypasses Conda env creation entirely
+    container:
+      image: quay.io/qiime2/qiime2:2026.7
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Initiate Conda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          channels: conda-forge,bioconda,defaults
-          auto-activate-base: true
-
-      - name: Set up QIIME Conda environment
-        run: |
-          conda env create -n testenv --file="https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
-
-
       - name: Install Dependencies & Package
         run: |
-          conda activate testenv
           conda install -y -c conda-forge pyzstd==0.19.1
-          pip install biopython==1.88 .
+          python -m pip install biopython==1.88 .
 
       - name: Test with pytest
-        run: |
-          conda activate testenv
-          pytest
+        run: pytest
 
       - name: Test QIIME Plugin Integration
         run: |
-          conda activate testenv
           qiime dev refresh-cache
-          qiime itsxpress --help
+          itsxpress --help
 
   # =========================================================================
   # JOB 2: Test against bleeding edge (Runs ONLY on weekly cron schedule)
@@ -80,8 +65,7 @@ jobs:
 
       - name: Set up QIIME Conda environment
         run: |
-          conda env create -n testenv --file="https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
-
+          conda env create -n testenv --file="https://githubusercontent.com"
 
       - name: Install Dependencies & Package
         run: |
@@ -106,7 +90,6 @@ jobs:
   docker:
     name: Build and Push Docker Image
     needs: [test-stable, test-latest-dev]
-    # Simple check: execute as long as whichever test ran completed successfully
     if: |
       always() && 
       (needs.test-stable.result == 'success' || needs.test-latest-dev.result == 'success')
@@ -145,6 +128,8 @@ jobs:
           context: .
           file: ./docker-images/Dockerfile
           push: true
+          build-args: |
+            DOCKER_IMAGE_VERSION=${{ env.IMAGE_TAG }}
           tags: |
             ghcr.io/usda-ars-gbru/itsxpress:${{ env.IMAGE_TAG }}
             ghcr.io/usda-ars-gbru/itsxpress:latest
