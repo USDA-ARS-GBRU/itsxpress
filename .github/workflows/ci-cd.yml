@@ -30,25 +30,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Cache the download directory for Conda packages
-      - name: Cache Conda Packages
-        uses: actions/cache@v4
-        with:
-          path: ~/conda_pkgs_dir
-          # This key ties the cache strictly to this specific 2026.7 environment definition
-          key: ${{ runner.os }}-conda-stable-2026.7
-
       - name: Initiate Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge,bioconda,defaults
           auto-activate-base: true
-          # Instructs setup-miniconda to look at our cache path directory
-          use-only-tar-bz2: true 
 
       - name: Set up QIIME Conda environment
         run: |
-          conda env create -n testenv --file="https://githubusercontent.com"
+          conda env create -n testenv --file="https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml"
+
 
       - name: Install Dependencies & Package
         run: |
@@ -81,24 +72,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Cache the download directory for dev environments separately
-      - name: Cache Conda Dev Packages
-        uses: actions/cache@v4
-        with:
-          path: ~/conda_pkgs_dir
-          # Re-downloads automatically if the remote file layout changes downstream
-          key: ${{ runner.os }}-conda-dev-latest
-
       - name: Initiate Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
           channels: conda-forge,bioconda,defaults
           auto-activate-base: true
-          use-only-tar-bz2: true
 
       - name: Set up QIIME Conda environment
         run: |
-          conda env create -n testenv --file="https://githubusercontent.com"
+          conda env create -n testenv --file="https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/latest/passed/rachis-qiime2-linux-64-conda.yml"
+
 
       - name: Install Dependencies & Package
         run: |
@@ -123,6 +106,7 @@ jobs:
   docker:
     name: Build and Push Docker Image
     needs: [test-stable, test-latest-dev]
+    # Simple check: execute as long as whichever test ran completed successfully
     if: |
       always() && 
       (needs.test-stable.result == 'success' || needs.test-latest-dev.result == 'success')
