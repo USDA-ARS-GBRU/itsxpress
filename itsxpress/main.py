@@ -8,13 +8,16 @@ common practice to trim off the conserved (SSU, 5,8S or LSU) regions. Bengtsson-
 et al. (2013) published software the software package ITSx to do this.
 ITSxpress is a high-speed implementation of the methods in ITSx than also allows FASTQ
 files to be processed. Processing FASTQ files Which is essential for analyzing
-sequences using the newer exact Sequence Variant methods in Qiime2, Dada2, Deblur
+sequences using the newer Amplicon Sequence Variant (ASV) methods in QIIME 2, Dada2, Deblur
 and Unoise that are replacing OTU clustering.
+
 Process:
     * Merges and error corrects reads using Vsearch if reads are paired-end
+    * Orients PacBio reads using Vsearch --orient against the universal reference database.
+    * Dynamically creates a HMM database for the specified taxa and region at runtime.
     * Deduplicates reads using Vsearch to eliminate redundant hmm searches
     * Searches for conserved regions using the ITSx hmms, using HMMsearch:
-    * Parses everything in python returning (optionally gzipped) fastq files.
+    * Parses everything in Python returning (optionally gzipped or zstd compressed) FASTQ files.
 Reference:
     Johan Bengtsson-Palme, Vilmar Veldre, Martin Ryberg, Martin Hartmann, Sara Branco,
     Zheng Wang, Anna Godhe, Yann Bertrand, Pierre De Wit, Marisol Sanchez,
