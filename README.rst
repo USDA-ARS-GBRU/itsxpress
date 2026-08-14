@@ -71,7 +71,7 @@ QIIME2 is being used.
 
 
 
-Installing ITSxpress for use as a QIIME2 Plugin
+Installing ITSxpress for use as a QIIME2 plugin
 ----------------------------------------------------
 
 To install ITSxpress as a plugin for QIIME 2, first install QIIME 2 Amplicon Distribution as a separate Conda/Mamba environemnt using their instructions 
@@ -186,7 +186,7 @@ Usage
 ||                         || Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Oomycota,                     |
 ||                         || Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,                            |
 ||                         || Tracheophyta, Eustigmatophyceae, Parabasalia, All}.                               |
-||                         || Default Fungi.                                                                    |
+||                         || Default Fungi.  For QIIME single letter codes are used, see help menu for list.   |
 +--------------------------+------------------------------------------------------------------------------------+
 || --cluster_id            || The percent identity for clustering reads range [0.99-1.0],                       |
 ||                         || set to 1 for exact de-replication. Default 1.0.                                   |
@@ -207,17 +207,10 @@ Usage
 ||                         || and adapter ACTGGAGACTGGGTTAA) with uniform quality scores.                       |
 +--------------------------+------------------------------------------------------------------------------------+
 
-
-PacBio CCS Trimming (--trim-ccs)
---------------------------------
-
-When analyzing PacBio CCS reads, the `--trim-ccs` parameter is supported. This feature orients sequence reads against a universal reference database and stitches synthetic dummy primers (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) with uniform Phred quality scores of 93 (`~`) onto the trimmed reads to satisfy downstream DADA2 requirements.
-At completion, ITSxpress provides a log message displaying the correct `qiime dada2 denoise-ccs` arguments for denoising.
-
 QIIME2 plugin Examples
 -----------------------
 
-Example 1: Trimming Fungal Paired-End Illumina Reads (Outputting Unmerged Reads)
+Example 1: trimming fungal paired-end Illumina reads (outputting unmerged reads)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When processing Illumina  paired-end fungal data intended for downstream analysis with DADA2, you must maintain separate forward and reverse read structures. The ``trim-pair-output-unmerged`` 
@@ -239,7 +232,7 @@ command trims the ITS region from both reads but keeps them unmerged.
 * ``--p-taxa F``: Restricts HMM searching to Fungi (selected by default).
 * ``--o-trimmed``: Generates an output artifact of type ``SampleData[PairedEndSequencesWithQuality]``.
 
-Example 2: Trimming Fungal Single-End Reads
+Example 2: trimming fungal single-end reads
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your dataset consists of single-end reads use the ``trim-single`` command. 
@@ -260,15 +253,15 @@ Using this for merged paired reads is not recommended by DADA2. It uses the info
 * ``--i-per-sample-sequences``: Accepts a ``SampleData[SequencesWithQuality]`` artifact containing single-end data.
 * ``--p-region ITS2``: Targets the ITS2 sub-region.
 
-Example 3: Trimming PacBio CCS Long Reads (Single-End)
+Example 3: trimming PacBio CCS long reads (single-end)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\
+
 PacBio Circular Consensus Sequencing (CCS) generates long, high-fidelity reads that can span the 
 entire ITS region (ITS1, 5.8S, and ITS2). To handle these long reads correctly, you must pass the ``--p-trim-ccs`` flag to the ``trim-single`` command.
-This feature orients sequence reads against a universal reference database and stitches synthetic 
-dummy primers (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) 
-with uniform Phred quality scores of 93 (`~`) onto the trimmed reads to satisfy downstream DADA2 requirements.
+This feature orients input sequence reads against a universal reference database with Vsearch. It outputs trimmed reads with synthetic 
+dummy primers on the ends (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) 
+with uniform Phred quality scores of 93 (`~`) to satisfy downstream QIMME2 DADA2  plugin requirements.
 At completion, ITSxpress provides a log message displaying the example `qiime dada2 denoise-ccs` arguments for denoising.
 
 
