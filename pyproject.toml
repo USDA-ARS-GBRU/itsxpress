@@ -7,28 +7,30 @@ name = "itsxpress"
 dynamic = ["version"]
 description = "Rapidly trim sequences down to their Internal Transcribed Spacer (ITS) regions"
 authors = [
-    {name = "Adam R. Rivers", email = "adam.rivers@usda.gov"},
-    {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}
+  {name = "Adam R. Rivers", email = "adam.rivers@usda.gov"},
+  {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}
 ]
 maintainers = [
-    {name = "Adam R. Rivers", email = "adam.rivers@usda.gov"},
-    {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}
+  {name = "Adam R. Rivers", email = "adam.rivers@usda.gov"},
+  {name = "Sveinn V. Einarsson", email = "seinarsson@ufl.edu"}
 ]
-license = {file = "LICENSE.txt"}
+# Modern PEP 639 standard formatting for license declarations
+license = "CC0-1.0"
+license-files = ["LICENSE.txt"]
 readme = "README.rst"
 keywords = ["Amplicon", "sequencing", "fungal", "ITS"]
 requires-python = ">=3.8"
 
-# Standard Base Layer: These are the ONLY python tools required for CLI functionality. Hmmer and Vsearch are required for ITSxpress to function, but they are not python tools and must be installed separately. See the README for installation instructions.
-
+# Standard Base Layer: These are the ONLY python tools required for CLI functionality. 
+# Hmmer and Vsearch are required for ITSxpress to function, but they are not python tools and must be installed separately. 
+# See the README for installation instructions.
 dependencies = [
-    "biopython >=1.79",
-    "pyzstd >=0.15.3",
+  "biopython >=1.79",
+  "pyzstd >=0.15.3",
 ]
 
 [project.urls]
-# Fixed: Restored full explicit target pointer url for your repository infrastructure
-repository = "http://github.com"
+repository = "https://github.com"
 
 [project.optional-dependencies]
 tests = [
@@ -39,11 +41,15 @@ docs = [
     "sphinx-rtd-theme>=2.0.0"
 ]
 
-[tool.setuptools_scm]
-version_file = "itsxpress/_version.py"
+# Explicitly declare package tracking to bypass 'recipes' flat-layout detection issues
+[tool.setuptools]
+packages = ["itsxpress"]
 
 [tool.setuptools.package-data]
 itsxpress = ["*.bib"]
+
+[tool.setuptools_scm]
+version_file = "itsxpress/_version.py"
 
 [project.scripts]
 itsxpress = "itsxpress.main:main"
@@ -55,6 +61,6 @@ itsxpress = "itsxpress.plugin_setup:plugin"
 # Instruct deptry to ignore missing framework declarations for plugin execution pathways
 [tool.deptry]
 ignore_transitive = [
-    "qiime2",
-    "q2_types"
+  "qiime2",
+  "q2_types"
 ]
