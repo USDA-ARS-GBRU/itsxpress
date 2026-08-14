@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """ITSxpress: A python module to rapidly trim ITS amplicon sequences from FASTQ files.
 
-Authors: Adam Rivers, Kyle weber, USDA Agricultural Research Service
 The internally transcribed spacer region is a region between the highly conserved small
 subunit (SSU) of rRNA and the large subunit (LSU) of the rRNA. The eukaryotic ITS contains
 the 5.8s gene and two variable length spacer regions. In amplicon sequencing studies it is
