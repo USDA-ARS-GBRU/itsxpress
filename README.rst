@@ -154,58 +154,58 @@ Usage
 ------
 
 
-+-------------------------+---------------------------------------------------------------+
-| Option                  | Description                                                   |
-+=========================+===============================================================+
-| -h, --help              | Show this help message and exit.                              |
-+-------------------------+---------------------------------------------------------------+
-| --fastq                 | A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file.      |
-|                         | Required.                                                     |
-+-------------------------+---------------------------------------------------------------+
-| --single_end            | A flag to specify that the fastq file is single-ended (not    |
-|                         | paired). Default is false.                                    |
-+-------------------------+---------------------------------------------------------------+
-| --fastq2                | A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file       |
-|                         | representing read 2 if present, optional.                     |
-+-------------------------+---------------------------------------------------------------+
-| --outfile               | The trimmed FASTQ file, if it ends in ``gz`` it will be       |
-|                         | gzipped.                                                      |
-+-------------------------+---------------------------------------------------------------+
-| --outfile2              | The trimmed FASTQ read 2 file, if it ends in ``gz`` it will   |
-|                         | be gzipped. If used, reads will be retuned as unmerged pairs  |
-|                         | rather than than merged.                                      |
-+-------------------------+---------------------------------------------------------------+
-| --tempdir               | Specify the temp file directory. Default is None.             |
-+-------------------------+---------------------------------------------------------------+
-| --keeptemp              | Should intermediate files be kept? Default is false.          |
-+-------------------------+---------------------------------------------------------------+
-| --region                | Options : {ITS2, ITS1, ALL}                                   |
-+-------------------------+---------------------------------------------------------------+
-| --taxa                  | Select the taxonomic group sequenced: {Alveolata, Bryophyta,  |
-|                         | Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,   |
-|                         | Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Oomycota, |
-|                         | Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,        |
-|                         | Tracheophyta, Eustigmatophyceae, Parabasalia, All}.           |
-|                         | Default Fungi.                                                |
-+-------------------------+---------------------------------------------------------------+
-| --cluster_id            | The percent identity for clustering reads range [0.99-1.0],   |
-|                         | set to 1 for exact de-replication. Default 1.0.               |
-+-------------------------+---------------------------------------------------------------+
-| --log                   | Log file. Default is ITSxpress.log.                           |
-+-------------------------+---------------------------------------------------------------+
-| --threads               | Number of processor threads to use. Default is 1.             |
-+-------------------------+---------------------------------------------------------------+
-| --reversed_primers      | Primers are in reverse orientation as in Taylor et al. 2016,  |
-|                         | DOI:10.1128/AEM.02576-16. If selected ITSxpress returns       |
-|                         | trimmed reads flipped to the forward orientation              |
-+-------------------------+---------------------------------------------------------------+
-| --allow_staggered_reads | Allow merging staggered reads with --fastq_allowmergestagger  |
-|                         | for Vsearch --fastq_mergepairs. See Vsearch documentation.    |
-|                         | (Optional) Default is true.                                   |
-+-------------------------+---------------------------------------------------------------+
-| --trim-ccs              | PacBio CCS reads mode. Stitch fake primers (GACAGGTACAAGAAGGA |
-|                         | and adapter ACTGGAGACTGGGTTAA) with uniform quality scores.   |
-+-------------------------+---------------------------------------------------------------+
++--------------------------+------------------------------------------------------------------------------------+
+| Option                   | Description                                                                        |
++==========================+====================================================================================+
+| -h, --help               | Show this help message and exit.                                                   |
++--------------------------+------------------------------------------------------------------------------------+
+|| --fastq                 || A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file.                          |
+||                         || Required.                                                                         |
++--------------------------+------------------------------------------------------------------------------------+
+|| --single_end            || A flag to specify that the fastq file is single-ended (not                        |
+||                         || paired). Default is false.                                                        |
++--------------------------+------------------------------------------------------------------------------------+
+|| --fastq2                || A ``.fastq``, ``.fq``, ``.fastq.gz`` or ``.fq.gz`` file                           |
+||                         || representing read 2 if present, optional.                                         |
++--------------------------+------------------------------------------------------------------------------------+
+|| --outfile               || The trimmed FASTQ file, if it ends in ``gz`` it will be                           |
+||                         || gzipped.                                                                          |
++--------------------------+------------------------------------------------------------------------------------+
+|| --outfile2              || The trimmed FASTQ read 2 file, if it ends in ``gz`` it will                       |
+||                         || be gzipped. If used, reads will be retuned as unmerged pairs                      |
+||                         || rather than than merged.                                                          |
++--------------------------+------------------------------------------------------------------------------------+
+| --tempdir                | Specify the temp file directory. Default is None.                                  |
++--------------------------+------------------------------------------------------------------------------------+
+| --keeptemp               | Should intermediate files be kept? Default is false.                               |
++--------------------------+------------------------------------------------------------------------------------+
+| --region                 | Options : {ITS2, ITS1, ALL}                                                        |
++--------------------------+------------------------------------------------------------------------------------+
+|| --taxa                  || Select the taxonomic group sequenced: {Alveolata, Bryophyta,                      |
+||                         || Bacillariophyta, Amoebozoa, Euglenozoa, Fungi, Chlorophyta,                       |
+||                         || Rhodophyta, Phaeophyceae, Marchantiophyta, Metazoa, Oomycota,                     |
+||                         || Haptophyceae, Raphidophyceae, Rhizaria, Synurophyceae,                            |
+||                         || Tracheophyta, Eustigmatophyceae, Parabasalia, All}.                               |
+||                         || Default Fungi.                                                                    |
++--------------------------+------------------------------------------------------------------------------------+
+|| --cluster_id            || The percent identity for clustering reads range [0.99-1.0],                       |
+||                         || set to 1 for exact de-replication. Default 1.0.                                   |
++--------------------------+------------------------------------------------------------------------------------+
+| --log                    | Log file. Default is ITSxpress.log.                                                |
++--------------------------+------------------------------------------------------------------------------------+
+| --threads                | Number of processor threads to use. Default is 1. There is not much benefit over 4.|
++--------------------------+------------------------------------------------------------------------------------+
+|| --reversed_primers      || Primers are in reverse orientation as in Taylor et al. 2016,                      |
+||                         || DOI:10.1128/AEM.02576-16. If selected ITSxpress returns                           |
+||                         || trimmed reads flipped to the forward orientation                                  |
++--------------------------+------------------------------------------------------------------------------------+
+|| --allow_staggered_reads || Allow merging staggered reads with --fastq_allowmergestagger                      |
+||                         || for Vsearch --fastq_mergepairs. See Vsearch documentation.                        |
+||                         || (Optional) Default is true.                                                       |
++--------------------------+------------------------------------------------------------------------------------+
+|| --trim-ccs              || PacBio CCS reads mode. Stitch fake primers (GACAGGTACAAGAAGGA                     |
+||                         || and adapter ACTGGAGACTGGGTTAA) with uniform quality scores.                       |
++--------------------------+------------------------------------------------------------------------------------+
 
 
 PacBio CCS Trimming (--trim-ccs)
@@ -214,9 +214,83 @@ PacBio CCS Trimming (--trim-ccs)
 When analyzing PacBio CCS reads, the `--trim-ccs` parameter is supported. This feature orients sequence reads against a universal reference database and stitches synthetic dummy primers (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) with uniform Phred quality scores of 93 (`~`) onto the trimmed reads to satisfy downstream DADA2 requirements.
 At completion, ITSxpress provides a log message displaying the correct `qiime dada2 denoise-ccs` arguments for denoising.
 
+QIIME2 plugin Examples
+-----------------------
 
-Examples
----------
+Example 1: Trimming Fungal Paired-End Illumina Reads (Outputting Unmerged Reads)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When processing Illumina  paired-end fungal data intended for downstream analysis with DADA2, you must maintain separate forward and reverse read structures. The ``trim-pair-output-unmerged`` 
+command trims the ITS region from both reads but keeps them unmerged.
+
+.. code-block:: bash
+
+   qiime itsxpress trim-pair-output-unmerged \
+     --i-per-sample-sequences paired-end-demux.qza \
+     --p-region ITS1 \
+     --p-taxa F \
+     --p-threads 4 \
+     --o-trimmed trimmed-paired-unmerged.qza \
+     --verbose
+
+**Key Parameters:**
+
+* ``--p-region ITS1``: Targets the ITS1 sub-region specifically.
+* ``--p-taxa F``: Restricts HMM searching to Fungi (selected by default).
+* ``--o-trimmed``: Generates an output artifact of type ``SampleData[PairedEndSequencesWithQuality]``.
+
+Example 2: Trimming Fungal Single-End Reads
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If your dataset consists of single-end reads use the ``trim-single`` command. 
+Using this for merged paired reads is not recommended by DADA2. It uses the information from both reads in its error modeling.
+
+.. code-block:: bash
+
+   qiime itsxpress trim-single \
+     --i-per-sample-sequences single-end-demux.qza \
+     --p-region ITS2 \
+     --p-taxa F \
+     --p-threads 4 \
+     --o-trimmed trimmed-single.qza \
+     --verbose
+
+**Key Parameters:**
+
+* ``--i-per-sample-sequences``: Accepts a ``SampleData[SequencesWithQuality]`` artifact containing single-end data.
+* ``--p-region ITS2``: Targets the ITS2 sub-region.
+
+Example 3: Trimming PacBio CCS Long Reads (Single-End)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\
+PacBio Circular Consensus Sequencing (CCS) generates long, high-fidelity reads that can span the 
+entire ITS region (ITS1, 5.8S, and ITS2). To handle these long reads correctly, you must pass the ``--p-trim-ccs`` flag to the ``trim-single`` command.
+This feature orients sequence reads against a universal reference database and stitches synthetic 
+dummy primers (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) 
+with uniform Phred quality scores of 93 (`~`) onto the trimmed reads to satisfy downstream DADA2 requirements.
+At completion, ITSxpress provides a log message displaying the example `qiime dada2 denoise-ccs` arguments for denoising.
+
+
+.. code-block:: bash
+
+   qiime itsxpress trim-single \
+     --i-per-sample-sequences pacbio-ccs-demux.qza \
+     --p-region ALL \
+     --p-taxa F \
+     --p-trim-ccs \
+     --p-threads 4 \
+     --o-trimmed trimmed-pacbio-ccs.qza \
+     --verbose
+
+**Key Parameters:**
+
+* ``--p-region ALL``: Instructs the plugin to extract the full ITS composite sequence (ITS1 + 5.8S + ITS2).
+* ``--p-trim-ccs``: Explicitly enables the specialized trimming mode optimized for PacBio CCS reads.
+
+
+Stand Alone Command Line Examples
+---------------------------------
 
 Use case 1: Trimming the ITS2 region from a fungal amplicon sequencing dataset with
 forward and reverse gzipped FASTQ files using two cpu threads. Return a single merged file for use in Deblur.
