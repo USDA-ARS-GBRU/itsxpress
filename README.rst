@@ -84,7 +84,7 @@ For Linux:
       --name rachis-qiime2-2026.7 \
       --file https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-linux-64-conda.yml
     conda activate rachis-qiime2-2026.7
-    conda install -c bioconda -c conda-forge ITSxpress
+    conda install -c bioconda -c conda-forge itsxpress
     qiime dev refresh-cache
 
 For maxOS (Intel) and OS X:
@@ -95,18 +95,19 @@ For maxOS (Intel) and OS X:
         --name rachis-qiime2-2026.7 \
         --file https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-osx-64-conda.yml
     conda activate rachis-qiime2-2026.7
-    conda install -c bioconda -c conda-forge ITSxpress
+    conda install -c bioconda -c conda-forge itsxpress
     qiime dev refresh-cache
 
 For macOS (Arm / Apple Silicon):
 
 .. code-block:: bash
+    
     CONDA_SUBDIR=osx-64 conda env create \
      --name rachis-qiime2-2026.7 \
      --file https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-osx-64-conda.yml
     conda activate rachis-qiime2-2026.7
     conda config --env --set subdir osx-64
-    CONDA_SUBDIR=osx-64 conda install -c bioconda -c conda-forge ITSxpress
+    CONDA_SUBDIR=osx-64 conda install -c bioconda -c conda-forge itsxpress
     qiime dev refresh-cache
 
 
