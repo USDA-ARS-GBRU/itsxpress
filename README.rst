@@ -23,8 +23,11 @@ ITSxpress: Software to rapidly trim  the internal transcribed spacer (ITS) regio
 
 Authors
 -------
+
 * Adam R. Rivers, US Department of Agriculture, Agricultural Research Service, Gainesville, FL, USA
 * Sveinn V. Einarsson, Queens University, Charlotte, NC, USA
+
+
 Citations
 ---------
 
@@ -63,7 +66,7 @@ the command line version of ITSxpress. The installation method will be slightly 
 QIIME2 is being used.
 
 .. _`Bengtsson-Palme et al. (2013)`: https://doi.org/10.1111/2041-210X.12073
-.. _ITSx: http://microbiology.se/software/itsx/
+.. _ITSx: https://microbiology.se/software/itsx/
 .. _OTUs: https://doi.org/10.1038/ismej.2017.119
 
 
@@ -101,7 +104,7 @@ For maxOS (Intel) and OS X:
 For macOS (Arm / Apple Silicon):
 
 .. code-block:: bash
-    
+
     CONDA_SUBDIR=osx-64 conda env create \
      --name rachis-qiime2-2026.7 \
      --file https://raw.githubusercontent.com/qiime2/distributions/refs/heads/dev/2026.7/qiime2/released/rachis-qiime2-osx-64-conda.yml
@@ -142,12 +145,13 @@ Running ITSxpress as a Docker container
 
 Dependencies
 -------------
+
 The software requires Vsearch, Hmmer and Biopython. Bioconda
 takes care of this for you so it is the preferred installation method.
 
 
 Usage
----------
+------
 
 
 +-------------------------+---------------------------------------------------------------+
@@ -204,15 +208,9 @@ Usage
 +-------------------------+---------------------------------------------------------------+
 
 
-
 PacBio CCS Trimming (--trim-ccs)
 --------------------------------
-When analyzing PacBio CCS reads, the `--trim-ccs` parameter is supported. This feature orients sequence reads against a universal reference database and stitches synthetic dummy primers (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) with uniform Phred quality scores of 93 (`~`) onto the trimmed reads to satisfy downstream DADA2 requirements.
-At completion, ITSxpress provides a log message displaying the correct `qiime dada2 denoise-ccs` arguments for denoising.
 
-
-PacBio CCS Trimming (--trim-ccs)
---------------------------------
 When analyzing PacBio CCS reads, the `--trim-ccs` parameter is supported. This feature orients sequence reads against a universal reference database and stitches synthetic dummy primers (forward: `GACAGGTACAAGAAGGA`, reverse complement of reverse: `ACTGGAGACTGGGTTAA`) with uniform Phred quality scores of 93 (`~`) onto the trimmed reads to satisfy downstream DADA2 requirements.
 At completion, ITSxpress provides a log message displaying the correct `qiime dada2 denoise-ccs` arguments for denoising.
 
@@ -262,13 +260,19 @@ ITS HMM Models
 The HMM models for identifying ITS regions were built by Henrik Nilsson at the University of Gothenburg. 
 Originally, they were built for the ITSx software package; Dr. Nilsson has continued to update the models, but not on the same schedule as ITSx. 
 To provide clarity about the reference data used, I have created a separate, versioned repository for the 
-ITS sequence models: `its-hmm-models on GitHub <https://github.com/USDA-ARS-GBRU/ITS_HMMs>`_ and assigned it a `DOI <https://doi.org/10.5281/zenodo.13285214>`_. 
+ITS sequence models: `ITS_HMMs on GitHub <https://github.com/USDA-ARS-GBRU/ITS_HMMs>`_ and assigned it a `DOI <https://doi.org/10.5281/zenodo.13285214>`_. 
 
 ITSXpress currently uses ITS_HMMS version 2.0.0.
 
 
+API Documentation
+-----------------
+
+The API documentation is available at https://itsxpress.readthedocs.io
+
 License information
 --------------------
+
 This software is a work of the United States Department of Agriculture, Agricultural Research Service.
 Under 17 U.S. Code § 105 the work is not copyrightable.  It is released under a Creative Commons CC0
 public domain attribution.
